@@ -1,0 +1,17 @@
+{
+  "id": "/",
+  "name": "SiGuru - SMP Negeri 6 Keritang",
+  "short_name": "SiGuru",
+  "description": "Asisten kerja guru: soal, modul ajar, LKPD, presentasi, absensi, nilai, jadwal, sertifikat",
+  "start_url": "./?p=beranda",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#2A2C84",
+  "lang": "id",
+  "icons": [
+    {"src": "aset/ikon2-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "aset/ikon2-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "aset/ikon2-512-mask.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
