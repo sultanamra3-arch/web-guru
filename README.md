@@ -19,6 +19,17 @@ Aplikasi web (bisa dipasang di HP) untuk guru:
 - Tabel SiGuru berawalan `guru_` di database yang sama; dibuat otomatis saat pertama dibuka. Tabel SLiMS tidak diubah.
 - AI gratis (Gemini, Groq, OpenRouter) memakai kunci yang sama dengan SiPustaka; **kunci tidak disimpan di GitHub**.
 
+## Coba dulu (sebelum dipasang)
+
+- **Pratinjau** (lihat tampilan, data contoh, tidak bisa menyimpan, AI nonaktif):
+  https://sultanamra3-arch.github.io/web-guru/
+- **Versi lengkap di Codespaces** (semua fitur jalan, data contoh, gratis ±60 jam/bulan):
+  [![Buka di GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/sultanamra3-arch/web-guru?quickstart=1)
+  Tunggu persiapan, buka tab **PORTS** → **SiGuru (8080)** → 🌐, lalu masuk **admin / admin123**.
+  Petunjuk: `.devcontainer/BACA-SAYA.md`. Matikan Codespace setelah selesai.
+
+Semua nama siswa di data contoh adalah fiktif.
+
 ## Pasang di hosting (cPanel) dari GitHub
 
 1. **Tarik kode dari GitHub dulu**: cPanel → **Git™ Version Control** → *Create*
@@ -48,3 +59,8 @@ aset/            CSS, JS, logo, pptxgenjs (MIT)
 data/            berkas server (tidak masuk Git)
 ```
 Pustaka pihak ketiga: Parsedown 1.7.4 (MIT), PptxGenJS 3.12.0 (MIT).
+
+## Memperbarui pratinjau (pengembang)
+
+Jalankan SiGuru dengan database contoh di `http://127.0.0.1:8092/`, lalu
+`python3 .github/pratinjau/ekspor.py <folder-keluaran> <folder-siguru>` dan unggah hasilnya ke cabang `gh-pages`.

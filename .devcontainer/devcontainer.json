@@ -1,0 +1,13 @@
+{
+  "name": "SiGuru (uji coba)",
+  "image": "mcr.microsoft.com/devcontainers/php:1-8.2-bookworm",
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": { "label": "SiGuru", "onAutoForward": "openPreview" }
+  },
+  "postCreateCommand": "bash .devcontainer/siapkan.sh",
+  "postStartCommand": "bash .devcontainer/jalankan.sh",
+  "customizations": {
+    "codespaces": { "openFiles": [".devcontainer/BACA-SAYA.md"] }
+  }
+}
