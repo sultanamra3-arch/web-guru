@@ -1,0 +1,59 @@
+<html><head><meta charset="utf-8"><style>body{font-family:"Times New Roman";font-size:12pt}table{border-collapse:collapse}td{vertical-align:top;padding:2px 6px}.soal-cetak{margin:6px 0}.no{float:left;width:28px}.badan{margin-left:28px}.ruang-jawab{height:90px}.kunci-cetak{color:#1d6b33}.bagian-soal{font-size:12pt;margin:14px 0 4px}</style></head><body><div class="lembar-soal">
+  <table class="kop-soal"><tr>
+        <td><b style="font-size:14pt">SMP Negeri 6 Keritang</b><br>Ulangan Harian<br>Tahun Ajaran 2026/2027</td>
+  </tr></table>
+  <table class="identitas-soal">
+    <tr><td>Mata pelajaran</td><td>: Informatika</td><td>Nama</td><td>: ..............................</td></tr>
+    <tr><td>Kelas</td><td>: VIII</td><td>No. absen</td><td>: ..........</td></tr>
+    <tr><td>Waktu</td><td>: 60 menit</td><td>Tanggal</td><td>: ..............................</td></tr>
+  </table>
+  <p><b>Petunjuk:</b></p><ol class="petunjuk"><li>Berdoalah sebelum mengerjakan. Kerjakan soal yang mudah terlebih dahulu.</li></ol>  <h3 class="bagian-soal">I. Pilihan Ganda</h3>    <div class="soal-cetak">
+      <div class="no">1.</div>
+      <div class="badan">Urutan langkah logis untuk menyelesaikan suatu masalah disebut ...        <table class="opsi-cetak"><tr><td>A.</td><td>Program</td></tr><tr><td>B.</td><td>Algoritma</td></tr><tr><td>C.</td><td>Data</td></tr><tr><td>D.</td><td>Variabel</td></tr></table>
+                      </div>
+    </div>
+      <div class="soal-cetak">
+      <div class="no">2.</div>
+      <div class="badan">Simbol flowchart berbentuk belah ketupat digunakan untuk ...        <table class="opsi-cetak"><tr><td>A.</td><td>Mulai/selesai</td></tr><tr><td>B.</td><td>Proses</td></tr><tr><td>C.</td><td>Percabangan/keputusan</td></tr><tr><td>D.</td><td>Input/output</td></tr></table>
+                      </div>
+    </div>
+      <div class="soal-cetak">
+      <div class="no">3.</div>
+      <div class="badan">Ibu menanak nasi: (1) cuci beras, (2) masukkan ke rice cooker, (3) tekan tombol masak, (4) takar beras. Urutan yang benar adalah ...        <table class="opsi-cetak"><tr><td>A.</td><td>1-2-3-4</td></tr><tr><td>B.</td><td>4-1-2-3</td></tr><tr><td>C.</td><td>4-2-1-3</td></tr><tr><td>D.</td><td>1-4-2-3</td></tr></table>
+                      </div>
+    </div>
+      <div class="soal-cetak">
+      <div class="no">4.</div>
+      <div class="badan">Memecah masalah besar menjadi bagian-bagian kecil disebut ...        <table class="opsi-cetak"><tr><td>A.</td><td>Abstraksi</td></tr><tr><td>B.</td><td>Pengenalan pola</td></tr><tr><td>C.</td><td>Dekomposisi</td></tr><tr><td>D.</td><td>Algoritma</td></tr></table>
+                      </div>
+    </div>
+      <div class="soal-cetak">
+      <div class="no">5.</div>
+      <div class="badan">Petani sawit di Keritang mencatat hasil panen tiap minggu dan melihat panen naik setiap musim hujan. Kegiatan ini termasuk ...        <table class="opsi-cetak"><tr><td>A.</td><td>Dekomposisi</td></tr><tr><td>B.</td><td>Pengenalan pola</td></tr><tr><td>C.</td><td>Abstraksi</td></tr><tr><td>D.</td><td>Debugging</td></tr></table>
+                      </div>
+    </div>
+      <div class="soal-cetak">
+      <div class="no">6.</div>
+      <div class="badan">Perangkat yang berfungsi memasukkan data ke komputer adalah ...        <table class="opsi-cetak"><tr><td>A.</td><td>Monitor</td></tr><tr><td>B.</td><td>Printer</td></tr><tr><td>C.</td><td>Keyboard</td></tr><tr><td>D.</td><td>Speaker</td></tr></table>
+                      </div>
+    </div>
+  <h3 class="bagian-soal">II. Benar atau Salah</h3>    <div class="soal-cetak">
+      <div class="no">7.</div>
+      <div class="badan">RAM menyimpan data secara permanen walaupun komputer dimatikan.                      </div>
+    </div>
+  <h3 class="bagian-soal">III. Isian Singkat</h3>    <div class="soal-cetak">
+      <div class="no">8.</div>
+      <div class="badan">Kesalahan dalam program disebut bug, sedangkan proses mencari dan memperbaikinya disebut ...        <div>Jawab: ........................................................</div>              </div>
+    </div>
+  <h3 class="bagian-soal">IV. Uraian</h3>    <div class="soal-cetak">
+      <div class="no">9.</div>
+      <div class="badan">Buatlah algoritma (minimal 6 langkah) untuk meminjam buku di perpustakaan sekolah!        <div class="ruang-jawab"></div>
+                      </div>
+    </div>
+  <h3 class="bagian-soal">I. Pilihan Ganda</h3>    <div class="soal-cetak">
+      <div class="no">10.</div>
+      <div class="badan">Temanmu membagikan berita yang belum jelas sumbernya di grup kelas. Sikap yang tepat adalah ...        <table class="opsi-cetak"><tr><td>A.</td><td>Ikut menyebarkan</td></tr><tr><td>B.</td><td>Mengecek kebenaran dari sumber terpercaya</td></tr><tr><td>C.</td><td>Mengabaikan dan menyebarkan ke grup lain</td></tr><tr><td>D.</td><td>Menghapus grup</td></tr></table>
+                      </div>
+    </div>
+  </div>
+</body></html>

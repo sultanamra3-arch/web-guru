@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script src="aset/pratinjau.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2A2C84">
+<meta name="robots" content="noindex, nofollow">
+<title>Cetak sertifikat · SiGuru</title>
+<meta name="application-name" content="SiGuru">
+<meta name="apple-mobile-web-app-title" content="SiGuru">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.0">
+<link rel="icon" href="aset/favicon.png">
+<link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="aset/gaya.css?v=1.0">
+<link rel="stylesheet" href="aset/guru.css?v=1.0">
+</head>
+<body class="polos">
+<main>
+<style>
+@page { size: A4 landscape; margin: 0; }
+body.polos { background: #e9ecf3; padding: 0; }
+.alat-cetak { position: sticky; top: 0; z-index: 5; display: flex; gap: .5rem; justify-content: center; padding: .6rem; background: #fff; border-bottom: 1px solid #ddd; }
+.lembar { width: 297mm; height: 210mm; margin: 12px auto; background: #fff; position: relative; overflow: hidden; page-break-after: always; box-shadow: 0 4px 20px rgba(0,0,0,.12);
+  --u: #2A2C84; --g: #1B1D5E; --e: #c9a227; font-family: 'Quicksand', sans-serif; color: #222; }
+.lembar:last-child { page-break-after: auto; }
+.bingkai { position: absolute; inset: 9mm; border: 2.2mm solid var(--u); outline: .8mm solid var(--e); outline-offset: -4.2mm; }
+.sudut { position: absolute; width: 46mm; height: 46mm; background: linear-gradient(135deg, var(--u) 0 50%, transparent 50%); }
+.sudut.a { top: 0; left: 0; } .sudut.b { top: 0; right: 0; transform: scaleX(-1); } .sudut.c { bottom: 0; left: 0; transform: scaleY(-1); } .sudut.d { bottom: 0; right: 0; transform: scale(-1); }
+.sudut::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 0 52%, var(--e) 52% 55%, transparent 55%); }
+.isi { position: absolute; inset: 20mm 26mm 18mm; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.isi img { width: 24mm; height: 24mm; object-fit: contain; }
+.sekolah { font-weight: 700; letter-spacing: .14em; color: var(--g); font-size: 11pt; margin-top: 2mm; text-transform: uppercase; }
+.judul { font-family: Georgia, 'Times New Roman', serif; font-size: 36pt; letter-spacing: .18em; color: var(--u); margin: 3mm 0 0; font-weight: 700; }
+.nomor { font-size: 10pt; color: #555; margin-bottom: 5mm; }
+.sebutan { font-size: 12pt; color: #444; }
+.nama { font-family: Georgia, 'Times New Roman', serif; font-size: 30pt; font-weight: 700; color: #111; margin: 3mm 0 1mm; padding: 0 10mm 1.5mm; border-bottom: .6mm solid var(--e); }
+.ket-orang { font-weight: 700; color: var(--g); font-size: 13pt; margin-top: 1mm; }
+.teks { font-size: 12.5pt; max-width: 210mm; margin-top: 4mm; line-height: 1.5; }
+.ttd { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-around; font-size: 11pt; }
+.ttd div { min-width: 70mm; }
+.ttd .garis { height: 20mm; }
+.ttd b { text-decoration: underline; }
+@media print { .alat-cetak { display: none; } body.polos { background: #fff; } .lembar { margin: 0; box-shadow: none; } }
+</style>
+<div class="alat-cetak">
+  <button class="utama" onclick="window.print()">🖨 Cetak / Simpan PDF</button>
+  <a class="tombol" href="sertifikat.html">‹ Kembali</a>
+  <span class="kecil redup" style="align-self:center">Pilih kertas A4 mendatar (landscape), margin "Tidak ada", centang "Grafik latar".</span>
+</div>
+<section class="lembar">
+  <div class="sudut a"></div><div class="sudut b"></div><div class="sudut c"></div><div class="sudut d"></div>
+  <div class="bingkai"></div>
+  <div class="isi">
+    <img src="aset/logo.png" alt="">
+    <div class="sekolah">SMP Negeri 6 Keritang</div>
+    <div class="judul">PIAGAM PENGHARGAAN</div>
+    <div class="nomor">Nomor: 001/SRT/XI/2026</div>    <div class="sebutan">Diberikan kepada</div>
+    <div class="nama">Rafi Saputra</div>
+    <div class="ket-orang">Juara 1 - Kelas VIII A</div>    <div class="teks">Atas prestasinya dalam Lomba Coding Antarkelas dalam rangka Hari Guru Nasional 2026.</div>
+    <div class="ttd">
+      <div><br>Kepala Sekolah<div class="garis"></div><b>Kepala Sekolah (contoh)</b><br></div>
+            <div>Keritang, 25 November 2026<br>Guru Informatika<div class="garis"></div><b>Budi Santoso, S.Pd.</b><br>NIP 198501012010011001</div>
+          </div>
+  </div>
+</section>
+<section class="lembar">
+  <div class="sudut a"></div><div class="sudut b"></div><div class="sudut c"></div><div class="sudut d"></div>
+  <div class="bingkai"></div>
+  <div class="isi">
+    <img src="aset/logo.png" alt="">
+    <div class="sekolah">SMP Negeri 6 Keritang</div>
+    <div class="judul">PIAGAM PENGHARGAAN</div>
+    <div class="nomor">Nomor: 002/SRT/XI/2026</div>    <div class="sebutan">Diberikan kepada</div>
+    <div class="nama">Nabila Maharani</div>
+    <div class="ket-orang">Juara 2 - Kelas IX A</div>    <div class="teks">Atas prestasinya dalam Lomba Coding Antarkelas dalam rangka Hari Guru Nasional 2026.</div>
+    <div class="ttd">
+      <div><br>Kepala Sekolah<div class="garis"></div><b>Kepala Sekolah (contoh)</b><br></div>
+            <div>Keritang, 25 November 2026<br>Guru Informatika<div class="garis"></div><b>Budi Santoso, S.Pd.</b><br>NIP 198501012010011001</div>
+          </div>
+  </div>
+</section>
+<section class="lembar">
+  <div class="sudut a"></div><div class="sudut b"></div><div class="sudut c"></div><div class="sudut d"></div>
+  <div class="bingkai"></div>
+  <div class="isi">
+    <img src="aset/logo.png" alt="">
+    <div class="sekolah">SMP Negeri 6 Keritang</div>
+    <div class="judul">PIAGAM PENGHARGAAN</div>
+    <div class="nomor">Nomor: 003/SRT/XI/2026</div>    <div class="sebutan">Diberikan kepada</div>
+    <div class="nama">Galih Pratama</div>
+    <div class="ket-orang">Juara 3 - Kelas VII A</div>    <div class="teks">Atas prestasinya dalam Lomba Coding Antarkelas dalam rangka Hari Guru Nasional 2026.</div>
+    <div class="ttd">
+      <div><br>Kepala Sekolah<div class="garis"></div><b>Kepala Sekolah (contoh)</b><br></div>
+            <div>Keritang, 25 November 2026<br>Guru Informatika<div class="garis"></div><b>Budi Santoso, S.Pd.</b><br>NIP 198501012010011001</div>
+          </div>
+  </div>
+</section>
+</main>
+<script src="aset/guru.js?v=1.0"></script>
+</body>
+</html>

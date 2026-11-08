@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script src="aset/pratinjau.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2A2C84">
+<meta name="robots" content="noindex, nofollow">
+<title>Soal · SiGuru</title>
+<meta name="application-name" content="SiGuru">
+<meta name="apple-mobile-web-app-title" content="SiGuru">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.0">
+<link rel="icon" href="aset/favicon.png">
+<link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="aset/gaya.css?v=1.0">
+<link rel="stylesheet" href="aset/guru.css?v=1.0">
+</head>
+<body class="">
+<header class="atas">
+  <a class="merek" href="beranda.html"><img src="aset/logo.png" alt="Logo"> <span><small>SMP Negeri 6 Keritang</small><b>SiGuru</b></span></a>
+    <form method="post"  class="keluar"><input type="hidden" name="_t" value="133f947193b7e7a2db62b84097154561"><button title="Keluar">Keluar</button></form>
+  </header>
+<nav class="menu">
+    <a href="beranda.html" class=""><span class="ik">⌂</span>Beranda</a>
+    <a href="kelas.html" class=""><span class="ik">🧑‍🎓</span>Kelas</a>
+    <a href="soal.html" class="aktif"><span class="ik">📝</span>Soal</a>
+    <a href="perangkat.html" class=""><span class="ik">📘</span>Perangkat</a>
+    <a href="lainnya.html" class=""><span class="ik">☰</span>Lainnya</a>
+  </nav>
+<main>
+<div class="judul-baris"><h1>Ubah soal</h1><span><a class="tombol" href="soal.html">‹ Bank soal</a></span></div><form method="post" class="formulir">
+  <input type="hidden" name="_t" value="133f947193b7e7a2db62b84097154561">  <fieldset><legend>Identitas</legend>
+    <div class="baris3">
+      <label>Mapel<input name="mapel" list="dl-mapel" required value="Informatika"></label>
+      <label>Kelas<select name="kelas"><option value="">-</option><option value="7">7</option><option value="8" selected>8</option><option value="9">9</option></select></label>
+      <label>Topik<input name="topik" value="Algoritma"></label>
+    </div>
+    <div class="baris3">
+      <label>Bentuk<select name="tipe" id="tipe-soal"><option value="pg" selected>Pilihan ganda</option><option value="bs">Benar/Salah</option><option value="isian">Isian singkat</option><option value="esai">Uraian/esai</option></select></label>
+      <label>Tingkat<select name="tingkat"><option value="mudah" selected>Mudah</option><option value="sedang">Sedang</option><option value="sulit">Sulit (HOTS)</option></select></label>
+      <label>Level<select name="level"><option value="">-</option><option value="C1" selected>C1</option><option value="C2">C2</option><option value="C3">C3</option><option value="C4">C4</option><option value="C5">C5</option><option value="C6">C6</option></select></label>
+    </div>
+  </fieldset>
+  <fieldset><legend>Soal</legend>
+    <label>Pertanyaan<textarea name="pertanyaan" rows="4" required>Urutan langkah logis untuk menyelesaikan suatu masalah disebut ...</textarea></label>
+    <div id="bagian-opsi">
+              <label>Opsi A<input name="opsi[A]" value="Program"></label>
+              <label>Opsi B<input name="opsi[B]" value="Algoritma"></label>
+              <label>Opsi C<input name="opsi[C]" value="Data"></label>
+              <label>Opsi D<input name="opsi[D]" value="Variabel"></label>
+              <label>Opsi E<input name="opsi[E]" value=""></label>
+          </div>
+    <label>Kunci jawaban <small>(huruf untuk pilihan ganda; jawaban/pedoman untuk isian & uraian)</small><textarea name="kunci" rows="2">B</textarea></label>
+    <label>Pembahasan<textarea name="pembahasan" rows="3">Algoritma adalah langkah-langkah terurut dan logis untuk menyelesaikan masalah.</textarea></label>
+    <label class="centang"><input type="checkbox" name="berbagi" value="1" checked> Bagikan ke guru lain (mereka bisa memakai, tidak bisa mengubah)</label>
+  </fieldset>
+  <div class="dua-tombol">
+    <button class="utama">Simpan</button>
+      </div>
+</form>
+<datalist id="dl-mapel"><option value="Informatika"><option value="Prakarya"></datalist>
+</main>
+<footer class="bawah tak-cetak">SiGuru v1.0 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.0"></script>
+</body>
+</html>

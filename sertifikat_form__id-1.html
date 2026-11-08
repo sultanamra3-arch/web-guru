@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script src="aset/pratinjau.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2A2C84">
+<meta name="robots" content="noindex, nofollow">
+<title>Sertifikat · SiGuru</title>
+<meta name="application-name" content="SiGuru">
+<meta name="apple-mobile-web-app-title" content="SiGuru">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.0">
+<link rel="icon" href="aset/favicon.png">
+<link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="aset/gaya.css?v=1.0">
+<link rel="stylesheet" href="aset/guru.css?v=1.0">
+</head>
+<body class="">
+<header class="atas">
+  <a class="merek" href="beranda.html"><img src="aset/logo.png" alt="Logo"> <span><small>SMP Negeri 6 Keritang</small><b>SiGuru</b></span></a>
+    <form method="post"  class="keluar"><input type="hidden" name="_t" value="133f947193b7e7a2db62b84097154561"><button title="Keluar">Keluar</button></form>
+  </header>
+<nav class="menu">
+    <a href="beranda.html" class=""><span class="ik">⌂</span>Beranda</a>
+    <a href="kelas.html" class=""><span class="ik">🧑‍🎓</span>Kelas</a>
+    <a href="soal.html" class=""><span class="ik">📝</span>Soal</a>
+    <a href="perangkat.html" class=""><span class="ik">📘</span>Perangkat</a>
+    <a href="lainnya.html" class="aktif"><span class="ik">☰</span>Lainnya</a>
+  </nav>
+<main>
+<div class="judul-baris"><h1>Ubah sertifikat</h1><span><a class="tombol" href="sertifikat.html">‹ Kembali</a></span></div><form method="post" class="formulir" id="form-sertifikat">
+  <input type="hidden" name="_t" value="133f947193b7e7a2db62b84097154561">  <fieldset><legend>Isi sertifikat</legend>
+    <div class="baris2">
+      <label>Judul<input name="judul" value="PIAGAM PENGHARGAAN" placeholder="SERTIFIKAT / PIAGAM PENGHARGAAN"></label>
+      <label>Desain warna<select name="warna"><option value="navy">Biru tua &amp; emas</option><option value="hijau">Hijau &amp; emas</option><option value="merah">Merah marun &amp; emas</option><option value="hitam">Hitam &amp; emas</option></select></label>
+    </div>
+    <label>Sebutan sebelum nama<input name="sebutan" value="Diberikan kepada"></label>
+    <label>Isi / keterangan <small>(muncul di bawah nama)</small><textarea name="isi" rows="3">Atas prestasinya dalam Lomba Coding Antarkelas dalam rangka Hari Guru Nasional 2026.</textarea></label>
+    <div class="baris3">
+      <label>Kota<input name="kota" value="Keritang"></label>
+      <label>Tanggal<input type="date" name="tanggal" value="2026-11-25"></label>
+      <label>Format nomor <small>({n} = urut)</small><input name="format_nomor" value="{n}/SRT/XI/2026"></label>
+    </div>
+  </fieldset>
+  <fieldset><legend>Penanda tangan</legend>
+    <div class="baris3">
+      <label>Kiri: jabatan<input name="ttd1_jabatan" value="Kepala Sekolah"></label>
+      <label>Nama<input name="ttd1_nama" value="Kepala Sekolah (contoh)"></label>
+      <label>NIP<input name="ttd1_nip" value=""></label>
+    </div>
+    <div class="baris3">
+      <label>Kanan: jabatan<input name="ttd2_jabatan" value="Guru Informatika"></label>
+      <label>Nama<input name="ttd2_nama" value="Budi Santoso, S.Pd."></label>
+      <label>NIP<input name="ttd2_nip" value="198501012010011001"></label>
+    </div>
+    <p class="kecil redup">Kosongkan nama penanda tangan kanan bila hanya satu tanda tangan.</p>
+  </fieldset>
+  <fieldset><legend>Penerima</legend>
+    <label>Ambil dari kelas
+      <select id="pilih-kelas-sertifikat"><option value="">— pilih kelas —</option><option value="IX A">IX A</option><option value="VII A">VII A</option><option value="VIII A">VIII A</option></select></label>
+    <div id="daftar-siswa-sertifikat">
+            <div class="blok-kelas" data-kelas="IX A" hidden>
+        <label class="centang"><input type="checkbox" class="centang-semua-kelas" checked disabled> Pilih semua siswa kelas IX A</label>
+        <input type="hidden" name="ket_kelas" value="Kelas IX A" disabled>
+        <div class="kolom-centang">
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Ahmad Lestari" checked disabled> Ahmad Lestari</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Dewi Safitri" checked disabled> Dewi Safitri</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Dimas Rahmawati" checked disabled> Dimas Rahmawati</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Fajar Wijaya" checked disabled> Fajar Wijaya</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Ilham Anggraini" checked disabled> Ilham Anggraini</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Rafi Maharani" checked disabled> Rafi Maharani</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Rina Wijaya" checked disabled> Rina Wijaya</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Rizki Kurniawan" checked disabled> Rizki Kurniawan</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Rizki Wijaya" checked disabled> Rizki Wijaya</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Taufik Setiawan" checked disabled> Taufik Setiawan</label>
+                </div>
+      </div>
+            <div class="blok-kelas" data-kelas="VII A" hidden>
+        <label class="centang"><input type="checkbox" class="centang-semua-kelas" checked disabled> Pilih semua siswa kelas VII A</label>
+        <input type="hidden" name="ket_kelas" value="Kelas VII A" disabled>
+        <div class="kolom-centang">
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Bayu Maharani" checked disabled> Bayu Maharani</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Dimas Wijaya" checked disabled> Dimas Wijaya</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Galih Setiawan" checked disabled> Galih Setiawan</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Hendra Wijaya" checked disabled> Hendra Wijaya</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Intan Safitri" checked disabled> Intan Safitri</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Mega Kurniawan" checked disabled> Mega Kurniawan</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Rina Rahmawati" checked disabled> Rina Rahmawati</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Salsa Rahmawati" checked disabled> Salsa Rahmawati</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Siti Pratama" checked disabled> Siti Pratama</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Yusuf Rahmawati" checked disabled> Yusuf Rahmawati</label>
+                </div>
+      </div>
+            <div class="blok-kelas" data-kelas="VIII A" hidden>
+        <label class="centang"><input type="checkbox" class="centang-semua-kelas" checked disabled> Pilih semua siswa kelas VIII A</label>
+        <input type="hidden" name="ket_kelas" value="Kelas VIII A" disabled>
+        <div class="kolom-centang">
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Arif Wijaya" checked disabled> Arif Wijaya</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Galih Lestari" checked disabled> Galih Lestari</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Hendra Permata" checked disabled> Hendra Permata</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Indah Setiawan" checked disabled> Indah Setiawan</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Intan Nugroho" checked disabled> Intan Nugroho</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Putri Permata" checked disabled> Putri Permata</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Putri Pratama" checked disabled> Putri Pratama</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Taufik Anggraini" checked disabled> Taufik Anggraini</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Taufik Lestari" checked disabled> Taufik Lestari</label>
+                  <label class="centang"><input type="checkbox" name="siswa[]" value="Wulan Saputra" checked disabled> Wulan Saputra</label>
+                </div>
+      </div>
+          </div>
+    <label>Atau ketik nama <small>(satu per baris; boleh "Nama | keterangan", mis. "Siti Aminah | Juara 1")</small>
+      <textarea name="nama_manual" rows="4">Rafi Saputra | Juara 1 - Kelas VIII A
+Nabila Maharani | Juara 2 - Kelas IX A
+Galih Pratama | Juara 3 - Kelas VII A
+</textarea></label>
+  </fieldset>
+  <button class="utama lebar">Simpan sertifikat</button>
+</form>
+</main>
+<footer class="bawah tak-cetak">SiGuru v1.0 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.0"></script>
+</body>
+</html>

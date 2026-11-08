@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script src="aset/pratinjau.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2A2C84">
+<meta name="robots" content="noindex, nofollow">
+<title>Pengaturan AI · SiGuru</title>
+<meta name="application-name" content="SiGuru">
+<meta name="apple-mobile-web-app-title" content="SiGuru">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.0">
+<link rel="icon" href="aset/favicon.png">
+<link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="aset/gaya.css?v=1.0">
+<link rel="stylesheet" href="aset/guru.css?v=1.0">
+</head>
+<body class="">
+<header class="atas">
+  <a class="merek" href="beranda.html"><img src="aset/logo.png" alt="Logo"> <span><small>SMP Negeri 6 Keritang</small><b>SiGuru</b></span></a>
+    <form method="post"  class="keluar"><input type="hidden" name="_t" value="133f947193b7e7a2db62b84097154561"><button title="Keluar">Keluar</button></form>
+  </header>
+<nav class="menu">
+    <a href="beranda.html" class=""><span class="ik">⌂</span>Beranda</a>
+    <a href="kelas.html" class=""><span class="ik">🧑‍🎓</span>Kelas</a>
+    <a href="soal.html" class=""><span class="ik">📝</span>Soal</a>
+    <a href="perangkat.html" class=""><span class="ik">📘</span>Perangkat</a>
+    <a href="lainnya.html" class="aktif"><span class="ik">☰</span>Lainnya</a>
+  </nav>
+<main>
+<div class="judul-baris">
+  <h1>Pengaturan AI</h1>
+  <a class="tombol" href="lainnya.html">‹ Lainnya</a>
+</div>
+
+<div class="kartu kecil">
+  <p><b>Cara dapat kunci gratis</b> (cukup login akun Google/email, tanpa kartu kredit):</p>
+  <ol>
+    <li><b>Gemini</b> (paling disarankan, bisa baca foto): buka <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> → <i>Create API key</i> → salin.</li>
+    <li><b>Groq</b> (cadangan, cepat): <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a> → <i>Create API Key</i>.</li>
+    <li><b>OpenRouter</b> (cadangan): hanya model berakhiran <code>:free</code> yang dipakai, jadi saldo tidak pernah terpotong.</li>
+    <li><b>Cerebras</b>, <b>SambaNova</b>, <b>NVIDIA</b>, <b>Mistral</b>: cadangan tambahan, gratis. Cukup tempel kunci; kolom Model boleh dikosongkan, nanti dipilih otomatis.</li>
+  </ol>
+  <p class="redup">AI dicoba berurutan dari nomor terkecil. Jika limit satu AI habis, otomatis pindah ke berikutnya. Cukup satu akun per layanan.</p>
+</div>
+
+
+<form method="post" class="formulir" autocomplete="off">
+  <input type="hidden" name="_t" value="133f947193b7e7a2db62b84097154561">  <input type="hidden" name="aksi" value="simpan">
+    <fieldset>
+    <legend>Google Gemini</legend>
+    <div class="baris2">
+      <label class="centang"><input type="checkbox" name="aktif[gemini]" value="1" checked> Aktif</label>
+      <label>Urutan<input type="number" name="urutan[gemini]" min="1" max="9" value="1"></label>
+    </div>
+    <label>Kunci API
+      <small>(belum diisi)        · <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">ambil kunci ↗</a></small>
+      <input type="password" name="kunci[gemini]" autocomplete="off" spellcheck="false" placeholder="tempel kunci di sini">
+    </label>
+        <label>Model <small>(boleh lebih dari satu, pisahkan koma; dicoba berurutan)</small>
+      <input name="model[gemini]" value="gemini-3.5-flash, gemini-3.6-flash, gemini-3.5-flash-lite, gemini-3.1-flash-lite, gemini-flash-lite-latest" spellcheck="false" placeholder="otomatis"></label>
+        <label class="centang"><input type="checkbox" name="gambar[gemini]" value="1" checked> Model ini bisa membaca foto</label>
+      </fieldset>
+    <fieldset>
+    <legend>Groq</legend>
+    <div class="baris2">
+      <label class="centang"><input type="checkbox" name="aktif[groq]" value="1" checked> Aktif</label>
+      <label>Urutan<input type="number" name="urutan[groq]" min="1" max="9" value="2"></label>
+    </div>
+    <label>Kunci API
+      <small>(belum diisi)        · <a href="https://console.groq.com/keys" target="_blank" rel="noopener">ambil kunci ↗</a></small>
+      <input type="password" name="kunci[groq]" autocomplete="off" spellcheck="false" placeholder="tempel kunci di sini">
+    </label>
+        <label>Model <small>(boleh lebih dari satu, pisahkan koma; dicoba berurutan)</small>
+      <input name="model[groq]" value="qwen/qwen3.8-27b, openai/gpt-oss-120b, openai/gpt-oss-20b" spellcheck="false" placeholder="otomatis"></label>
+        <label class="centang"><input type="checkbox" name="gambar[groq]" value="1" checked> Model ini bisa membaca foto</label>
+      </fieldset>
+    <fieldset>
+    <legend>Mistral</legend>
+    <div class="baris2">
+      <label class="centang"><input type="checkbox" name="aktif[mistral]" value="1" checked> Aktif</label>
+      <label>Urutan<input type="number" name="urutan[mistral]" min="1" max="9" value="3"></label>
+    </div>
+    <label>Kunci API
+      <small>(belum diisi)        · <a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener">ambil kunci ↗</a></small>
+      <input type="password" name="kunci[mistral]" autocomplete="off" spellcheck="false" placeholder="tempel kunci di sini">
+    </label>
+        <label>Model <small>(boleh lebih dari satu, pisahkan koma; dicoba berurutan)</small>
+      <input name="model[mistral]" value="mistral-small-latest" spellcheck="false" placeholder="otomatis"></label>
+        <label class="centang"><input type="checkbox" name="gambar[mistral]" value="1" checked> Model ini bisa membaca foto</label>
+      </fieldset>
+    <fieldset>
+    <legend>OpenRouter</legend>
+    <div class="baris2">
+      <label class="centang"><input type="checkbox" name="aktif[openrouter]" value="1" checked> Aktif</label>
+      <label>Urutan<input type="number" name="urutan[openrouter]" min="1" max="9" value="4"></label>
+    </div>
+    <label>Kunci API
+      <small>(belum diisi)        · <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">ambil kunci ↗</a></small>
+      <input type="password" name="kunci[openrouter]" autocomplete="off" spellcheck="false" placeholder="tempel kunci di sini">
+    </label>
+        <label>Model <small>(boleh lebih dari satu, pisahkan koma; dicoba berurutan)</small>
+      <input name="model[openrouter]" value="nvidia/nemotron-3.5-super-vl:free, google/gemma-4-26b-a4b-it:free, nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free, dots-studio/dots-3-note-preview:free, google/gemma-4-31b-it:free, nvidia/nemotron-3-ultra-550b-a55b:free, nvidia/nemotron-3.5-lightning:free, openrouter/free" spellcheck="false" placeholder="otomatis"></label>
+        <label class="centang"><input type="checkbox" name="gambar[openrouter]" value="1" checked> Model ini bisa membaca foto</label>
+      </fieldset>
+    <fieldset>
+    <legend>Cerebras</legend>
+    <div class="baris2">
+      <label class="centang"><input type="checkbox" name="aktif[cerebras]" value="1" checked> Aktif</label>
+      <label>Urutan<input type="number" name="urutan[cerebras]" min="1" max="9" value="5"></label>
+    </div>
+    <label>Kunci API
+      <small>(belum diisi)        · <a href="https://cloud.cerebras.ai" target="_blank" rel="noopener">ambil kunci ↗</a></small>
+      <input type="password" name="kunci[cerebras]" autocomplete="off" spellcheck="false" placeholder="tempel kunci di sini">
+    </label>
+        <label>Model <small>(boleh lebih dari satu, pisahkan koma; dicoba berurutan; kosong = otomatis)</small>
+      <input name="model[cerebras]" value="" spellcheck="false" placeholder="otomatis"></label>
+        <label class="centang"><input type="checkbox" name="gambar[cerebras]" value="1" checked> Model ini bisa membaca foto</label>
+      </fieldset>
+    <fieldset>
+    <legend>SambaNova</legend>
+    <div class="baris2">
+      <label class="centang"><input type="checkbox" name="aktif[sambanova]" value="1" checked> Aktif</label>
+      <label>Urutan<input type="number" name="urutan[sambanova]" min="1" max="9" value="6"></label>
+    </div>
+    <label>Kunci API
+      <small>(belum diisi)        · <a href="https://cloud.sambanova.ai/apis" target="_blank" rel="noopener">ambil kunci ↗</a></small>
+      <input type="password" name="kunci[sambanova]" autocomplete="off" spellcheck="false" placeholder="tempel kunci di sini">
+    </label>
+        <label>Model <small>(boleh lebih dari satu, pisahkan koma; dicoba berurutan; kosong = otomatis)</small>
+      <input name="model[sambanova]" value="" spellcheck="false" placeholder="otomatis"></label>
+        <label class="centang"><input type="checkbox" name="gambar[sambanova]" value="1" checked> Model ini bisa membaca foto</label>
+      </fieldset>
+    <fieldset>
+    <legend>NVIDIA</legend>
+    <div class="baris2">
+      <label class="centang"><input type="checkbox" name="aktif[nvidia]" value="1" checked> Aktif</label>
+      <label>Urutan<input type="number" name="urutan[nvidia]" min="1" max="9" value="7"></label>
+    </div>
+    <label>Kunci API
+      <small>(belum diisi)        · <a href="https://build.nvidia.com/settings/api-keys" target="_blank" rel="noopener">ambil kunci ↗</a></small>
+      <input type="password" name="kunci[nvidia]" autocomplete="off" spellcheck="false" placeholder="tempel kunci di sini">
+    </label>
+        <label>Model <small>(boleh lebih dari satu, pisahkan koma; dicoba berurutan; kosong = otomatis)</small>
+      <input name="model[nvidia]" value="" spellcheck="false" placeholder="otomatis"></label>
+        <label class="centang"><input type="checkbox" name="gambar[nvidia]" value="1" checked> Model ini bisa membaca foto</label>
+      </fieldset>
+    <button class="utama lebar">Simpan pengaturan</button>
+</form>
+
+<form method="post" style="margin-top:.8rem">
+  <input type="hidden" name="_t" value="133f947193b7e7a2db62b84097154561"><input type="hidden" name="aksi" value="tes">
+  <button class="lebar">Tes semua AI</button>
+</form>
+<p class="redup kecil">Kunci disimpan di server sekolah: <code>data/ai-kunci.php</code> (dipakai bersama SiPustaka, tidak bisa dibuka dari internet, tidak ikut ke GitHub).</p>
+</main>
+<footer class="bawah tak-cetak">SiGuru v1.0 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.0"></script>
+</body>
+</html>
