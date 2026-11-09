@@ -156,8 +156,8 @@ CREATE TABLE `guru_akun` (
 LOCK TABLES `guru_akun` WRITE;
 /*!40000 ALTER TABLE `guru_akun` DISABLE KEYS */;
 INSERT INTO `guru_akun` VALUES
-(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 12:31:05'),
-(2,'guru','Rina Marlina, S.Pd.','','Bahasa Indonesia','$2y$10$Yw3mhbCfjooqB0Du1toAHOUjFDbN9QrzkiWwGmppHqYXAPc4C3aKS','guru',1,'2026-11-08 07:19:47','2026-11-09 12:31:13');
+(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 12:31:35'),
+(2,'guru','Rina Marlina, S.Pd.','','Bahasa Indonesia','$2y$10$Yw3mhbCfjooqB0Du1toAHOUjFDbN9QrzkiWwGmppHqYXAPc4C3aKS','guru',1,'2026-11-08 07:19:47','2026-11-09 12:39:02');
 /*!40000 ALTER TABLE `guru_akun` ENABLE KEYS */;
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `guru_dokumen`;
@@ -527,6 +527,12 @@ CREATE TABLE `guru_setelan` (
 LOCK TABLES `guru_setelan` WRITE;
 /*!40000 ALTER TABLE `guru_setelan` DISABLE KEYS */;
 INSERT INTO `guru_setelan` VALUES
+('jam_h1:2','1 07:15-07:45\n2 07:45-08:30\n3 08:30-09:15'),
+('jam_h2:2','1 07:15-07:45\n2 07:45-08:30\n3 08:30-09:15\n4 09:15-09:55'),
+('jam_h3:2','1 07:00-07:45\n2 07:45-08:30\n3 08:30-09:15'),
+('jam_h4:2','1 07:00-07:45\n2 07:45-08:30\n3 08:30-09:15'),
+('jam_h5:2','1 07:00-07:40'),
+('jam_h6:2','0'),
 ('jam_jumat:2','1 07:00-07:40'),
 ('jam_umum:2','1 07:00-07:45\n2 07:45-08:30\n3 08:30-09:15'),
 ('tahun_ajaran','2026/2027');

@@ -14,7 +14,7 @@ Aplikasi web (bisa dipasang di HP) untuk guru:
 | ✅ Absensi | H/S/I/A per kelas & tanggal, rekap bulanan, unduh Excel |
 | 📊 Penilaian | input nilai, KKTP, rekap per mapel, unduh Excel, cetak |
 | 📷 Nilai dari foto | foto lembar jawaban → AI membaca, program menilai PG/benar-salah dari kunci, AI menilai isian/uraian; dibaca dua AI berbeda, nomor meragukan ditandai kuning; lembar jawaban siap cetak |
-| 🗓 Jadwal | isi seminggu sekaligus (pilih kelas per jam; jam mulai–selesai diisi sendiri tiap guru sekali), salin hari, atau isi otomatis dari foto roster sekolah (AI menyalin tabel, program mencari kode/nama guru); tampil di beranda |
+| 🗓 Jadwal | isi seminggu sekaligus (pilih kelas per jam; jam mulai–selesai diisi sendiri tiap guru, boleh berbeda tiap hari), salin hari, atau isi otomatis dari foto roster sekolah (AI menyalin tabel, program mencari kode/nama guru); tampil di beranda |
 | 🏅 Sertifikat | A4 mendatar, banyak penerima sekaligus (dari kelas atau ketik nama) |
 
 - Tiap guru punya akun sendiri (dibuat admin).
