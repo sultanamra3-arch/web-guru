@@ -156,7 +156,7 @@ CREATE TABLE `guru_akun` (
 LOCK TABLES `guru_akun` WRITE;
 /*!40000 ALTER TABLE `guru_akun` DISABLE KEYS */;
 INSERT INTO `guru_akun` VALUES
-(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 13:07:38'),
+(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 14:18:24'),
 (2,'guru','Rina Marlina, S.Pd.','','Bahasa Indonesia','$2y$10$Yw3mhbCfjooqB0Du1toAHOUjFDbN9QrzkiWwGmppHqYXAPc4C3aKS','guru',1,'2026-11-08 07:19:47','2026-11-09 12:39:02');
 /*!40000 ALTER TABLE `guru_akun` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -456,7 +456,7 @@ CREATE TABLE `guru_penilaian` (
 LOCK TABLES `guru_penilaian` WRITE;
 /*!40000 ALTER TABLE `guru_penilaian` DISABLE KEYS */;
 INSERT INTO `guru_penilaian` VALUES
-(1,1,'VIII A','Informatika','Ulangan Bab 1: Berpikir Komputasional','Ulangan Harian','2026-10-14',75.00,'2026-11-08 07:19:47'),
+(1,1,'VIII A','Informatika','Ulangan Tengah Semester Ganjil','Sumatif Tengah Semester','2026-10-14',70.00,'2026-11-08 07:19:47'),
 (2,1,'VIII A','Informatika','Tugas Proyek Algoritma','Tugas','2026-10-28',75.00,'2026-11-08 07:19:47'),
 (3,1,'VII A','Informatika','Ulangan Bab 1: Informatika & Kehidupan','Ulangan Harian','2026-10-21',75.00,'2026-11-08 07:19:47'),
 (4,1,'VIII A','Informatika','Ulangan Harian Informatika Bab 1 (online)','Ulangan Harian','2026-11-09',75.00,'2026-11-09 10:55:55');

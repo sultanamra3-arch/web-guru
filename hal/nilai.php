@@ -13,6 +13,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         pesan('Penilaian dihapus.');
         ke('?p=penilaian');
     }
+    if (post('aksi') === 'ubah') {
+        $judul = mb_substr(trim((string)post('judul')), 0, 200);
+        $tgl = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)post('tanggal')) ? (string)post('tanggal') : $p['tanggal'];
+        if ($judul === '') { pesan('Nama penilaian tidak boleh kosong.', 'galat'); ke('?p=nilai&id=' . $id); }
+        q('UPDATE guru_penilaian SET judul = ?, jenis = ?, mapel = ?, tanggal = ?, kktp = ? WHERE id = ?', [
+            $judul, in_array(post('jenis'), JENIS_PENILAIAN, true) ? post('jenis') : $p['jenis'],
+            mb_substr(trim((string)post('mapel')), 0, 120) ?: $p['mapel'], $tgl, max(0, min(100, (float)str_replace(',', '.', (string)post('kktp', $p['kktp'])))), $id]);
+        pesan('Penilaian diperbarui.');
+        ke('?p=nilai&id=' . $id);
+    }
     $nilai = (array)($_POST['nilai'] ?? []);
     $cat = (array)($_POST['catatan'] ?? []);
     db()->beginTransaction();
@@ -58,6 +68,23 @@ judul_baris(h($p['judul']), '<a class="tombol" href="?p=penilaian">‹ Penilaian
     <span><b><?= $tuntas ?></b>tuntas</span>
   </div>
   <p class="kecil"><a href="?p=nilai&amp;id=<?= $id ?>&amp;unduh=1">⬇ Unduh Excel</a></p>
+  <details class="ubah-penilaian">
+    <summary>✎ Ubah nama / keterangan</summary>
+    <form method="post" class="formulir" style="margin-top:.6rem">
+      <?= input_token() ?><input type="hidden" name="aksi" value="ubah">
+      <label>Nama penilaian<input name="judul" value="<?= h($p['judul']) ?>" required maxlength="200"></label>
+      <div class="baris2">
+        <label>Jenis<select name="jenis"><?= pilihan(array_combine(JENIS_PENILAIAN, JENIS_PENILAIAN), in_array($p['jenis'], JENIS_PENILAIAN, true) ? $p['jenis'] : 'Lainnya') ?></select></label>
+        <label>Mapel<input name="mapel" value="<?= h($p['mapel']) ?>"></label>
+      </div>
+      <div class="baris2">
+        <label>Tanggal<input type="date" name="tanggal" value="<?= h($p['tanggal']) ?>"></label>
+        <label>KKTP<input name="kktp" value="<?= h(angka($p['kktp'])) ?>" inputmode="decimal"></label>
+      </div>
+      <button class="lebar">Simpan perubahan</button>
+      <p class="kecil redup">Kelas tidak bisa diganti karena nilai terikat pada siswa kelas ini.</p>
+    </form>
+  </details>
 </div>
 <a class="tombol utama tombol-foto-nilai" href="?p=koreksi&amp;id=<?= $id ?>">📷 Nilai otomatis dari foto lembar jawaban</a>
 <form method="post" class="tabel-nilai" data-kktp="<?= h($p['kktp']) ?>">

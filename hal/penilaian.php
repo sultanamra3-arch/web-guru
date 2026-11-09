@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-const JENIS_PENILAIAN = ['Tugas', 'Ulangan Harian', 'Asesmen Formatif', 'Sumatif Lingkup Materi', 'Sumatif Tengah Semester', 'Sumatif Akhir Semester', 'Praktik', 'Proyek', 'Lainnya'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $kelas = (string)post('kelas');

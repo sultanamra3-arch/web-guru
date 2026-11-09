@@ -5,7 +5,7 @@ declare(strict_types=1);
 date_default_timezone_set('Asia/Jakarta');
 mb_internal_encoding('UTF-8');
 
-const VERSI = '1.6';
+const VERSI = '1.7';
 
 $__konfig = __DIR__ . '/../config.php';
 if (!is_file($__konfig)) $__konfig = __DIR__ . '/../config.contoh.php';
@@ -259,6 +259,8 @@ function wajib_admin(): void
         exit('Halaman ini khusus admin.');
     }
 }
+
+const JENIS_PENILAIAN = ['Tugas', 'Ulangan Harian', 'Asesmen Formatif', 'Sumatif Lingkup Materi', 'Sumatif Tengah Semester', 'Sumatif Akhir Semester', 'Praktik', 'Proyek', 'Lainnya'];
 
 /** "7.5", "0715", "7:15" → "07:15" (format 24 jam); kosong bila tidak valid. */
 function jam_rapi(string $s): string
