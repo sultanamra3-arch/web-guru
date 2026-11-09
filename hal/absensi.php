@@ -51,7 +51,7 @@ judul_baris('Absensi siswa', '<a class="tombol" href="?p=absensi_rekap&amp;kelas
 <datalist id="dl-mapel"><?php foreach (mapel_saya() as $m): ?><option value="<?= h($m) ?>"><?php endforeach; ?></datalist>
 
 <?php if (!$siswa): ?>
-  <div class="pesan info">Pilih kelas. Bila kelas belum muncul, isi kelas siswa di SiPustaka terlebih dahulu.</div>
+  <?php if (daftar_kelas()): ?><div class="pesan info">Pilih kelas.</div><?php else: ?><div class="pesan info">Belum ada kelas. <a href="?p=siswa_tambah">Tambahkan kelas &amp; siswamu dulu →</a></div><?php endif; ?>
 <?php else: ?>
 <form method="post" id="form-absen">
   <?= input_token() ?>

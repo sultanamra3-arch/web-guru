@@ -34,6 +34,7 @@ if (get('unduh')) {
 kepala('Rekap nilai', 'kelas');
 judul_baris('Rekap nilai', '<button type="button" class="tombol" onclick="window.print()">🖨 Cetak</button>');
 ?>
+<?php if (!$kelas_list): ?><p class="pesan">Belum ada kelas. <a href="?p=siswa_tambah">Tambahkan kelas &amp; siswamu dulu →</a></p><?php endif; ?>
 <form class="cari tak-cetak" method="get">
   <input type="hidden" name="p" value="nilai_rekap">
   <select name="kelas" onchange="this.form.submit()"><?= pilihan(array_combine($kelas_list, array_map(fn($k) => 'Kelas ' . $k, $kelas_list)) ?: [], $kelas) ?></select>

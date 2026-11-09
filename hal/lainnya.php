@@ -12,7 +12,7 @@ kepala('Lainnya', 'lainnya');
   <?php if (adalah_admin()): ?>
   <li><a href="?p=asisten"><b>✨ Asisten AI (admin)</b><small>Ubah datamu lewat chat: siswa, nilai, absensi, jadwal, soal… setiap perubahan dikonfirmasi</small></a></li>
   <li><a href="?p=akun"><b>👥 Akun guru</b><small>Tambah, ubah, nonaktifkan akun guru (khusus admin)</small></a></li>
-  <li><a href="?p=pengaturan_ai"><b>⚙ Pengaturan AI</b><small>Kunci & model AI (dipakai bersama SiPustaka)</small></a></li>
+  <li><a href="?p=pengaturan_ai"><b>⚙ Pengaturan AI</b><small>Kunci & model AI sekolah</small></a></li>
   <?php endif; ?>
 </ul>
 <form method="post" action="?p=keluar"><?= input_token() ?><button class="lebar">Keluar</button></form>

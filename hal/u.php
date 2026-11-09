@@ -28,6 +28,12 @@ function ujian_bisa_masuk(array $u): string
 }
 
 $alat = alat_siswa();
+// HP dipakai bergantian: lepaskan nama sebelumnya dari HP ini (jawabannya tetap tersimpan; ia bisa lanjut lagi di HP lain setelah guru menekan "Buka ulang")
+if ($u && get('ganti') && isset($_SESSION['ujian'][(int)$u['id']])) {
+    q('UPDATE guru_ujian_peserta SET perangkat = NULL WHERE ujian_id = ? AND kode = ? AND selesai IS NULL', [$u['id'], $_SESSION['ujian'][(int)$u['id']]]);
+    unset($_SESSION['ujian'][(int)$u['id']]);
+    ke('?p=u&k=' . $u['kode']);
+}
 if ($u && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $siswa = (string)post('siswa');
     $_SESSION['coba_token'] = $_SESSION['coba_token'] ?? ['n' => 0, 't' => 0];
@@ -88,6 +94,7 @@ kepala($u ? $u['judul'] : 'Masuk ujian', '', true);
   <?php if ($galat): ?><div class="pesan galat"><?= h($galat) ?></div><?php endif; ?>
   <?php if ($lanjut): ?>
     <a class="tombol utama lebar" href="?p=u_kerja&amp;id=<?= (int)$u['id'] ?>">Lanjutkan mengerjakan (<?= h(nama_siswa($lanjut['kode'])) ?>)</a>
+    <p class="kecil" style="text-align:center;margin-top:1rem">Bukan <?= h(nama_siswa($lanjut['kode'])) ?>? <a href="?p=u&amp;k=<?= h($u['kode']) ?>&amp;ganti=1" onclick="return confirm('Keluarkan nama ini dari HP ini? Jawabannya tetap tersimpan.')">Masuk dengan nama lain</a></p>
   <?php elseif ($alasan !== ''): ?>
     <div class="pesan"><?= h($alasan) ?></div>
     <a class="tombol lebar" href="?p=u&amp;k=<?= h($u['kode']) ?>">↻ Muat ulang</a>

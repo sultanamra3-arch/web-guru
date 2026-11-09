@@ -31,6 +31,7 @@ judul_baris('Penilaian', '<a class="tombol" href="?p=nilai_rekap' . ($f ? '&amp;
 ?>
 <details class="kartu" <?= $daftar ? '' : 'open' ?>>
   <summary><b>＋ Penilaian baru</b></summary>
+  <?php if (!$kelas_list): ?><p class="pesan">Belum ada kelas. <a href="?p=siswa_tambah">Tambahkan kelas &amp; siswamu dulu →</a></p><?php endif; ?>
   <form method="post" class="formulir" style="margin-top:.8rem">
     <?= input_token() ?>
     <label>Judul<input name="judul" required placeholder="mis. Ulangan Bab 2 Sistem Pencernaan"></label>

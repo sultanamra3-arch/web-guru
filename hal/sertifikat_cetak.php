@@ -11,6 +11,10 @@ kepala('Cetak sertifikat', '', true);
 ?>
 <style>
 @page { size: A4 landscape; margin: 0; }
+@media screen and (max-width: 1140px) { .lembar { zoom: 0.85; } }
+@media screen and (max-width: 900px) { .lembar { zoom: 0.65; } }
+@media screen and (max-width: 700px) { .lembar { zoom: 0.5; } }
+@media screen and (max-width: 520px) { .lembar { zoom: 0.33; } }
 body.polos { background: #e9ecf3; padding: 0; }
 .alat-cetak { position: sticky; top: 0; z-index: 5; display: flex; gap: .5rem; justify-content: center; padding: .6rem; background: #fff; border-bottom: 1px solid #ddd; }
 .lembar { width: 297mm; height: 210mm; margin: 12px auto; background: #fff; position: relative; overflow: hidden; page-break-after: always; box-shadow: 0 4px 20px rgba(0,0,0,.12);

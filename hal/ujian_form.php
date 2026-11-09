@@ -69,10 +69,8 @@ judul_baris($u ? 'Pengaturan ujian' : 'Ujian online baru', '<a class="tombol" hr
     <label>Durasi (menit)<input type="number" name="durasi" min="5" max="300" value="<?= $v('durasi', 60) ?>"></label>
     <label>Token berganti tiap<select name="token_menit"><?= pilihan(['0' => 'Tetap (tidak berganti)', '5' => '5 menit', '10' => '10 menit', '15' => '15 menit', '30' => '30 menit'], (string)($u['token_menit'] ?? 10)) ?></select></label>
   </div>
-  <div class="baris2">
     <label>Boleh mulai sejak (opsional)<span class="tgl-jam"><input type="date" name="mulai_tgl" value="<?= $tg('mulai') ?>"><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="07:30" autocomplete="off" name="mulai_jam" value="<?= $jm('mulai') ?>" aria-label="jam mulai"></span></label>
     <label>Batas akhir (opsional)<span class="tgl-jam"><input type="date" name="selesai_tgl" value="<?= $tg('selesai') ?>"><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="07:30" autocomplete="off" name="selesai_jam" value="<?= $jm('selesai') ?>" aria-label="jam batas"></span></label>
-  </div>
   <?php if ($ada_uraian && !$sudah_mulai): ?>
   <label>Poin per soal uraian (PG/isian = 1 poin)<input type="number" name="poin_uraian" min="1" max="50" step="0.5" value="<?= h((string)$poin) ?>"></label>
   <?php endif; ?>
