@@ -166,7 +166,7 @@ CREATE TABLE `guru_akun` (
 LOCK TABLES `guru_akun` WRITE;
 /*!40000 ALTER TABLE `guru_akun` DISABLE KEYS */;
 INSERT INTO `guru_akun` VALUES
-(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 18:53:06'),
+(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 18:57:23'),
 (2,'guru','Rina Marlina, S.Pd.','','Bahasa Indonesia','$2y$10$Yw3mhbCfjooqB0Du1toAHOUjFDbN9QrzkiWwGmppHqYXAPc4C3aKS','guru',1,'2026-11-08 07:19:47','2026-11-09 16:02:32');
 /*!40000 ALTER TABLE `guru_akun` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -393,6 +393,54 @@ INSERT INTO `guru_koreksi_kunci` VALUES
 (1,'lj','1. B\n2. D\n3. A\n4. C\n5. B\n6. A\n7. D\n8. C\n9. B\n10. A\n11. C\n12. D\n13. B\n14. A\n15. C\n16. (bs) B\n17. (bs) S\n18. (bs) S\n19. (isian) debugging\n20. (esai, 10 poin) Buatlah algoritma meminjam buku di perpustakaan (minimal 5 langkah). Poin kunci: urut, lengkap, logis, ada pencatatan & tanggal kembali.','2026-11-09 10:10:49');
 /*!40000 ALTER TABLE `guru_koreksi_kunci` ENABLE KEYS */;
 UNLOCK TABLES;
+DROP TABLE IF EXISTS `guru_kuis`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `guru_kuis` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `guru_id` int(11) NOT NULL,
+  `paket_id` int(11) DEFAULT NULL,
+  `kelas` varchar(50) NOT NULL,
+  `tahun` varchar(9) DEFAULT NULL,
+  `judul` varchar(200) NOT NULL,
+  `kode` varchar(10) NOT NULL,
+  `soal` longtext DEFAULT NULL,
+  `detik` smallint(6) NOT NULL DEFAULT 20,
+  `status` varchar(10) NOT NULL DEFAULT 'lobi',
+  `nomor` smallint(6) NOT NULL DEFAULT -1,
+  `mulai_ms` bigint(20) DEFAULT NULL,
+  `penilaian_id` int(11) DEFAULT NULL,
+  `dibuat` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `kode` (`kode`),
+  KEY `guru_id` (`guru_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `guru_kuis` WRITE;
+/*!40000 ALTER TABLE `guru_kuis` DISABLE KEYS */;
+/*!40000 ALTER TABLE `guru_kuis` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `guru_kuis_peserta`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `guru_kuis_peserta` (
+  `kuis_id` int(11) NOT NULL,
+  `kode` varchar(20) NOT NULL,
+  `perangkat` varchar(64) DEFAULT NULL,
+  `poin` int(11) NOT NULL DEFAULT 0,
+  `benar` smallint(6) NOT NULL DEFAULT 0,
+  `jawaban` text DEFAULT NULL,
+  `gabung` datetime DEFAULT NULL,
+  `terakhir` datetime DEFAULT NULL,
+  PRIMARY KEY (`kuis_id`,`kode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `guru_kuis_peserta` WRITE;
+/*!40000 ALTER TABLE `guru_kuis_peserta` DISABLE KEYS */;
+/*!40000 ALTER TABLE `guru_kuis_peserta` ENABLE KEYS */;
+UNLOCK TABLES;
 DROP TABLE IF EXISTS `guru_nilai`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -465,7 +513,7 @@ CREATE TABLE `guru_penilaian` (
   `dibuat` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `guru_id` (`guru_id`,`kelas`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `guru_penilaian` WRITE;

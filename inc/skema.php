@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 6;
+const SKEMA_VERSI = 7;
 
 function pastikan_skema(): void
 {
@@ -240,6 +240,34 @@ function pastikan_skema(): void
             saran_ai TEXT NULL,
             dinilai DATETIME NULL,
             PRIMARY KEY (tugas_id, kode)
+        ) DEFAULT CHARSET=utf8mb4",
+        "CREATE TABLE IF NOT EXISTS guru_kuis (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            guru_id INT NOT NULL,
+            paket_id INT NULL,
+            kelas VARCHAR(50) NOT NULL,
+            tahun VARCHAR(9) NULL,
+            judul VARCHAR(200) NOT NULL,
+            kode VARCHAR(10) NOT NULL UNIQUE,
+            soal LONGTEXT NULL,
+            detik SMALLINT NOT NULL DEFAULT 20,
+            status VARCHAR(10) NOT NULL DEFAULT 'lobi',
+            nomor SMALLINT NOT NULL DEFAULT -1,
+            mulai_ms BIGINT NULL,
+            penilaian_id INT NULL,
+            dibuat DATETIME NULL,
+            KEY (guru_id)
+        ) DEFAULT CHARSET=utf8mb4",
+        "CREATE TABLE IF NOT EXISTS guru_kuis_peserta (
+            kuis_id INT NOT NULL,
+            kode VARCHAR(20) NOT NULL,
+            perangkat VARCHAR(64) NULL,
+            poin INT NOT NULL DEFAULT 0,
+            benar SMALLINT NOT NULL DEFAULT 0,
+            jawaban TEXT NULL,
+            gabung DATETIME NULL,
+            terakhir DATETIME NULL,
+            PRIMARY KEY (kuis_id, kode)
         ) DEFAULT CHARSET=utf8mb4",
     ];
     foreach ($sql as $q) db()->exec($q);
