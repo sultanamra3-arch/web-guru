@@ -9,19 +9,19 @@
 <title>Pengaturan ujian · SiGuru</title>
 <meta name="application-name" content="SiGuru">
 <meta name="apple-mobile-web-app-title" content="SiGuru">
-<link rel="x-manifest" href="manifest.webmanifest?v=1.5">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.6">
 <link rel="icon" href="aset/favicon.png">
 <link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="aset/gaya.css?v=1.5">
-<link rel="stylesheet" href="aset/guru.css?v=1.5">
+<link rel="stylesheet" href="aset/gaya.css?v=1.6">
+<link rel="stylesheet" href="aset/guru.css?v=1.6">
 </head>
 <body class="">
 <header class="atas">
   <a class="merek" href="beranda.html"><img src="aset/logo.png" alt="Logo"> <span><small>SMP Negeri 6 Keritang</small><b>SiGuru</b></span></a>
-    <form method="post"  class="keluar"><input type="hidden" name="_t" value="fd95a2886372f63f4e4ff2965883ae4f"><button title="Keluar">Keluar</button></form>
+    <form method="post"  class="keluar"><input type="hidden" name="_t" value="41968df5a427a2bec99a012d84830452"><button title="Keluar">Keluar</button></form>
   </header>
 <nav class="menu">
     <a href="beranda.html" class=""><span class="ik">⌂</span>Beranda</a>
@@ -32,7 +32,7 @@
   </nav>
 <main>
 <div class="judul-baris"><h1>Pengaturan ujian</h1><span><a class="tombol" href="ujian_lihat__id-2.html">‹ Kembali</a></span></div><form method="post" class="kartu formulir">
-  <input type="hidden" name="_t" value="fd95a2886372f63f4e4ff2965883ae4f">  <p class="redup" style="margin-top:0">Paket: <b>Ulangan Harian Informatika Bab 1</b> · 10 soal</p>
+  <input type="hidden" name="_t" value="41968df5a427a2bec99a012d84830452">  <p class="redup" style="margin-top:0">Paket: <b>Ulangan Harian Informatika Bab 1</b> · 10 soal</p>
   <label>Judul ujian<input name="judul" required value="Kuis Informatika (coba sebagai siswa)"></label>
   <div class="baris2">
     <label>Kelas<select name="kelas" required><option value="IX A">IX A</option><option value="IX B">IX B</option><option value="VII A" selected>VII A</option><option value="VII B">VII B</option><option value="VIII A">VIII A</option><option value="VII C">VII C</option></select></label>
@@ -43,8 +43,8 @@
     <label>Token berganti tiap<select name="token_menit"><option value="Tetap (tidak berganti)">Tetap (tidak berganti)</option><option value="5 menit">5 menit</option><option value="10 menit">10 menit</option><option value="15 menit">15 menit</option><option value="30 menit">30 menit</option></select></label>
   </div>
   <div class="baris2">
-    <label>Boleh mulai sejak (opsional)<input type="datetime-local" name="mulai" value=""></label>
-    <label>Batas akhir (opsional)<input type="datetime-local" name="selesai" value=""></label>
+    <label>Boleh mulai sejak (opsional)<span class="tgl-jam"><input type="date" name="mulai_tgl" value=""><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="07:30" autocomplete="off" name="mulai_jam" value="" aria-label="jam mulai"></span></label>
+    <label>Batas akhir (opsional)<span class="tgl-jam"><input type="date" name="selesai_tgl" value="2026-11-20"><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="07:30" autocomplete="off" name="selesai_jam" value="13:30" aria-label="jam batas"></span></label>
   </div>
     <label>Poin per soal uraian (PG/isian = 1 poin)<input type="number" name="poin_uraian" min="1" max="50" step="0.5" value="5"></label>
     <label class="centang"><input type="checkbox" name="acak_soal" value="1" checked> Acak urutan soal per siswa</label>
@@ -54,6 +54,6 @@
     <button class="utama lebar">Simpan</button>
 </form>
 </main>
-<footer class="bawah tak-cetak">SiGuru v1.5 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.5"></script>
+<footer class="bawah tak-cetak">SiGuru v1.6 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.6"></script>
 </body>
 </html>

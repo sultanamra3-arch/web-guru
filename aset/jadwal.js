@@ -127,6 +127,7 @@
   var form = document.getElementById('form-jam');
   if (!form) return;
   function tambahMenit(w, m) { var p = String(w || '07:30').split(':'), t = (+p[0]) * 60 + (+p[1]) + m; return ('0' + Math.floor(t / 60) % 24).slice(-2) + ':' + ('0' + t % 60).slice(-2); }
+  var JAM24 = 'class="jam24" inputmode="numeric" maxlength="5" placeholder="07:30" autocomplete="off"';
   function bagian(h) { return form.querySelector('.daftar-jam[data-hari="' + h + '"]'); }
   function baris(fs) { return fs.querySelectorAll('.baris-waktu'); }
   function hitung() {
@@ -135,7 +136,7 @@
   function barisBaru(fs, mulai, selesai) {
     var h = fs.dataset.hari, n = baris(fs).length + 1, d = document.createElement('div');
     d.className = 'baris-waktu';
-    d.innerHTML = '<b>' + n + '</b><input type="time" name="mulai[' + h + '][]" required><span>–</span><input type="time" name="selesai[' + h + '][]" required>';
+    d.innerHTML = '<b>' + n + '</b><input type="text" ' + JAM24 + ' name="mulai[' + h + '][]" required><span>–</span><input type="text" ' + JAM24 + ' name="selesai[' + h + '][]" required>';
     d.children[1].value = mulai; d.children[3].value = selesai;
     fs.insertBefore(d, fs.querySelector('.dua-tombol'));
   }
