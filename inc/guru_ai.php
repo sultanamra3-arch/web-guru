@@ -173,3 +173,63 @@ function ai_revisi(string $md, string $perintah): array
     if (mb_strlen($baru) < mb_strlen($md) * 0.3) return ['ok' => false, 'galat' => 'Hasil revisi AI terlalu pendek, dibatalkan agar dokumen tidak rusak.', 'rincian' => [$r['oleh']]];
     return ['ok' => true, 'isi' => $baru, 'oleh' => $r['oleh']];
 }
+
+/* ---------- Jadwal dari foto roster sekolah ---------- */
+
+/**
+ * AI menyalin SELURUH tabel jadwal (tanpa mencari guru tertentu), lalu program yang memilih sel milik guru.
+ * Menyalin lebih andal daripada menyuruh AI mencari di tabel yang padat.
+ */
+function ai_baca_jadwal(array $foto, string $guru): array
+{
+    $p = "Foto terlampir adalah jadwal pelajaran (roster) sebuah SMP. SALIN tabelnya apa adanya, sel per sel; jangan menyimpulkan apa pun.\n"
+        . "- \"kolom\": daftar nama kelas pada judul kolom, urut kiri ke kanan (mis. [\"VII A\",\"VII B\"]).\n"
+        . "- \"baris\": satu objek per jam pelajaran: hari (Senin–Sabtu; untuk baris tanpa nama hari, pakai hari di atasnya), jam (angka jam ke-), "
+        . "isi = daftar isi sel untuk tiap kolom kelas, urut sama dengan \"kolom\" (kode/nama guru dan/atau mapel persis seperti tertulis; \"\" bila kosong). Abaikan baris istirahat/upacara.\n"
+        . "- \"keterangan\": daftar kode guru → nama (dan mapel) bila ada keterangan kode di foto.\n"
+        . "Bila jadwal berbentuk lain (mis. per guru), salin ke bentuk yang sama sebaik mungkin.\n"
+        . 'Balas HANYA JSON: {"kolom":["VII A"],"baris":[{"hari":"Senin","jam":1,"isi":["05"]}],"keterangan":[{"kode":"05","nama":"Budi Santoso","mapel":"Informatika"}]}';
+    $isi = array_merge([['type' => 'text', 'text' => $p]], ai_bagian_foto($foto, 4));
+    $r = ai_minta([['role' => 'user', 'content' => $isi]], ['gambar' => true, 'maks_token' => 16000, 'waktu' => 180, 'suhu' => 0]);
+    if (!$r['ok']) return $r;
+    $j = ai_ambil_json((string)$r['pesan']['content']);
+    if (!is_array($j) || !is_array($j['baris'] ?? null) || !is_array($j['kolom'] ?? null)) return ['ok' => false, 'galat' => 'AI tidak bisa membaca tabel jadwal dari foto.', 'rincian' => [$r['oleh']]];
+    // kode guru: angka yang diketik langsung, atau dicocokkan dari keterangan
+    $cari = trim($guru);
+    $kode = [];
+    $mapel_kode = [];
+    foreach ((array)($j['keterangan'] ?? []) as $k) {
+        if (!is_array($k)) continue;
+        $kd = trim((string)($k['kode'] ?? ''));
+        $nm = (string)($k['nama'] ?? '');
+        if ($kd === '') continue;
+        $mapel_kode[$kd] = trim((string)($k['mapel'] ?? ''));
+        if (jadwal_nama_cocok($cari, $nm) || strcasecmp($kd, $cari) === 0) $kode[] = $kd;
+    }
+    if (!$kode && preg_match('/^[A-Za-z0-9.]{1,6}$/', $cari)) $kode[] = $cari;
+    $out = [];
+    $kolom = array_map(fn($k) => rapikan_kelas((string)$k), $j['kolom']);
+    foreach ($j['baris'] as $b) {
+        if (!is_array($b) || empty($b['jam'])) continue;
+        foreach (array_values((array)($b['isi'] ?? [])) as $i => $sel) {
+            $sel = trim((string)$sel);
+            if ($sel === '' || !isset($kolom[$i])) continue;
+            $cocok = null;
+            foreach ($kode as $kd) if (preg_match('/(^|[^0-9A-Za-z])' . preg_quote($kd, '/') . '($|[^0-9A-Za-z])/i', $sel)) $cocok = $kd;
+            if ($cocok === null && !jadwal_nama_cocok($cari, $sel)) continue;
+            $out[] = ['hari' => trim((string)($b['hari'] ?? '')), 'jam_ke' => (int)$b['jam'], 'kelas' => $kolom[$i], 'mapel' => $cocok !== null ? ($mapel_kode[$cocok] ?? '') : ''];
+        }
+    }
+    return ['ok' => true, 'jadwal' => $out, 'kode' => $kode, 'oleh' => $r['oleh']];
+}
+
+function jadwal_nama_cocok(string $cari, string $teks): bool
+{
+    $bersih = fn($s) => trim(preg_replace('/\s+/', ' ', preg_replace('/,?\s*(s\.?\s?pd|s\.?\s?ag|s\.?\s?kom|s\.?\s?si|s\.?\s?e|m\.?\s?pd|gr)\.?\b|\(.*?\)|[^a-z\s]/i', ' ', mb_strtolower($s))));
+    $a = $bersih($cari);
+    $b = $bersih($teks);
+    if (mb_strlen($a) < 3 || mb_strlen($b) < 3) return false;
+    if (str_contains($b, $a) || str_contains($a, $b)) return true;
+    similar_text($a, $b, $persen);
+    return $persen >= 80;
+}

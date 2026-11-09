@@ -58,6 +58,13 @@ switch ($aksi) {
         if (!$r['ok']) balas($r);
         q('UPDATE guru_dokumen SET isi = ?, diubah = ? WHERE id = ?', [$r['isi'], sekarang(), $id]);
         balas(['ok' => true, 'oleh' => $r['oleh']]);
+    case 'baca_jadwal':
+        if (!$foto) balas(['ok' => false, 'galat' => 'Ambil foto jadwal dulu.']);
+        $guru = mb_substr(trim((string)post('guru')), 0, 100);
+        if ($guru === '') balas(['ok' => false, 'galat' => 'Isi nama atau kode guru.']);
+        session_write_close();
+        balas(ai_baca_jadwal($foto, $guru));
+
     case 'baca_daftar':
         if (!$foto) balas(['ok' => false, 'galat' => 'Ambil foto daftar siswa dulu.']);
         session_write_close();

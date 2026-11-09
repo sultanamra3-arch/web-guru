@@ -156,7 +156,7 @@ CREATE TABLE `guru_akun` (
 LOCK TABLES `guru_akun` WRITE;
 /*!40000 ALTER TABLE `guru_akun` DISABLE KEYS */;
 INSERT INTO `guru_akun` VALUES
-(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 10:58:05'),
+(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 12:09:34'),
 (2,'guru','Rina Marlina, S.Pd.','','Bahasa Indonesia','$2y$10$Yw3mhbCfjooqB0Du1toAHOUjFDbN9QrzkiWwGmppHqYXAPc4C3aKS','guru',1,'2026-11-08 07:19:47','2026-11-09 10:23:52');
 /*!40000 ALTER TABLE `guru_akun` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -203,22 +203,50 @@ CREATE TABLE `guru_jadwal` (
   `ruang` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `guru_id` (`guru_id`,`hari`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `guru_jadwal` WRITE;
 /*!40000 ALTER TABLE `guru_jadwal` DISABLE KEYS */;
 INSERT INTO `guru_jadwal` VALUES
-(1,1,1,1,'07:30:00','08:50:00','VIII A','Informatika','Lab Komputer'),
-(2,1,1,3,'10:10:00','11:30:00','VII A','Informatika','Lab Komputer'),
-(3,1,2,1,'07:30:00','08:50:00','IX A','Informatika','Lab Komputer'),
-(4,1,2,4,'11:30:00','12:50:00','VIII A','Prakarya','R. VIII A'),
-(5,1,3,2,'08:50:00','10:10:00','VIII A','Informatika','Lab Komputer'),
-(6,1,4,1,'07:30:00','08:50:00','VII A','Informatika','Lab Komputer'),
-(7,1,4,3,'10:10:00','11:30:00','IX A','Prakarya','R. IX A'),
-(8,1,5,2,'08:50:00','10:10:00','IX A','Informatika','Lab Komputer'),
-(9,1,6,1,'07:30:00','08:50:00','VII A','Prakarya','R. VII A'),
-(10,1,1,2,'08:50:00','10:10:00','VII A','Informatika','Lab');
+(47,1,1,1,'07:30:00','08:10:00','VII B','Informatika',''),
+(48,1,1,2,'08:10:00','08:50:00','VIII A','Informatika',''),
+(50,1,1,4,'09:45:00','10:25:00','VIII A','Informatika',''),
+(51,1,1,5,'10:25:00','11:05:00','VII B','Informatika',''),
+(52,1,1,6,'11:05:00','11:45:00','IX A','Informatika',''),
+(53,1,1,7,'12:15:00','12:55:00','VII B','Informatika',''),
+(54,1,1,8,'12:55:00','13:35:00','VIII A','Informatika',''),
+(55,1,2,1,'07:30:00','08:10:00','VII B','Informatika',''),
+(56,1,2,2,'08:10:00','08:50:00','VIII B','Informatika',''),
+(57,1,2,3,'08:50:00','09:30:00','IX A','Informatika',''),
+(58,1,2,4,'09:45:00','10:25:00','VII A','Informatika',''),
+(59,1,2,5,'10:25:00','11:05:00','VII B','Informatika',''),
+(60,1,2,6,'11:05:00','11:45:00','IX A','Informatika',''),
+(61,1,2,7,'12:15:00','12:55:00','VII B','Informatika',''),
+(62,1,2,8,'12:55:00','13:35:00','IX B','Informatika',''),
+(63,1,3,1,'07:30:00','08:10:00','VIII A','Informatika',''),
+(64,1,3,2,'08:10:00','08:50:00','VIII A','Informatika',''),
+(65,1,3,3,'08:50:00','09:30:00','IX A','Informatika',''),
+(66,1,3,4,'09:45:00','10:25:00','IX B','Informatika',''),
+(67,1,3,5,'10:25:00','11:05:00','VIII A','Informatika',''),
+(68,1,3,7,'12:15:00','12:55:00','VIII A','Informatika',''),
+(69,1,3,8,'12:55:00','13:35:00','VII A','Informatika',''),
+(70,1,4,1,'07:30:00','08:10:00','VII A','Informatika',''),
+(71,1,4,3,'08:50:00','09:30:00','VIII B','Informatika',''),
+(72,1,4,4,'09:45:00','10:25:00','VIII B','Informatika',''),
+(73,1,4,5,'10:25:00','11:05:00','VII B','Informatika',''),
+(74,1,4,6,'11:05:00','11:45:00','IX B','Informatika',''),
+(75,1,4,7,'12:15:00','12:55:00','VIII B','Informatika',''),
+(76,1,5,2,'08:05:00','08:40:00','VII B','Informatika',''),
+(77,1,5,3,'08:40:00','09:15:00','IX B','Informatika',''),
+(78,1,5,4,'09:30:00','10:05:00','VII A','Informatika',''),
+(79,1,5,5,'10:05:00','10:40:00','VII B','Informatika',''),
+(80,1,6,1,'07:30:00','08:10:00','VIII A','Informatika',''),
+(81,1,6,2,'08:10:00','08:50:00','VII A','Informatika',''),
+(82,1,6,3,'08:50:00','09:30:00','VIII A','Informatika',''),
+(83,1,6,4,'09:45:00','10:25:00','VII B','Informatika',''),
+(84,1,6,5,'10:25:00','11:05:00','VII B','Informatika',''),
+(85,1,6,6,'11:05:00','11:45:00','IX A','Informatika','');
 /*!40000 ALTER TABLE `guru_jadwal` ENABLE KEYS */;
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `guru_kelas`;
