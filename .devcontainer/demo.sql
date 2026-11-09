@@ -166,7 +166,7 @@ CREATE TABLE `guru_akun` (
 LOCK TABLES `guru_akun` WRITE;
 /*!40000 ALTER TABLE `guru_akun` DISABLE KEYS */;
 INSERT INTO `guru_akun` VALUES
-(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 19:40:30'),
+(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 19:56:09'),
 (2,'guru','Rina Marlina, S.Pd.','','Bahasa Indonesia','$2y$10$Yw3mhbCfjooqB0Du1toAHOUjFDbN9QrzkiWwGmppHqYXAPc4C3aKS','guru',1,'2026-11-08 07:19:47','2026-11-09 16:02:32');
 /*!40000 ALTER TABLE `guru_akun` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -411,10 +411,12 @@ CREATE TABLE `guru_kuis` (
   `mulai_ms` bigint(20) DEFAULT NULL,
   `penilaian_id` int(11) DEFAULT NULL,
   `dibuat` datetime DEFAULT NULL,
+  `mode` varchar(10) NOT NULL DEFAULT 'bersama',
+  `selesai_ms` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `kode` (`kode`),
   KEY `guru_id` (`guru_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `guru_kuis` WRITE;
@@ -433,6 +435,10 @@ CREATE TABLE `guru_kuis_peserta` (
   `jawaban` text DEFAULT NULL,
   `gabung` datetime DEFAULT NULL,
   `terakhir` datetime DEFAULT NULL,
+  `urutan` text DEFAULT NULL,
+  `pos` smallint(6) NOT NULL DEFAULT 0,
+  `soal_ms` bigint(20) DEFAULT NULL,
+  `selesai_ms` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`kuis_id`,`kode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

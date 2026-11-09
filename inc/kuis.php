@@ -80,6 +80,7 @@ function kuis_poin(int $sisa_ms, int $detik): int
  */
 function kuis_maju(array $k): array
 {
+    if (kuis_mandiri($k)) return kuis_mandiri_cek_akhir($k);
     if (!in_array($k['status'], ['soal', 'jawab'], true)) return $k;
     $sekarang = kuis_ms();
     $habis = $sekarang > (int)$k['mulai_ms'] + (int)$k['detik'] * 1000 + 800;
@@ -116,4 +117,63 @@ function kuis_rekap(array $k, array $peringkat): array
             'benar' => $benar, 'pembahasan' => (string)$s['pembahasan']];
     }
     return $out;
+}
+
+/* ---------- Mode mandiri: tiap siswa maju sendiri, soal & pilihan diacak per siswa ---------- */
+function kuis_mandiri(array $k): bool
+{
+    return ($k['mode'] ?? 'bersama') === 'mandiri';
+}
+
+function kuis_urutan_baru(array $k): array
+{
+    $soal = kuis_soal($k);
+    $s = array_keys($soal);
+    shuffle($s);
+    $o = [];
+    foreach ($soal as $i => $x) { $kk = array_keys($x['opsi']); shuffle($kk); $o[$i] = $kk; }
+    return ['s' => $s, 'o' => $o];
+}
+
+/**
+ * Langkah seorang siswa (mode mandiri): siapkan urutan, mulai jam soal, lewati soal yang waktunya habis
+ * (dianggap tidak menjawab), tandai selesai setelah soal terakhir. Mengembalikan baris peserta terbaru.
+ */
+function kuis_mandiri_langkah(array $k, array $p): array
+{
+    if ($k['status'] !== 'jalan') return $p;
+    $now = kuis_ms();
+    if ($now < (int)$k['mulai_ms']) return $p;
+    $total = count(kuis_soal($k));
+    $ubah = [];
+    if (!$p['urutan']) { $p['urutan'] = json_encode(kuis_urutan_baru($k)); $ubah['urutan'] = $p['urutan']; }
+    $pos = (int)$p['pos'];
+    $ms = $p['soal_ms'] !== null ? (int)$p['soal_ms'] : null;
+    if ($pos < $total && $ms === null) { $ms = $now; $ubah['soal_ms'] = $ms; }
+    $batas = (int)$k['detik'] * 1000 + 800;
+    while ($pos < $total && $ms !== null && $now > $ms + $batas) { $pos++; $ms += $batas; $ubah['pos'] = $pos; $ubah['soal_ms'] = $ms; }
+    if ($pos >= $total && $p['selesai_ms'] === null) { $ubah['selesai_ms'] = min($now, $ms ?? $now); }
+    if ($ubah) {
+        q('UPDATE guru_kuis_peserta SET ' . implode(', ', array_map(fn($c) => "$c = ?", array_keys($ubah))) . ' WHERE kuis_id = ? AND kode = ?',
+            [...array_values($ubah), $k['id'], $p['kode']]);
+        $p = array_merge($p, $ubah);
+    }
+    return $p;
+}
+
+/** Mode mandiri: kuis berakhir bila waktu total habis atau semua peserta sudah selesai. */
+function kuis_mandiri_cek_akhir(array $k): array
+{
+    if ($k['status'] !== 'jalan') return $k;
+    $now = kuis_ms();
+    $selesai = $now > (int)$k['selesai_ms'];
+    if (!$selesai && $now > (int)$k['mulai_ms']) {
+        $r = satu('SELECT COUNT(*) n, SUM(selesai_ms IS NOT NULL) s FROM guru_kuis_peserta WHERE kuis_id = ?', [$k['id']]);
+        $selesai = (int)$r['n'] > 0 && (int)$r['s'] >= (int)$r['n'];
+    }
+    if ($selesai) {
+        q("UPDATE guru_kuis SET status = 'selesai' WHERE id = ? AND status = 'jalan'", [$k['id']]);
+        $k['status'] = 'selesai';
+    }
+    return $k;
 }

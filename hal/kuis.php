@@ -16,9 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (post('acak')) shuffle($soal);
     $n = max(1, min(count($soal), (int)post('jumlah', count($soal))));
     $soal = array_slice($soal, 0, $n);
-    q('INSERT INTO guru_kuis (guru_id, paket_id, kelas, tahun, judul, kode, soal, detik, dibuat) VALUES (?,?,?,?,?,?,?,?,?)',
+    q('INSERT INTO guru_kuis (guru_id, paket_id, kelas, tahun, judul, kode, soal, detik, mode, dibuat) VALUES (?,?,?,?,?,?,?,?,?,?)',
         [uid(), $paket['id'], $kelas, tahun_aktif(), mb_substr(trim((string)post('judul')) ?: $paket['judul'], 0, 200), kuis_kode_baru(),
-         json_encode($soal, JSON_UNESCAPED_UNICODE), in_array((int)post('detik'), [10, 15, 20, 30, 45, 60, 90], true) ? (int)post('detik') : 20, sekarang()]);
+         json_encode($soal, JSON_UNESCAPED_UNICODE), in_array((int)post('detik'), [10, 15, 20, 30, 45, 60, 90], true) ? (int)post('detik') : 20,
+         post('mode') === 'bersama' ? 'bersama' : 'mandiri', sekarang()]);
     ke('?p=kuis_main&id=' . db()->lastInsertId());
 }
 
@@ -34,6 +35,11 @@ judul_baris('Kuis cepat');
 <?php else: ?>
 <form method="post" class="kartu formulir">
   <?= input_token() ?>
+  <fieldset class="pilih-mode">
+    <legend>Cara main</legend>
+    <label class="kartu-pilih"><input type="radio" name="mode" value="mandiri" checked><span><b>Mandiri</b><small>Siswa maju sendiri-sendiri tanpa menunggu teman; soal &amp; pilihan diacak per siswa; layar guru menampilkan balapan kemajuan</small></span></label>
+    <label class="kartu-pilih"><input type="radio" name="mode" value="bersama"><span><b>Bersama</b><small>Soal tampil di proyektor, semua siswa menjawab soal yang sama bersamaan</small></span></label>
+  </fieldset>
   <label>Paket soal <small>(yang dipakai hanya soal pilihan ganda & benar/salah)</small><select name="paket" required><?= pilihan($paket, '', 'id', 'judul') ?></select></label>
   <div class="baris2">
     <label>Kelas<select name="kelas" required><?= pilihan(array_combine($kl, $kl) ?: [], '') ?></select></label>
@@ -43,7 +49,7 @@ judul_baris('Kuis cepat');
     <label>Jumlah soal <small>(kosong = semua)</small><input type="number" name="jumlah" min="1" max="60" placeholder="semua"></label>
     <label>Judul <small>(opsional)</small><input name="judul" placeholder="mis. Kuis Algoritma"></label>
   </div>
-  <label class="centang"><input type="checkbox" name="acak" value="1" checked> Acak urutan soal</label>
+  <label class="centang"><input type="checkbox" name="acak" value="1" checked> <span>Acak urutan soal <small class="redup">(mode mandiri selalu diacak per siswa)</small></span></label>
   <button class="utama lebar">▶ Buat kuis &amp; buka layar kuis</button>
 </form>
 <?php endif; ?>
@@ -52,7 +58,7 @@ judul_baris('Kuis cepat');
 <ul class="daftar kartu">
   <?php foreach ($daftar as $k): ?>
   <li class="baris-kuis"><a href="?p=kuis_main&amp;id=<?= (int)$k['id'] ?>"><b><?= h($k['judul']) ?></b>
-    <small>Kelas <?= h($k['kelas']) ?> · <?= count(kuis_soal($k)) ?> soal · <?= (int)$k['n'] ?> peserta · <?= ['lobi' => 'belum mulai', 'soal' => 'berlangsung', 'jawab' => 'berlangsung', 'selesai' => 'selesai'][$k['status']] ?? $k['status'] ?> · <?= h(tgl(substr((string)$k['dibuat'], 0, 10))) ?></small></a>
+    <small>Kelas <?= h($k['kelas']) ?> · <?= count(kuis_soal($k)) ?> soal · <?= (int)$k['n'] ?> peserta · <?= kuis_mandiri($k) ? 'mandiri' : 'bersama' ?> · <?= ['lobi' => 'belum mulai', 'soal' => 'berlangsung', 'jawab' => 'berlangsung', 'jalan' => 'berlangsung', 'selesai' => 'selesai'][$k['status']] ?? $k['status'] ?> · <?= h(tgl(substr((string)$k['dibuat'], 0, 10))) ?></small></a>
     <form method="post" onsubmit="return confirm('Hapus kuis ini?')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><input type="hidden" name="id" value="<?= (int)$k['id'] ?>"><button class="kecil bahaya" aria-label="Hapus">🗑</button></form></li>
   <?php endforeach; ?>
 </ul>

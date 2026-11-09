@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 7;
+const SKEMA_VERSI = 8;
 
 function pastikan_skema(): void
 {
@@ -273,6 +273,7 @@ function pastikan_skema(): void
     foreach ($sql as $q) db()->exec($q);
     skema_migrasi_4();
     skema_migrasi_5();
+    skema_migrasi_8();
     @file_put_contents($f, date('c'));
 }
 
@@ -314,4 +315,16 @@ function skema_migrasi_5(): void
     // perbaiki data lama: pilihan kelas dulu terkirim sebagai "Kelas 8"
     db()->exec("UPDATE guru_soal SET kelas = TRIM(SUBSTRING(kelas, 7)) WHERE kelas LIKE 'Kelas %'");
     db()->exec("UPDATE guru_dokumen SET kelas = TRIM(SUBSTRING(kelas, 7)) WHERE kelas LIKE 'Kelas %' AND jenis IN ('modul', 'lkpd', 'presentasi')");
+}
+
+/** v8: kuis cepat mode mandiri (siswa mengerjakan sendiri-sendiri, soal & pilihan diacak per siswa). */
+function skema_migrasi_8(): void
+{
+    $kolom = [
+        'guru_kuis' => ['mode' => "VARCHAR(10) NOT NULL DEFAULT 'bersama'", 'selesai_ms' => 'BIGINT NULL'],
+        'guru_kuis_peserta' => ['urutan' => 'TEXT NULL', 'pos' => 'SMALLINT NOT NULL DEFAULT 0', 'soal_ms' => 'BIGINT NULL', 'selesai_ms' => 'BIGINT NULL'],
+    ];
+    foreach ($kolom as $t => $daftar) {
+        foreach ($daftar as $k => $def) if (!kolom_ada($t, $k)) db()->exec("ALTER TABLE $t ADD COLUMN $k $def");
+    }
 }

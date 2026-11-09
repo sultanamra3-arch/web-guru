@@ -16,6 +16,64 @@ $soal = kuis_soal($k);
 $no = (int)$k['nomor'];
 $jw = json_decode((string)$p['jawaban'], true) ?: [];
 
+/** Rekap untuk siswa di akhir (urutan asli soal; jawaban ditampilkan sebagai teks pilihannya). */
+function kuis_rekap_siswa(array $soal, array $jw): array
+{
+    $out = [];
+    foreach ($soal as $i => $x) $out[] = ['no' => $i + 1, 'teks' => $x['teks'], 'kunci' => $x['kunci'], 'kunci_teks' => (string)($x['opsi'][$x['kunci']] ?? ''),
+        'jawabku' => $jw[$i]['p'] ?? null, 'jawab_teks' => isset($jw[$i]['p']) ? (string)($x['opsi'][$jw[$i]['p']] ?? '') : '',
+        'poin' => (int)($jw[$i]['poin'] ?? 0), 'pembahasan' => (string)$x['pembahasan']];
+    return $out;
+}
+
+if (kuis_mandiri($k)) {
+    // ---------- mode mandiri: tiap siswa maju sendiri ----------
+    $p = kuis_mandiri_langkah($k, $p);
+    $total = count($soal);
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'jawab' && $k['status'] === 'jalan') {
+        $ur = json_decode((string)$p['urutan'], true) ?: [];
+        $pos = (int)$p['pos'];
+        $i = $ur['s'][$pos] ?? null;
+        $pilih = strtoupper((string)post('pilihan'));
+        $sisa = (int)$p['soal_ms'] + (int)$k['detik'] * 1000 - kuis_ms();
+        if ($i !== null && (int)post('nomor') === $pos && isset($soal[$i]['opsi'][$pilih]) && !isset($jw[$i]) && $sisa > -1000) {
+            $benar = $pilih === $soal[$i]['kunci'];
+            $poin = $benar ? kuis_poin($sisa, (int)$k['detik']) : 0;
+            $jw[$i] = ['p' => $pilih, 'poin' => $poin];
+            $now = kuis_ms();
+            // simpan & langsung ke soal berikutnya (hanya bila posisi belum berubah: cegah kirim ganda)
+            $n = q('UPDATE guru_kuis_peserta SET jawaban = ?, poin = poin + ?, benar = benar + ?, pos = pos + 1, soal_ms = ?, selesai_ms = ?, terakhir = ?
+                    WHERE kuis_id = ? AND kode = ? AND pos = ?',
+                [json_encode($jw, JSON_FORCE_OBJECT), $poin, $benar ? 1 : 0, $now, $pos + 1 >= $total ? $now : null, sekarang(), $kid, $kode, $pos])->rowCount();
+            $p = satu('SELECT * FROM guru_kuis_peserta WHERE kuis_id = ? AND kode = ?', [$kid, $kode]);
+            $jw = json_decode((string)$p['jawaban'], true) ?: [];
+            if ($n) $k = kuis_mandiri_cek_akhir($k);
+        }
+    } else {
+        q('UPDATE guru_kuis_peserta SET terakhir = ? WHERE kuis_id = ? AND kode = ?', [sekarang(), $kid, $kode]);
+    }
+    $out = ['ok' => true, 'mode' => 'mandiri', 'status' => $k['status'], 'total' => $total, 'detik' => (int)$k['detik'],
+        'mulai_dalam' => max(0, (int)$k['mulai_ms'] - kuis_ms()), 'nomor' => (int)$p['pos'], 'soal' => null, 'sisa_ms' => 0,
+        'selesai_saya' => $p['selesai_ms'] !== null, 'poin' => null, 'benar' => null, 'rank' => null,
+        'jumlah' => (int)nilai('SELECT COUNT(*) FROM guru_kuis_peserta WHERE kuis_id = ?', [$kid])];
+    if ($k['status'] === 'jalan' && $p['selesai_ms'] === null && $out['mulai_dalam'] === 0 && (int)$p['pos'] < $total) {
+        $ur = json_decode((string)$p['urutan'], true) ?: [];
+        $i = $ur['s'][(int)$p['pos']] ?? 0;
+        $x = $soal[$i];
+        $out['soal'] = ['teks' => $x['teks'], 'g' => gambar_url($x['gambar'] ?? null),
+            'opsi' => array_map(fn($h) => ['k' => $h, 't' => (string)$x['opsi'][$h]], $ur['o'][$i] ?? array_keys($x['opsi']))];
+        $out['sisa_ms'] = max(0, (int)$p['soal_ms'] + (int)$k['detik'] * 1000 - kuis_ms());
+    }
+    if ($p['selesai_ms'] !== null) $out['urut_selesai'] = 1 + (int)nilai('SELECT COUNT(*) FROM guru_kuis_peserta WHERE kuis_id = ? AND selesai_ms IS NOT NULL AND selesai_ms < ?', [$kid, $p['selesai_ms']]);
+    if ($k['status'] === 'selesai') {
+        foreach (kuis_peringkat($kid) as $r) if ($r['kode'] === $kode) $out['rank'] = $r['rank'];
+        $out['poin'] = (int)$p['poin']; $out['benar'] = (int)$p['benar'];
+        $out['rekap'] = kuis_rekap_siswa($soal, $jw);
+    }
+    echo json_encode($out, JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'jawab') {
     $pilih = strtoupper((string)post('pilihan'));
     $s = $soal[$no] ?? null;
@@ -40,9 +98,7 @@ $jumlah = 0;
 $rekap = null;
 if ($k['status'] === 'selesai') {
     foreach (kuis_peringkat($kid) as $r) { $jumlah++; if ($r['kode'] === $kode) $rank = $r['rank']; }
-    $rekap = [];
-    foreach ($soal as $i => $x) $rekap[] = ['no' => $i + 1, 'teks' => $x['teks'], 'kunci' => $x['kunci'], 'kunci_teks' => (string)($x['opsi'][$x['kunci']] ?? ''),
-        'jawabku' => $jw[$i]['p'] ?? null, 'poin' => (int)($jw[$i]['poin'] ?? 0), 'pembahasan' => (string)$x['pembahasan']];
+    $rekap = kuis_rekap_siswa($soal, $jw);
 } else {
     $jumlah = (int)nilai('SELECT COUNT(*) FROM guru_kuis_peserta WHERE kuis_id = ?', [$kid]);
 }
