@@ -252,3 +252,24 @@ body.polos main{max-width:none;padding:0}
 .jam24{text-align:center;font-variant-numeric:tabular-nums;letter-spacing:.03em}
 .tgl-jam{display:grid;grid-template-columns:1fr 6rem;gap:.4rem}
 .ubah-penilaian{margin-top:.4rem}.ubah-penilaian summary{cursor:pointer;color:var(--navy);font-weight:700;font-size:.9rem}
+/* ---------- Asisten AI ---------- */
+.chat{display:flex;flex-direction:column;gap:.6rem;padding-bottom:9rem}
+.gelembung{max-width:88%;padding:.65rem .85rem;border-radius:16px;line-height:1.45;word-wrap:break-word;font-size:.95rem}
+.gelembung.ai{background:#fff;border:1px solid var(--garis);align-self:flex-start;border-bottom-left-radius:4px}
+.gelembung.saya{background:var(--navy);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.gelembung.galat{background:#fde8e6;border-color:#f0c2c8}
+.gelembung.menunggu{color:var(--redup);font-style:italic}
+.gelembung small.oleh{display:block;margin-top:.35rem;color:var(--redup);font-size:.72rem}
+.gelembung .foto-chat{display:block;max-width:180px;border-radius:10px;margin-top:.4rem}
+.usulan{align-self:stretch;background:#fff8dc;border:1px solid #f2dc8c;border-radius:14px;padding:.8rem .9rem}
+.usulan-judul{font-weight:700;margin-bottom:.3rem}
+.usulan dl{font-size:.88rem;margin:.3rem 0 .6rem;display:grid;grid-template-columns:auto 1fr;gap:.15rem .7rem}
+.usulan dt{color:var(--redup)}.usulan dd{margin:0;font-weight:600}
+.usulan-aksi{display:flex;gap:.5rem;flex-wrap:wrap}.usulan-aksi .utama{flex:1}
+.usulan-hasil{font-size:.9rem}.usulan-hasil.ok{color:#1d6b33;font-weight:700}.usulan-hasil.galat{color:#b3261e}
+.chat-form{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom));background:var(--latar,#f4f6fb);padding:.5rem .7rem;border-top:1px solid var(--garis);z-index:6}
+.chat-baris{display:flex;gap:.45rem;align-items:flex-end;max-width:760px;margin:0 auto}
+.chat-baris textarea{flex:1;min-height:44px;max-height:160px;resize:none}
+.chat-baris button{flex:none}
+.tombol-foto{flex:none;padding:.55rem .6rem;font-size:1.2rem;line-height:1}
+#chat-foto-pratinjau{max-width:760px;margin:0 auto}

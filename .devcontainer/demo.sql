@@ -26,7 +26,7 @@ CREATE TABLE `guru_absensi` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unik` (`guru_id`,`kelas`,`tanggal`,`mapel`,`member_id`),
   KEY `kelas` (`kelas`,`tanggal`)
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=111 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `guru_absensi` WRITE;
@@ -131,7 +131,17 @@ INSERT INTO `guru_absensi` VALUES
 (97,1,'VIII A','2026-11-04','Informatika','9000000017','H','','2026-11-08 07:19:47'),
 (98,1,'VIII A','2026-11-04','Informatika','9000000018','H','','2026-11-08 07:19:47'),
 (99,1,'VIII A','2026-11-04','Informatika','9000000019','S','demam','2026-11-08 07:19:47'),
-(100,1,'VIII A','2026-11-04','Informatika','9000000020','S','demam','2026-11-08 07:19:47');
+(100,1,'VIII A','2026-11-04','Informatika','9000000020','S','demam','2026-11-08 07:19:47'),
+(101,1,'VIII A','2026-11-09','Informatika','9000000012','S','','2026-11-09 14:50:27'),
+(102,1,'VIII A','2026-11-09','Informatika','9000000013','I','acara keluarga','2026-11-09 14:50:27'),
+(103,1,'VIII A','2026-11-09','Informatika','9000000019','H','','2026-11-09 14:50:27'),
+(104,1,'VIII A','2026-11-09','Informatika','9000000015','H','','2026-11-09 14:50:27'),
+(105,1,'VIII A','2026-11-09','Informatika','9000000020','H','','2026-11-09 14:50:27'),
+(106,1,'VIII A','2026-11-09','Informatika','9000000018','H','','2026-11-09 14:50:27'),
+(107,1,'VIII A','2026-11-09','Informatika','9000000016','H','','2026-11-09 14:50:27'),
+(108,1,'VIII A','2026-11-09','Informatika','9000000011','H','','2026-11-09 14:50:27'),
+(109,1,'VIII A','2026-11-09','Informatika','9000000017','H','','2026-11-09 14:50:27'),
+(110,1,'VIII A','2026-11-09','Informatika','9000000014','H','','2026-11-09 14:50:27');
 /*!40000 ALTER TABLE `guru_absensi` ENABLE KEYS */;
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `guru_akun`;
@@ -156,8 +166,8 @@ CREATE TABLE `guru_akun` (
 LOCK TABLES `guru_akun` WRITE;
 /*!40000 ALTER TABLE `guru_akun` DISABLE KEYS */;
 INSERT INTO `guru_akun` VALUES
-(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 14:18:24'),
-(2,'guru','Rina Marlina, S.Pd.','','Bahasa Indonesia','$2y$10$Yw3mhbCfjooqB0Du1toAHOUjFDbN9QrzkiWwGmppHqYXAPc4C3aKS','guru',1,'2026-11-08 07:19:47','2026-11-09 12:39:02');
+(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 14:52:22'),
+(2,'guru','Rina Marlina, S.Pd.','','Bahasa Indonesia','$2y$10$Yw3mhbCfjooqB0Du1toAHOUjFDbN9QrzkiWwGmppHqYXAPc4C3aKS','guru',1,'2026-11-08 07:19:47','2026-11-09 14:50:31');
 /*!40000 ALTER TABLE `guru_akun` ENABLE KEYS */;
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `guru_dokumen`;
@@ -315,7 +325,7 @@ INSERT INTO `guru_kelas_siswa` VALUES
 ('2026/2027','9000000008','VII A',6),
 ('2026/2027','9000000009','VII A',2),
 ('2026/2027','9000000010','VII A',10),
-('2026/2027','9000000011','VIII A',NULL),
+('2026/2027','9000000011','VII A',NULL),
 ('2026/2027','9000000012','VIII A',NULL),
 ('2026/2027','9000000013','VIII A',NULL),
 ('2026/2027','9000000014','VIII A',NULL),
@@ -393,8 +403,8 @@ CREATE TABLE `guru_nilai` (
 LOCK TABLES `guru_nilai` WRITE;
 /*!40000 ALTER TABLE `guru_nilai` DISABLE KEYS */;
 INSERT INTO `guru_nilai` VALUES
-(1,'9000000011',74.00,'remedial'),
-(1,'9000000012',84.00,''),
+(1,'9000000011',88.00,'remedial'),
+(1,'9000000012',92.00,''),
 (1,'9000000013',52.00,'Foto: benar 8/18 PG'),
 (1,'9000000014',93.00,''),
 (1,'9000000015',65.00,'remedial'),

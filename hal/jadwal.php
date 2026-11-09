@@ -1,36 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/* Jam pelajaran diisi sendiri oleh tiap guru (bawaan: contoh di bawah). Disimpan sebagai baris "1 07:30-08:10". */
-const JAM_BAWAAN_UMUM = "1 07:30-08:10\n2 08:10-08:50\n3 08:50-09:30\n4 09:45-10:25\n5 10:25-11:05\n6 11:05-11:45\n7 12:15-12:55\n8 12:55-13:35";
-const JAM_BAWAAN_JUMAT = "1 07:30-08:05\n2 08:05-08:40\n3 08:40-09:15\n4 09:30-10:05\n5 10:05-10:40\n6 10:40-11:15";
-
-function urai_jam(string $teks): array
-{
-    $out = [];
-    foreach (preg_split('/\r?\n/', $teks) as $b) {
-        if (preg_match('/^\s*(\d{1,2})\D+(\d{1,2})[.:](\d{2})\s*[-–]\s*(\d{1,2})[.:](\d{2})/', $b, $m)) {
-            $out[(int)$m[1]] = [sprintf('%02d:%s', $m[2], $m[3]), sprintf('%02d:%s', $m[4], $m[5])];
-        }
-    }
-    ksort($out);
-    return $out;
-}
-/** Jam pelajaran satu hari milik guru ini (tiap hari bisa berbeda). */
-function jam_hari(int $hari): array
-{
-    $t = setelan('jam_h' . $hari . ':' . uid())
-        ?? ($hari === 5 ? setelan('jam_jumat:' . uid()) : setelan('jam_umum:' . uid()))
-        ?? ($hari === 5 ? JAM_BAWAAN_JUMAT : JAM_BAWAAN_UMUM);
-    if (trim((string)$t) === '0') return [];   // hari libur / tidak ada jam
-    return urai_jam((string)$t) ?: urai_jam($hari === 5 ? JAM_BAWAAN_JUMAT : JAM_BAWAAN_UMUM);
-}
-function jam_sudah_diatur(): bool
-{
-    foreach (array_keys(HARI) as $h) if (setelan('jam_h' . $h . ':' . uid()) !== null) return true;
-    return setelan('jam_umum:' . uid()) !== null;
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (post('aksi') === 'jam') {
         foreach (array_keys(HARI) as $h) {

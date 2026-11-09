@@ -58,6 +58,29 @@ switch ($aksi) {
         if (!$r['ok']) balas($r);
         q('UPDATE guru_dokumen SET isi = ?, diubah = ? WHERE id = ?', [$r['isi'], sekarang(), $id]);
         balas(['ok' => true, 'oleh' => $r['oleh']]);
+    case 'chat':
+    case 'simpan_usulan':
+    case 'batal_usulan':
+    case 'chat_baru':
+        if (!adalah_admin()) balas(['ok' => false, 'galat' => 'Asisten khusus admin.', 'teks' => 'Asisten khusus admin.']);
+        if ($aksi === 'chat') {
+            $teks = mb_substr(trim((string)post('pesan')), 0, 4000);
+            if ($teks === '' && !$foto) balas(['ok' => false, 'teks' => 'Tulis pesan dulu.']);
+            balas(asisten_giliran($teks, $foto));
+        }
+        if ($aksi === 'simpan_usulan') balas(asisten_simpan_usulan((string)post('id')));
+        if ($aksi === 'batal_usulan') {
+            $id = (string)post('id');
+            if (isset($_SESSION['usulan_guru'][$id]) && empty($_SESSION['usulan_guru'][$id]['selesai'])) {
+                $_SESSION['usulan_guru'][$id]['selesai'] = true;
+                asisten_riwayat_tambah('assistant', '[Catatan sistem] Usulan ' . $id . ' DIBATALKAN oleh pengguna.');
+            }
+            balas(['ok' => true]);
+        }
+        $_SESSION['asisten_guru'] = [];
+        $_SESSION['usulan_guru'] = [];
+        balas(['ok' => true]);
+
     case 'baca_jadwal':
         if (!$foto) balas(['ok' => false, 'galat' => 'Ambil foto jadwal dulu.']);
         $guru = mb_substr(trim((string)post('guru')), 0, 100);
