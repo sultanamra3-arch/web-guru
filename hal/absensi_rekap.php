@@ -54,6 +54,7 @@ judul_baris('Rekap absensi', '<button type="button" class="tombol" onclick="wind
   <div class="kop-cetak hanya-cetak"><img src="aset/logo.png" alt=""><div><b><?= h((string)k('sekolah')) ?></b><br>Rekap Absensi Siswa</div></div>
   <h2>Kelas <?= h($kelas) ?> · <?= BULAN[(int)substr($bulan, 5)] ?> <?= substr($bulan, 0, 4) ?><?= $mapel ? ' · ' . h($mapel) : '' ?></h2>
   <?php if (!$tgl_ada): ?><p class="redup">Belum ada data absensi pada bulan ini.</p><?php else: ?>
+  <p class="kecil redup tak-cetak"><?= count($tgl_ada) ?> pertemuan diisi. Hanya tanggal yang diisi yang dihitung; hari tanpa absensi tidak dianggap hadir. Tanda · = siswa itu tidak diberi status.</p>
   <div class="tabel-gulir">
   <table class="tabel rapat">
     <thead><tr><th>No</th><th>Nama</th><?php foreach ($tgl_ada as $t): ?><th><?= date('d', strtotime($t)) ?></th><?php endforeach; ?><th>H</th><th>S</th><th>I</th><th>A</th><th>%</th></tr></thead>

@@ -9,10 +9,13 @@
   // Cegah klik ganda pada formulir biasa
   $$('form[method="post"]').forEach(function (f) {
     f.addEventListener('submit', function (e) {
-      if (e.defaultPrevented) return;
       if (f.dataset.terkirim) { e.preventDefault(); return; }
-      f.dataset.terkirim = '1';
-      setTimeout(function () { delete f.dataset.terkirim; }, 15000);
+      // tandai terkirim setelah semua pemeriksaan lain selesai; bila dibatalkan, jangan dikunci
+      setTimeout(function () {
+        if (e.defaultPrevented) return;
+        f.dataset.terkirim = '1';
+        setTimeout(function () { delete f.dataset.terkirim; }, 15000);
+      }, 0);
     });
   });
 
@@ -216,13 +219,26 @@
   /* ---------- Absensi ---------- */
   var fa = $('#form-absen');
   if (fa) {
+    var baris = $$('.absen li', fa);
+    function belum() { return baris.filter(function (li) { return !$('input[type=radio]:checked', li); }); }
     function hitung() {
       var h = { H: 0, S: 0, I: 0, A: 0 };
       $$('input[type=radio]:checked', fa).forEach(function (r) { h[r.value]++; });
-      $('#hitung-absen').textContent = 'H ' + h.H + ' · S ' + h.S + ' · I ' + h.I + ' · A ' + h.A;
+      var b = belum().length;
+      $('#hitung-absen').innerHTML = 'H ' + h.H + ' · S ' + h.S + ' · I ' + h.I + ' · A ' + h.A + (b ? ' · <b>belum dipilih ' + b + '</b>' : '');
+      baris.forEach(function (li) { li.classList.toggle('belum-pilih', !$('input[type=radio]:checked', li)); });
     }
+    function sisanyaHadir() { belum().forEach(function (li) { var r = $('input[type=radio][value=H]', li); if (r) r.checked = true; }); hitung(); }
     fa.addEventListener('change', hitung);
-    $('#semua-hadir').addEventListener('click', function () { $$('input[type=radio][value=H]', fa).forEach(function (r) { r.checked = true; }); hitung(); });
+    $('#semua-hadir').addEventListener('click', sisanyaHadir);
+    fa.addEventListener('submit', function (e) {
+      var b = belum();
+      if (!b.length) return;
+      if (b.length === baris.length) { e.preventDefault(); alert('Belum ada siswa yang dipilih. Pilih S/I/A untuk yang tidak hadir, atau tekan "Sisanya hadir".'); return; }
+      if (confirm(b.length + ' siswa belum dipilih. Tandai mereka HADIR?\n\nOK = tandai hadir lalu simpan\nBatal = periksa lagi')) { sisanyaHadir(); return; }
+      e.preventDefault(); b[0].scrollIntoView({ block: 'center' });
+    });
+    hitung();
   }
 
   /* ---------- Nilai: tandai di bawah KKTP ---------- */

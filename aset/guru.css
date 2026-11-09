@@ -308,3 +308,8 @@ html.apl input,html.apl select,html.apl textarea{font-size:max(16px,1em)}
 .opsi-baris{display:grid!important;grid-template-columns:1.6rem 1.4rem 1fr;align-items:center;gap:.3rem;margin:0!important}
 .opsi-baris input[type=radio]{width:20px;height:20px;accent-color:#2E9E48}
 .lengket-bawah{position:sticky;bottom:64px;z-index:4;box-shadow:0 -6px 18px rgba(0,0,0,.06)}
+
+.lencana.abu{background:var(--garis,#e5e7eb);color:var(--redup,#6b7280)}
+.absen li.belum-pilih .absen-nama b{color:var(--redup,#6b7280)}
+.absen li.belum-pilih .absen-pilih .pil span{border-style:dashed}
+.hapus-absen{margin-top:14px;text-align:center}

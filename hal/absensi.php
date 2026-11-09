@@ -14,19 +14,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         pesan('Kelas atau tanggal tidak valid.', 'galat');
     } else {
         $siswa = array_column(siswa_kelas($kelas), 'member_id');
+        if (post('aksi') === 'hapus') {
+            $n = q('DELETE FROM guru_absensi WHERE guru_id = ? AND kelas = ? AND tanggal = ? AND mapel = ?', [uid(), $kelas, $tanggal, $mapel])->rowCount();
+            pesan('Absensi kelas ' . h($kelas) . ' tanggal ' . h(tgl($tanggal)) . ' dihapus (' . $n . ' siswa). Tanggal ini kembali "belum diisi".');
+            ke('?' . http_build_query(['p' => 'absensi', 'kelas' => $kelas, 'tanggal' => $tanggal, 'mapel' => $mapel]));
+        }
         $st = (array)($_POST['status'] ?? []);
         $ket = (array)($_POST['ket'] ?? []);
         db()->beginTransaction();
         $n = 0;
         foreach ($siswa as $mid) {
-            $s = strtoupper((string)($st[$mid] ?? 'H'));
-            if (!in_array($s, ['H', 'S', 'I', 'A'], true)) $s = 'H';
+            // siswa yang tidak dipilih statusnya TIDAK disimpan (tidak dianggap hadir)
+            $s = strtoupper((string)($st[$mid] ?? ''));
+            if (!in_array($s, ['H', 'S', 'I', 'A'], true)) continue;
             q('INSERT INTO guru_absensi (guru_id, kelas, tanggal, mapel, member_id, status, ket, diubah) VALUES (?,?,?,?,?,?,?,?)
                ON DUPLICATE KEY UPDATE status = VALUES(status), ket = VALUES(ket), diubah = VALUES(diubah)',
                 [uid(), $kelas, $tanggal, $mapel, $mid, $s, mb_substr(trim((string)($ket[$mid] ?? '')), 0, 200), sekarang()]);
             $n++;
         }
         db()->commit();
+        if ($n === 0) {
+            pesan('Belum ada siswa yang dipilih statusnya, jadi tidak ada yang disimpan.', 'galat');
+            ke('?' . http_build_query(['p' => 'absensi', 'kelas' => $kelas, 'tanggal' => $tanggal, 'mapel' => $mapel]));
+        }
         pesan('Absensi kelas ' . h($kelas) . ' tanggal ' . h(tgl($tanggal)) . ' tersimpan (' . $n . ' siswa).');
     }
     ke('?' . http_build_query(['p' => 'absensi', 'kelas' => $kelas, 'tanggal' => $tanggal, 'mapel' => $mapel]));
@@ -35,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $siswa = kelas_valid($kelas) ? siswa_kelas($kelas) : [];
 $ada = [];
 foreach (semua('SELECT member_id, status, ket FROM guru_absensi WHERE guru_id = ? AND kelas = ? AND tanggal = ? AND mapel = ?', [uid(), $kelas, $tanggal, $mapel]) as $r) $ada[$r['member_id']] = $r;
-$hitung = ['H' => 0, 'S' => 0, 'I' => 0, 'A' => 0];
-foreach ($siswa as $s) $hitung[$ada[$s['member_id']]['status'] ?? 'H']++;
+$hitung = ['H' => 0, 'S' => 0, 'I' => 0, 'A' => 0, '' => 0];
+foreach ($siswa as $s) $hitung[$ada[$s['member_id']]['status'] ?? '']++;
 
 kepala('Absensi', 'kelas');
 judul_baris('Absensi siswa', '<a class="tombol" href="?p=absensi_rekap&amp;kelas=' . h(rawurlencode($kelas)) . '">Rekap</a>');
@@ -57,12 +67,13 @@ judul_baris('Absensi siswa', '<a class="tombol" href="?p=absensi_rekap&amp;kelas
   <?= input_token() ?>
   <input type="hidden" name="kelas" value="<?= h($kelas) ?>"><input type="hidden" name="tanggal" value="<?= h($tanggal) ?>"><input type="hidden" name="mapel" value="<?= h($mapel) ?>">
   <div class="kartu lengket ringkas-absen">
-    <span><b><?= h($kelas) ?></b> · <?= h(tgl($tanggal)) ?><?= $ada ? ' · <span class="lencana">sudah diisi</span>' : '' ?></span>
-    <span id="hitung-absen" class="kecil">H <?= $hitung['H'] ?> · S <?= $hitung['S'] ?> · I <?= $hitung['I'] ?> · A <?= $hitung['A'] ?></span>
-    <button type="button" class="kecil" id="semua-hadir">Semua hadir</button>
+    <span><b><?= h($kelas) ?></b> · <?= h(tgl($tanggal)) ?><?= $ada ? ' · <span class="lencana">sudah diisi</span>' : ' · <span class="lencana abu">belum diisi</span>' ?></span>
+    <span id="hitung-absen" class="kecil">H <?= $hitung['H'] ?> · S <?= $hitung['S'] ?> · I <?= $hitung['I'] ?> · A <?= $hitung['A'] ?><?= $hitung[''] ? ' · <b>belum dipilih ' . $hitung[''] . '</b>' : '' ?></span>
+    <button type="button" class="kecil" id="semua-hadir">Sisanya hadir</button>
   </div>
+  <?php if (!$ada): ?><p class="kecil redup">Absensi tanggal ini <b>belum diisi</b>. Cukup pilih siswa yang <b>S / I / A</b>, lalu Simpan — sisanya bisa ditandai hadir sekaligus. Hari yang tidak diisi tidak dihitung di rekap.</p><?php endif; ?>
   <ul class="daftar kartu absen">
-  <?php foreach ($siswa as $i => $s): $cur = $ada[$s['member_id']]['status'] ?? 'H'; ?>
+  <?php foreach ($siswa as $i => $s): $cur = $ada[$s['member_id']]['status'] ?? ''; ?>
     <li>
       <div class="absen-nama"><span class="no"><?= $i + 1 ?></span> <b><?= h($s['member_name']) ?></b> <small><?= (int)$s['gender'] === 1 ? 'L' : 'P' ?></small></div>
       <div class="absen-pilih">
@@ -76,6 +87,13 @@ judul_baris('Absensi siswa', '<a class="tombol" href="?p=absensi_rekap&amp;kelas
   </ul>
   <button class="utama lebar">Simpan absensi (<?= count($siswa) ?> siswa)</button>
 </form>
+<?php if ($ada): ?>
+<form method="post" class="hapus-absen" onsubmit="return confirm('Hapus absensi kelas <?= h($kelas) ?> tanggal <?= h(tgl($tanggal)) ?>? Tanggal ini akan kembali \'belum diisi\' dan tidak dihitung di rekap.')">
+  <?= input_token() ?><input type="hidden" name="aksi" value="hapus">
+  <input type="hidden" name="kelas" value="<?= h($kelas) ?>"><input type="hidden" name="tanggal" value="<?= h($tanggal) ?>"><input type="hidden" name="mapel" value="<?= h($mapel) ?>">
+  <button class="kecil bahaya">Hapus absensi tanggal ini (kalau tidak sengaja tersimpan)</button>
+</form>
+<?php endif; ?>
 <?php endif; ?>
 <?php
 kaki();
