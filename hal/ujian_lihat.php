@@ -42,13 +42,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             pesan('Jawaban ' . h(nama_siswa($kode)) . ' dihapus; siswa bisa mengulang dari awal.');
             break;
         case 'hapus':
-            if (!nilai('SELECT 1 FROM guru_ujian_peserta WHERE ujian_id = ? LIMIT 1', [$id])) {
-                q('DELETE FROM guru_ujian WHERE id = ?', [$id]);
-                pesan('Ujian dihapus.');
-                ke('?p=ujian');
-            }
-            pesan('Ujian yang sudah dikerjakan tidak bisa dihapus.', 'galat');
-            break;
+            // jawaban siswa ikut terhapus; nilai yang sudah dikirim ke Penilaian tetap ada
+            db()->beginTransaction();
+            q('DELETE FROM guru_ujian_peserta WHERE ujian_id = ?', [$id]);
+            q('DELETE FROM guru_ujian WHERE id = ? AND guru_id = ?', [$id, uid()]);
+            db()->commit();
+            pesan('Ujian "' . h($u['judul']) . '" dihapus.' . ($u['penilaian_id'] ? ' Nilai yang sudah dikirim ke Penilaian tetap tersimpan.' : ''));
+            ke('?p=ujian');
     }
     ke('?p=ujian_lihat&id=' . $id);
 }
@@ -95,9 +95,9 @@ judul_baris(h($u['judul']), '<a class="tombol" href="?p=ujian">‹ Ujian</a>');
   <div class="statistik" id="pantau-ringkas"></div>
   <ul class="daftar pantau" id="pantau"></ul>
 </div>
-<?php if (!nilai('SELECT 1 FROM guru_ujian_peserta WHERE ujian_id = ? LIMIT 1', [$id])): ?>
-<form method="post" onsubmit="return confirm('Hapus ujian ini?')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus ujian</button></form>
-<?php endif; ?>
+<?php $n_peserta = (int)nilai('SELECT COUNT(*) FROM guru_ujian_peserta WHERE ujian_id = ? AND mulai IS NOT NULL', [$id]);
+$tanya = $n_peserta ? "Hapus ujian ini? Jawaban $n_peserta siswa ikut terhapus" . ($u['penilaian_id'] ? ' (nilai yang sudah dikirim ke Penilaian tetap ada).' : '. Kirim dulu nilainya ke Penilaian bila perlu.') : 'Hapus ujian ini?'; ?>
+<form method="post" style="margin-top:1rem" onsubmit="return confirm(<?= h(json_encode($tanya, JSON_UNESCAPED_UNICODE)) ?>)"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">🗑 Hapus ujian</button></form>
 <template id="tpl-aksi">
   <form method="post" class="aksi-pantau">
     <?= input_token() ?><input type="hidden" name="kode">
