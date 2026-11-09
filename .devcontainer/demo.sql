@@ -166,7 +166,7 @@ CREATE TABLE `guru_akun` (
 LOCK TABLES `guru_akun` WRITE;
 /*!40000 ALTER TABLE `guru_akun` DISABLE KEYS */;
 INSERT INTO `guru_akun` VALUES
-(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 16:48:48'),
+(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 16:48:57'),
 (2,'guru','Rina Marlina, S.Pd.','','Bahasa Indonesia','$2y$10$Yw3mhbCfjooqB0Du1toAHOUjFDbN9QrzkiWwGmppHqYXAPc4C3aKS','guru',1,'2026-11-08 07:19:47','2026-11-09 16:02:32');
 /*!40000 ALTER TABLE `guru_akun` ENABLE KEYS */;
 UNLOCK TABLES;

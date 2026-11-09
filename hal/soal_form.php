@@ -4,6 +4,10 @@ declare(strict_types=1);
 $id = (int)get('id');
 $s = $id ? satu('SELECT * FROM guru_soal WHERE id = ? AND guru_id = ?', [$id, uid()]) : null;
 if ($id && !$s) ke('?p=soal');
+// datang dari halaman paket: kembali ke paket, soal baru langsung masuk paket itu
+$pk_id = (int)get('paket');
+$pk = $pk_id ? satu("SELECT * FROM guru_dokumen WHERE id = ? AND guru_id = ? AND jenis = 'paket'", [$pk_id, uid()]) : null;
+$kembali = $pk ? '?p=paket_cetak&id=' . $pk_id . '&ubah=1#ubah-soal' : '?p=soal';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $opsi = [];
@@ -15,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'tipe' => $tipe, 'tingkat' => isset(TINGKAT_SOAL[post('tingkat')]) ? post('tingkat') : 'sedang',
         'level' => in_array(post('level'), LEVEL_KOGNITIF, true) ? post('level') : null,
         'pertanyaan' => trim((string)post('pertanyaan')), 'opsi' => $opsi ? json_encode($opsi, JSON_UNESCAPED_UNICODE) : null,
-        'kunci' => trim((string)post('kunci')), 'pembahasan' => trim((string)post('pembahasan')), 'berbagi' => post('berbagi') ? 1 : 0,
+        'kunci' => trim((string)post('kunci')), 'pembahasan' => trim((string)post('pembahasan')),
     ];
     if ($d['mapel'] === '' || $d['pertanyaan'] === '') {
         pesan('Mapel dan pertanyaan wajib diisi.', 'galat');
@@ -25,15 +29,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $d['guru_id'] = uid(); $d['dibuat'] = sekarang();
             q('INSERT INTO guru_soal (' . implode(',', array_keys($d)) . ') VALUES (' . implode(',', array_fill(0, count($d), '?')) . ')', array_values($d));
+            if ($pk) {
+                $isi = json_decode((string)$pk['isi'], true) ?: [];
+                $isi['ids'][] = (int)db()->lastInsertId();
+                q('UPDATE guru_dokumen SET isi = ?, diubah = ? WHERE id = ?', [json_encode($isi, JSON_UNESCAPED_UNICODE), sekarang(), $pk_id]);
+            }
         }
-        pesan('Soal tersimpan.');
-        ke(post('lagi') ? '?p=soal_form' : '?p=soal');
+        pesan('Soal tersimpan' . ($pk ? ' di paket "' . h($pk['judul']) . '".' : '.'));
+        ke(post('lagi') ? '?p=soal_form' . ($pk ? '&paket=' . $pk_id : '') : $kembali);
     }
 }
 $opsi = $s ? (json_decode((string)$s['opsi'], true) ?: []) : [];
 
 kepala('Soal', 'soal');
-judul_baris($s ? 'Ubah soal' : 'Tambah soal manual', '<a class="tombol" href="?p=soal">‹ Bank soal</a>');
+judul_baris($s ? 'Ubah soal' : ($pk ? 'Tambah soal ke paket' : 'Tambah soal manual'), '<a class="tombol" href="' . h($kembali) . '">‹ ' . ($pk ? 'Kembali ke paket' : 'Bank soal') . '</a>');
+if ($pk): ?><p class="kecil redup">Paket: <b><?= h($pk['judul']) ?></b><?= $s ? '. Perubahan langsung terlihat di lembar soal paket ini (ujian online yang sudah dibuat tidak ikut berubah).' : '' ?></p><?php endif;
 ?>
 <form method="post" class="formulir">
   <?= input_token() ?>
@@ -58,7 +68,6 @@ judul_baris($s ? 'Ubah soal' : 'Tambah soal manual', '<a class="tombol" href="?p
     </div>
     <label>Kunci jawaban <small>(huruf untuk pilihan ganda; jawaban/pedoman untuk isian & uraian)</small><textarea name="kunci" rows="2"><?= h($s['kunci'] ?? '') ?></textarea></label>
     <label>Pembahasan<textarea name="pembahasan" rows="3"><?= h($s['pembahasan'] ?? '') ?></textarea></label>
-    <label class="centang"><input type="checkbox" name="berbagi" value="1" <?= !empty($s['berbagi']) ? 'checked' : '' ?>> Bagikan ke guru lain (mereka bisa memakai, tidak bisa mengubah)</label>
   </fieldset>
   <div class="dua-tombol">
     <button class="utama">Simpan</button>

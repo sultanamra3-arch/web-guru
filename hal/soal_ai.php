@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             isset(TIPE_SOAL[$s['tipe'] ?? '']) ? $s['tipe'] : 'pg', isset(TINGKAT_SOAL[$s['tingkat'] ?? '']) ? $s['tingkat'] : 'sedang',
             in_array($s['level'] ?? '', LEVEL_KOGNITIF, true) ? $s['level'] : null, (string)$s['pertanyaan'],
             !empty($s['opsi']) ? json_encode($s['opsi'], JSON_UNESCAPED_UNICODE) : null, (string)($s['kunci'] ?? ''), (string)($s['pembahasan'] ?? ''),
-            post('berbagi') ? 1 : 0, sekarang()]);
+            0, sekarang()]);
         $ids[] = (int)db()->lastInsertId();
         $n++;
     }
@@ -63,7 +63,7 @@ judul_baris('✨ Buat soal dengan AI', '<a class="tombol" href="?p=soal">‹ Ban
   <input type="hidden" name="data"><input type="hidden" name="mapel"><input type="hidden" name="kelas_angka"><input type="hidden" name="topik">
   <div class="kartu lengket aksi-bank">
     <label class="centang"><input type="checkbox" id="pilih-semua-hasil" checked> Pilih semua</label>
-    <span><label class="centang kecil"><input type="checkbox" name="berbagi" value="1"> Bagikan</label>
+    <span>
       <label class="centang kecil"><input type="checkbox" name="jadikan_paket" value="1" checked> Langsung jadikan paket soal</label>
       <button class="utama kecil">💾 Simpan</button></span>
   </div>

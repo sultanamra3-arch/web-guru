@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $kunci = $kunci === 'B' ? 'B' : 'A';
         }
         q('INSERT INTO guru_soal (guru_id, mapel, kelas, topik, tipe, tingkat, level, pertanyaan, opsi, kunci, pembahasan, berbagi, dibuat) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-            [uid(), $mapel, $kelas, $topik, $tipe, $tingkat, null, $tanya, $opsi, mb_substr($kunci, 0, 5000), mb_substr(trim((string)($s['pembahasan'] ?? '')), 0, 5000), post('berbagi') ? 1 : 0, sekarang()]);
+            [uid(), $mapel, $kelas, $topik, $tipe, $tingkat, null, $tanya, $opsi, mb_substr($kunci, 0, 5000), mb_substr(trim((string)($s['pembahasan'] ?? '')), 0, 5000), 0, sekarang()]);
         $ids[] = (int)db()->lastInsertId();
     }
     db()->commit();
@@ -98,7 +98,6 @@ judul_baris('Buat soal manual', '<a class="tombol" href="?p=soal">‹ Bank soal<
   <?php endfor; endforeach; ?>
   <div class="kartu lengket-bawah">
     <label class="centang"><input type="checkbox" name="jadikan_paket" value="1" checked> Langsung jadikan paket soal</label>
-    <label class="centang"><input type="checkbox" name="berbagi" value="1"> Bagikan ke guru lain</label>
     <button class="utama lebar">💾 Simpan semua soal</button>
     <p class="kecil redup">Soal yang pertanyaannya kosong dilewati.</p>
   </div>

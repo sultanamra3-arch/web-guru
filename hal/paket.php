@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 $ids = array_map('intval', (array)($_SESSION['paket_pilih'] ?? []));
 if (!$ids) { pesan('Pilih soal di bank soal dulu.', 'galat'); ke('?p=soal'); }
-$soal = semua('SELECT * FROM guru_soal WHERE (guru_id = ? OR berbagi = 1) AND id IN (' . implode(',', $ids) . ')', [uid()]);
+$soal = semua('SELECT * FROM guru_soal WHERE guru_id = ? AND id IN (' . implode(',', $ids) . ')', [uid()]);
 // urutkan: PG/BS dulu, lalu isian, lalu esai
 $urut = ['pg' => 1, 'bs' => 2, 'isian' => 3, 'esai' => 4];
 usort($soal, fn($a, $b) => [$urut[$a['tipe']] ?? 9, $a['id']] <=> [$urut[$b['tipe']] ?? 9, $b['id']]);

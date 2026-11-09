@@ -5,7 +5,7 @@ Aplikasi web (bisa dipasang di HP) untuk guru:
 | Fitur | Keterangan |
 |---|---|
 | ✨ Generator soal AI | pilih jumlah tiap bentuk (PG, benar/salah, isian, uraian; maks 60); level C1–C6; bisa dari teks/foto materi; langsung jadi paket soal |
-| 📝 Bank soal | tulis soal manual (pilih jumlah tiap bentuk, isi di lembar), simpan, cari, bagikan ke guru lain, jadikan **paket soal** (cetak/Word, dengan kunci) |
+| 📝 Bank soal | tulis soal manual (pilih jumlah tiap bentuk, isi di lembar), simpan, cari, jadikan **paket soal** (cetak/Word, dengan kunci); soal yang sudah masuk paket diubah lewat paketnya; soal milik masing-masing akun |
 | ✨ Modul ajar | struktur Perencanaan Pembelajaran Mendalam (Kurikulum Merdeka), cetak/Word, revisi dengan AI |
 | ✨ LKPD | siap cetak, dengan pedoman guru |
 | ✨ Presentasi | tayang layar penuh di browser + unduh PowerPoint (.pptx) |

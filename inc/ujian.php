@@ -53,7 +53,7 @@ function ujian_soal_dari_paket(int $paket_id, float $poin_uraian): ?array
     if (!$ids) return [];
     $peta = [];
     $tanda = implode(',', array_fill(0, count($ids), '?'));
-    foreach (semua("SELECT * FROM guru_soal WHERE id IN ($tanda) AND (guru_id = ? OR berbagi = 1)", array_merge($ids, [uid()])) as $s) $peta[(int)$s['id']] = $s;
+    foreach (semua("SELECT * FROM guru_soal WHERE id IN ($tanda) AND guru_id = ?", array_merge($ids, [uid()])) as $s) $peta[(int)$s['id']] = $s;
     $out = [];
     foreach ($ids as $id) {
         if (!isset($peta[$id])) continue;

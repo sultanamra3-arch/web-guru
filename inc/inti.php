@@ -5,7 +5,7 @@ declare(strict_types=1);
 date_default_timezone_set('Asia/Jakarta');
 mb_internal_encoding('UTF-8');
 
-const VERSI = '1.16';
+const VERSI = '1.17';
 
 $__konfig = __DIR__ . '/../config.php';
 if (!is_file($__konfig)) $__konfig = __DIR__ . '/../config.contoh.php';
@@ -269,6 +269,17 @@ function jam_rapi(string $s): string
     if (preg_match('/^(\d{3,4})$/', $s)) $s = substr($s, 0, -2) . ':' . substr($s, -2);
     if (!preg_match('/^(\d{1,2}):(\d{2})$/', $s, $m) || (int)$m[1] > 23 || (int)$m[2] > 59) return '';
     return sprintf('%02d:%02d', $m[1], $m[2]);
+}
+
+/** Id soal yang sudah masuk paket milik guru ini (soal itu diubah lewat paketnya). */
+function soal_di_paket(?int $kecuali_paket = null): array
+{
+    $ids = [];
+    foreach (semua("SELECT id, isi FROM guru_dokumen WHERE guru_id = ? AND jenis = 'paket'", [uid()]) as $d) {
+        if ($kecuali_paket && (int)$d['id'] === $kecuali_paket) continue;
+        foreach ((array)(json_decode((string)$d['isi'], true)['ids'] ?? []) as $i) $ids[(int)$i] = true;
+    }
+    return array_keys($ids);
 }
 
 function uid(): int

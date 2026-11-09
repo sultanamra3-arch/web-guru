@@ -68,7 +68,7 @@ function koreksi_kunci_dari_paket(int $paket_id): ?string
     if (!$ids) return '';
     $soal = [];
     $tanda = implode(',', array_fill(0, count($ids), '?'));
-    foreach (semua("SELECT * FROM guru_soal WHERE id IN ($tanda) AND (guru_id = ? OR berbagi = 1)", array_merge($ids, [uid()])) as $s) $soal[(int)$s['id']] = $s;
+    foreach (semua("SELECT * FROM guru_soal WHERE id IN ($tanda) AND guru_id = ?", array_merge($ids, [uid()])) as $s) $soal[(int)$s['id']] = $s;
     $baris = [];
     $no = 0;
     foreach ($ids as $id) {

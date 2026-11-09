@@ -335,3 +335,15 @@ html.apl input,html.apl select,html.apl textarea{font-size:max(16px,1em)}
 .kelas-aksi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.4rem}
 .kelas-aksi .tombol{padding-left:.3rem;padding-right:.3rem;text-align:center;justify-content:center;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:360px){.kelas-aksi{gap:.3rem}.kelas-aksi .tombol{font-size:.82rem;padding-left:.15rem;padding-right:.15rem}}
+/* Paket: ubah soal */
+.ubah-paket summary,.ubah-paket+details summary{cursor:pointer}
+.paket-soal{padding-left:0;margin:.4rem 0 .8rem}
+.paket-soal li{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--garis)}
+.paket-soal .ps-isi{flex:1 1 200px;min-width:0;overflow-wrap:anywhere}
+.paket-soal .ps-isi span{display:block}
+.paket-soal .ps-aksi{display:flex;gap:.3rem;align-items:center;flex-wrap:wrap}
+.paket-soal .ps-aksi form{display:flex;gap:.3rem}
+.paket-soal button[disabled]{opacity:.35}
+.info-paket .lencana{margin-right:.2rem}
+.aksi-bank select.kecil{min-height:36px;max-width:150px;font-size:.85rem}
+b.merah{color:var(--merah)}

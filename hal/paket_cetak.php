@@ -4,15 +4,44 @@ declare(strict_types=1);
 $id = (int)get('id');
 $d = satu("SELECT * FROM guru_dokumen WHERE id = ? AND guru_id = ? AND jenis = 'paket'", [$id, uid()]);
 if (!$d) ke('?p=soal');
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'hapus') {
-    q('DELETE FROM guru_dokumen WHERE id = ?', [$id]);
-    pesan('Paket soal dihapus (soal di bank soal tetap ada).');
-    ke('?p=perangkat&jenis=paket');
-}
 $isi = json_decode((string)$d['isi'], true) ?: [];
 $ids = array_map('intval', $isi['ids'] ?? []);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $aksi = (string)post('aksi');
+    if ($aksi === 'hapus') {
+        $lain = soal_di_paket($id);
+        $sendiri = array_values(array_diff($ids, $lain));
+        if (post('dengan_soal') && $sendiri) q('DELETE FROM guru_soal WHERE guru_id = ? AND id IN (' . implode(',', $sendiri) . ')', [uid()]);
+        q('DELETE FROM guru_dokumen WHERE id = ?', [$id]);
+        pesan(post('dengan_soal') ? 'Paket soal dan soal-soalnya dihapus.' : 'Paket soal dihapus. Soal-soalnya kembali tampil di bank soal.');
+        ke('?p=soal');
+    }
+    if ($aksi === 'kop') {
+        foreach (['mapel', 'kelas', 'waktu', 'jenis_ujian', 'petunjuk'] as $k) $isi[$k] = trim((string)post($k));
+        $judul = mb_substr(trim((string)post('judul')) ?: $d['judul'], 0, 250);
+        q('UPDATE guru_dokumen SET judul = ?, mapel = ?, kelas = ?, isi = ?, diubah = ? WHERE id = ?',
+            [$judul, $isi['mapel'], mb_substr($isi['kelas'], 0, 20), json_encode($isi, JSON_UNESCAPED_UNICODE), sekarang(), $id]);
+        pesan('Kop paket tersimpan.');
+    }
+    if ($aksi === 'keluarkan' || $aksi === 'hapus_soal' || $aksi === 'naik' || $aksi === 'turun') {
+        $sid = (int)post('soal');
+        $pos = array_search($sid, $ids, true);
+        if ($pos !== false) {
+            if ($aksi === 'naik' && $pos > 0) [$ids[$pos - 1], $ids[$pos]] = [$ids[$pos], $ids[$pos - 1]];
+            elseif ($aksi === 'turun' && $pos < count($ids) - 1) [$ids[$pos + 1], $ids[$pos]] = [$ids[$pos], $ids[$pos + 1]];
+            elseif ($aksi === 'keluarkan' || $aksi === 'hapus_soal') {
+                array_splice($ids, $pos, 1);
+                if ($aksi === 'hapus_soal' && !in_array($sid, soal_di_paket($id), true)) q('DELETE FROM guru_soal WHERE id = ? AND guru_id = ?', [$sid, uid()]);
+            }
+            $isi['ids'] = array_values($ids);
+            q('UPDATE guru_dokumen SET isi = ?, diubah = ? WHERE id = ?', [json_encode($isi, JSON_UNESCAPED_UNICODE), sekarang(), $id]);
+            pesan(['keluarkan' => 'Soal dikeluarkan dari paket dan kembali ke bank soal.', 'hapus_soal' => 'Soal dihapus.'][$aksi] ?? 'Urutan soal diubah.');
+        }
+    }
+    ke('?p=paket_cetak&id=' . $id . (in_array($aksi, ['keluarkan', 'hapus_soal', 'naik', 'turun'], true) ? '&ubah=1#ubah-soal' : ''));
+}
 $peta = [];
-if ($ids) foreach (semua('SELECT * FROM guru_soal WHERE id IN (' . implode(',', $ids) . ')') as $s) $peta[$s['id']] = $s;
+if ($ids) foreach (semua('SELECT * FROM guru_soal WHERE guru_id = ? AND id IN (' . implode(',', $ids) . ')', [uid()]) as $s) $peta[$s['id']] = $s;
 $soal = array_values(array_filter(array_map(fn($i) => $peta[$i] ?? null, $ids)));
 
 function lembar_soal(array $d, array $isi, array $soal, bool $kunci, bool $word = false): string
@@ -63,6 +92,7 @@ if (get('word')) {
 kepala($d['judul'], 'soal');
 ?>
 <div class="judul-baris tak-cetak"><h1><?= h($d['judul']) ?></h1><a class="tombol" href="?p=soal">‹ Bank soal</a></div>
+<p class="kecil redup tak-cetak"><?= count($soal) ?> soal<?php $hit = array_count_values(array_column($soal, 'tipe')); foreach ($hit as $t => $n) echo ' · ' . h(TIPE_SOAL[$t] ?? $t) . ' ' . $n; ?></p>
 <div class="kartu tak-cetak alat-dokumen">
   <button class="utama" onclick="document.body.classList.remove('tampil-kunci');window.print()">🖨 Cetak soal</button>
   <button onclick="document.body.classList.add('tampil-kunci');window.print();document.body.classList.remove('tampil-kunci')">🖨 Cetak kunci</button>
@@ -70,8 +100,52 @@ kepala($d['judul'], 'soal');
   <a class="tombol" href="?p=paket_cetak&amp;id=<?= $id ?>&amp;word=1">⬇ Word (soal)</a>
   <a class="tombol" href="?p=paket_cetak&amp;id=<?= $id ?>&amp;word=1&amp;kunci=1">⬇ Word (kunci)</a>
   <label class="centang"><input type="checkbox" onchange="document.body.classList.toggle('tampil-kunci', this.checked)"> Tampilkan kunci</label>
-  <form method="post" class="sebaris" onsubmit="return confirm('Hapus paket ini?')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus paket</button></form>
 </div>
+
+<details class="kartu tak-cetak ubah-paket" id="ubah-soal"<?= get('ubah') ? ' open' : '' ?>>
+  <summary><b>✎ Ubah soal di paket ini</b> <span class="kecil redup">(<?= count($soal) ?> soal)</span></summary>
+  <p class="kecil redup">Perubahan langsung terlihat di lembar soal. Ujian online yang sudah dibuat dari paket ini tidak ikut berubah.</p>
+  <ol class="daftar paket-soal">
+  <?php foreach ($soal as $i => $s): ?>
+    <li>
+      <div class="ps-isi"><small class="meta"><b>No. <?= $i + 1 ?></b> · <?= h(TIPE_SOAL[$s['tipe']] ?? $s['tipe']) ?><?= $s['tipe'] === 'pg' || $s['tipe'] === 'bs' ? ' · kunci ' . h((string)$s['kunci']) : '' ?></small>
+        <span><?= h(mb_strimwidth((string)$s['pertanyaan'], 0, 140, '…')) ?></span></div>
+      <div class="ps-aksi">
+        <a class="tombol kecil" href="?p=soal_form&amp;id=<?= (int)$s['id'] ?>&amp;paket=<?= $id ?>">Ubah</a>
+        <form method="post" class="sebaris"><?= input_token() ?><input type="hidden" name="soal" value="<?= (int)$s['id'] ?>">
+          <button name="aksi" value="naik" class="kecil" title="Naikkan" aria-label="Naikkan"<?= $i === 0 ? ' disabled' : '' ?>>↑</button><button name="aksi" value="turun" class="kecil" title="Turunkan" aria-label="Turunkan"<?= $i === count($soal) - 1 ? ' disabled' : '' ?>>↓</button>
+          <button name="aksi" value="hapus_soal" class="kecil bahaya" onclick="return confirm('Hapus soal ini dari paket?')">Hapus</button>
+        </form>
+      </div>
+    </li>
+  <?php endforeach; ?>
+  </ol>
+  <a class="tombol" href="?p=soal_form&amp;paket=<?= $id ?>">＋ Tambah soal ke paket ini</a>
+</details>
+
+<details class="kartu tak-cetak">
+  <summary><b>✎ Ubah kop paket</b> <span class="kecil redup">(judul, mapel, kelas, waktu, petunjuk)</span></summary>
+  <form method="post" class="formulir" style="margin-top:.6rem">
+    <?= input_token() ?><input type="hidden" name="aksi" value="kop">
+    <label>Judul paket<input name="judul" required value="<?= h($d['judul']) ?>"></label>
+    <label>Jenis ujian<input name="jenis_ujian" value="<?= h($isi['jenis_ujian'] ?? '') ?>"></label>
+    <div class="baris3">
+      <label>Mapel<input name="mapel" value="<?= h($isi['mapel'] ?? '') ?>"></label>
+      <label>Kelas<input name="kelas" value="<?= h($isi['kelas'] ?? '') ?>"></label>
+      <label>Waktu<input name="waktu" value="<?= h($isi['waktu'] ?? '') ?>"></label>
+    </div>
+    <label>Petunjuk<textarea name="petunjuk" rows="3"><?= h($isi['petunjuk'] ?? '') ?></textarea></label>
+    <button class="utama">Simpan kop</button>
+  </form>
+</details>
+
+<details class="kartu tak-cetak">
+  <summary><b class="merah">Hapus paket</b></summary>
+  <form method="post" style="margin-top:.6rem" onsubmit="return confirm('Hapus paket ini?')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus">
+    <label class="centang"><input type="checkbox" name="dengan_soal" value="1" checked> Hapus juga soal-soalnya (kalau tidak dicentang, soalnya kembali ke bank soal)</label>
+    <button class="kecil bahaya">Hapus paket</button>
+  </form>
+</details>
 <div class="kertas versi-soal"><?= lembar_soal($d, $isi, $soal, false) ?></div>
 <div class="kertas versi-kunci"><?= lembar_soal($d, $isi, $soal, true) ?></div>
 <?php
