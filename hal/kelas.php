@@ -48,9 +48,9 @@ judul_baris('Kelas & siswa', '<a class="tombol" href="?p=siswa_tambah">＋ Siswa
     <div class="eks-atas"><a href="?p=siswa&amp;kelas=<?= h(rawurlencode($k)) ?>"><b>Kelas <?= h($k) ?></b></a>
       <?= in_array($k, $saya, true) ? '<span class="lencana">kelas saya</span>' : '' ?>
       <small><?= (int)$j['n'] ?> siswa · L <?= (int)$j['l'] ?> · P <?= (int)$j['pr'] ?></small></div>
-    <div class="eks-aksi">
+    <div class="eks-aksi kelas-aksi">
       <a class="tombol kecil" href="?p=siswa&amp;kelas=<?= h(rawurlencode($k)) ?>">Siswa</a>
-      <a class="tombol kecil" href="?p=absensi&amp;kelas=<?= h(rawurlencode($k)) ?>">Absensi</a>
+      <a class="tombol kecil" href="?p=absensi&amp;kelas=<?= h(rawurlencode($k)) ?>">Absen</a>
       <a class="tombol kecil" href="?p=nilai_rekap&amp;kelas=<?= h(rawurlencode($k)) ?>">Nilai</a>
       <a class="tombol kecil" href="?p=absensi_rekap&amp;kelas=<?= h(rawurlencode($k)) ?>">Rekap</a>
     </div>

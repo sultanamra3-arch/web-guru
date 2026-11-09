@@ -48,6 +48,27 @@ foreach (semua('SELECT member_id, status, ket FROM guru_absensi WHERE guru_id = 
 $hitung = ['H' => 0, 'S' => 0, 'I' => 0, 'A' => 0, '' => 0];
 foreach ($siswa as $s) $hitung[$ada[$s['member_id']]['status'] ?? '']++;
 
+// Kalender: tanggal mana saja yang sudah diisi untuk kelas ini
+$bln = preg_match('/^\d{4}-\d{2}$/', (string)get('bln')) ? (string)get('bln') : substr($tanggal, 0, 7);
+$k_awal = $bln . '-01';
+$k_akhir = date('Y-m-t', strtotime($k_awal));
+$terisi = [];
+if (kelas_valid($kelas)) {
+    foreach (semua("SELECT tanggal, mapel, SUM(status='H') h, SUM(status='S') s, SUM(status='I') i, SUM(status='A') a
+                    FROM guru_absensi WHERE guru_id = ? AND kelas = ? AND tanggal BETWEEN ? AND ?
+                    GROUP BY tanggal, mapel ORDER BY tanggal", [uid(), $kelas, $k_awal, $k_akhir]) as $r) {
+        $t = (string)$r['tanggal'];
+        if (!isset($terisi[$t])) $terisi[$t] = ['mapel' => $r['mapel'], 'h' => 0, 's' => 0, 'i' => 0, 'a' => 0, 'n' => 0];
+        foreach (['h', 's', 'i', 'a'] as $x) $terisi[$t][$x] += (int)$r[$x];
+        $terisi[$t]['n']++;
+        if ($r['mapel'] === $mapel) $terisi[$t]['mapel'] = $mapel;
+    }
+}
+$hari_jadwal = kelas_valid($kelas) ? array_map('intval', q('SELECT DISTINCT hari FROM guru_jadwal WHERE guru_id = ? AND kelas = ?', [uid(), $kelas])->fetchAll(PDO::FETCH_COLUMN)) : [];
+$bln_lalu = date('Y-m', strtotime($k_awal . ' -1 month'));
+$bln_depan = date('Y-m', strtotime($k_awal . ' +1 month'));
+$url_abs = fn(array $x) => '?' . http_build_query(array_merge(['p' => 'absensi', 'kelas' => $kelas, 'tanggal' => $tanggal, 'mapel' => $mapel], $x));
+
 kepala('Absensi', 'kelas');
 judul_baris('Absensi siswa', '<a class="tombol" href="?p=absensi_rekap&amp;kelas=' . h(rawurlencode($kelas)) . '">Rekap</a>');
 ?>
@@ -63,6 +84,26 @@ judul_baris('Absensi siswa', '<a class="tombol" href="?p=absensi_rekap&amp;kelas
 <?php if (!$siswa): ?>
   <?php if (daftar_kelas()): ?><div class="pesan info">Pilih kelas.</div><?php else: ?><div class="pesan info">Belum ada kelas. <a href="?p=siswa_tambah">Tambahkan kelas &amp; siswamu dulu →</a></div><?php endif; ?>
 <?php else: ?>
+<details class="kartu kalender-absen" open>
+  <summary><?= ikon('jadwal') ?> <b>Tanggal yang sudah diisi</b> <span class="kecil redup">· <?= count($terisi) ?> pertemuan di <?= BULAN[(int)substr($bln, 5)] ?></span></summary>
+  <div class="kal-nav">
+    <a class="tombol kecil" href="<?= h($url_abs(['bln' => $bln_lalu])) ?>" aria-label="Bulan sebelumnya">‹</a>
+    <b><?= BULAN[(int)substr($bln, 5)] ?> <?= substr($bln, 0, 4) ?></b>
+    <a class="tombol kecil" href="<?= h($url_abs(['bln' => $bln_depan])) ?>" aria-label="Bulan berikutnya">›</a>
+  </div>
+  <div class="kal">
+    <?php foreach (['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'] as $nm): ?><span class="kal-h"><?= $nm ?></span><?php endforeach; ?>
+    <?php for ($i = 1; $i < (int)date('N', strtotime($k_awal)); $i++): ?><span></span><?php endfor; ?>
+    <?php for ($d = 1; $d <= (int)date('t', strtotime($k_awal)); $d++):
+        $t = sprintf('%s-%02d', $bln, $d); $n = (int)date('N', strtotime($t)); $x = $terisi[$t] ?? null;
+        $kls = 'kal-d' . ($x ? ' isi' : '') . (in_array($n, $hari_jadwal, true) ? ' jadwal' : '') . ($t === $tanggal ? ' pilih' : '') . ($t === hari_ini() ? ' kini' : '') . ($n === 7 ? ' minggu' : '');
+        $judul = $x ? 'Sudah diisi: H ' . $x['h'] . ', S ' . $x['s'] . ', I ' . $x['i'] . ', A ' . $x['a'] : (in_array($n, $hari_jadwal, true) ? 'Ada jadwal, belum diisi' : 'Belum diisi'); ?>
+      <a class="<?= $kls ?>" title="<?= h($judul) ?>" href="<?= h($url_abs(['tanggal' => $t, 'bln' => null, 'mapel' => $x['mapel'] ?? $mapel])) ?>"><?= $d ?><?php if ($x): ?><?php $tdk = $x['s'] + $x['i'] + $x['a']; ?><small<?= $tdk ? ' class="tdk"' : '' ?>><?= $tdk ? $tdk . ' tdk' : '✓' ?></small><?php endif; ?></a>
+    <?php endfor; ?>
+  </div>
+  <p class="kecil redup kal-ket"><span class="kal-d isi contoh">✓</span> sudah diisi, semua hadir · <b class="tdk">2 tdk</b> = 2 siswa S/I/A<?php if ($hari_jadwal): ?> · <span class="kal-d jadwal contoh"></span> hari jadwalmu di kelas ini<?php endif; ?> · tekan tanggal untuk membuka</p>
+</details>
+
 <form method="post" id="form-absen">
   <?= input_token() ?>
   <input type="hidden" name="kelas" value="<?= h($kelas) ?>"><input type="hidden" name="tanggal" value="<?= h($tanggal) ?>"><input type="hidden" name="mapel" value="<?= h($mapel) ?>">

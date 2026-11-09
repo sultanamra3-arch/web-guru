@@ -313,3 +313,25 @@ html.apl input,html.apl select,html.apl textarea{font-size:max(16px,1em)}
 .absen li.belum-pilih .absen-nama b{color:var(--redup,#6b7280)}
 .absen li.belum-pilih .absen-pilih .pil span{border-style:dashed}
 .hapus-absen{margin-top:14px;text-align:center}
+/* Kalender absensi */
+.kalender-absen summary{cursor:pointer;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;list-style:none}
+.kalender-absen summary::-webkit-details-marker{display:none}
+.kalender-absen summary .ikon{width:18px;height:18px}
+.kal-nav{display:flex;align-items:center;justify-content:space-between;margin:.6rem 0 .4rem}
+.kal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.kal-h{font-size:.72rem;color:var(--redup);font-weight:600}
+.kal-d{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:40px;border-radius:9px;border:1px solid var(--garis);color:var(--teks);text-decoration:none;font-size:.88rem;line-height:1.1;background:var(--putih)}
+.kal-d small{font-size:.66rem;font-weight:700}
+.kal-d.minggu{color:var(--merah)}
+.kal-d.jadwal{border:1.5px dashed #8a97cf}
+.kal-d.isi{background:var(--hijau-muda);border:1.5px solid var(--hijau);color:var(--navy);font-weight:700}
+.kal-d.kini{box-shadow:inset 0 0 0 2px var(--emas)}
+.kal-d.pilih{outline:2.5px solid var(--navy);outline-offset:1px}
+.kal-ket{margin:.5rem 0 0;display:flex;flex-wrap:wrap;align-items:center;gap:.3rem}
+.kal-d.contoh{display:inline-flex;min-height:18px;width:22px;font-size:.7rem;vertical-align:middle}
+.kal .tdk,.kal-ket .tdk{color:var(--merah)}
+.kal-ket .tdk{font-size:.75rem}
+.eks-aksi{flex-wrap:wrap}
+.kelas-aksi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.4rem}
+.kelas-aksi .tombol{padding-left:.3rem;padding-right:.3rem;text-align:center;justify-content:center;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:360px){.kelas-aksi{gap:.3rem}.kelas-aksi .tombol{font-size:.82rem;padding-left:.15rem;padding-right:.15rem}}
