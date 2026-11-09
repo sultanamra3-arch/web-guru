@@ -9,19 +9,19 @@
 <title>Jadwal · SiGuru</title>
 <meta name="application-name" content="SiGuru">
 <meta name="apple-mobile-web-app-title" content="SiGuru">
-<link rel="x-manifest" href="manifest.webmanifest?v=1.2">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.3">
 <link rel="icon" href="aset/favicon.png">
 <link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="aset/gaya.css?v=1.2">
-<link rel="stylesheet" href="aset/guru.css?v=1.2">
+<link rel="stylesheet" href="aset/gaya.css?v=1.3">
+<link rel="stylesheet" href="aset/guru.css?v=1.3">
 </head>
 <body class="">
 <header class="atas">
   <a class="merek" href="beranda.html"><img src="aset/logo.png" alt="Logo"> <span><small>SMP Negeri 6 Keritang</small><b>SiGuru</b></span></a>
-    <form method="post"  class="keluar"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><button title="Keluar">Keluar</button></form>
+    <form method="post"  class="keluar"><input type="hidden" name="_t" value="e17ed6ffb802ad94c8bffc1f303bedd2"><button title="Keluar">Keluar</button></form>
   </header>
 <nav class="menu">
     <a href="beranda.html" class=""><span class="ik">⌂</span>Beranda</a>
@@ -31,108 +31,518 @@
     <a href="lainnya.html" class="aktif"><span class="ik">☰</span>Lainnya</a>
   </nav>
 <main>
-<div class="judul-baris"><h1>Jadwal pelajaran</h1><span><button type="button" class="tombol" onclick="window.print()">🖨 Cetak</button></span></div><form method="post" class="formulir tak-cetak" autocomplete="off">
-  <input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><input type="hidden" name="id" value="0">
-  <fieldset><legend>Tambah jadwal</legend>
-    <div class="baris3">
-      <label>Hari<select name="hari"><option value="Senin">Senin</option><option value="Selasa">Selasa</option><option value="Rabu">Rabu</option><option value="Kamis">Kamis</option><option value="Jumat">Jumat</option><option value="Sabtu">Sabtu</option></select></label>
-      <label>Jam ke-<input type="number" name="jam_ke" min="1" max="12" value="2"></label>
-      <label>Ruang<input name="ruang" value=""></label>
+<div class="judul-baris"><h1>Jadwal pelajaran</h1><span><button type="button" class="tombol" onclick="window.print()">🖨 Cetak</button></span></div><form method="post" class="kartu formulir tak-cetak" id="form-jadwal" data-token="e17ed6ffb802ad94c8bffc1f303bedd2">
+  <input type="hidden" name="_t" value="e17ed6ffb802ad94c8bffc1f303bedd2">  <p style="margin-top:0" class="kecil redup">Pilih <b>kelas</b> di jam yang kamu mengajar, kosongkan yang tidak. Jam mulai–selesai terisi otomatis. Simpan sekali di bawah.</p>
+  <label>Mapel yang diajar<input name="mapel_utama" value="Informatika" placeholder="mis. Informatika" list="dl-mapel"></label>
+    <details class="foto-jadwal">
+    <summary>📷 Isi otomatis dari foto jadwal sekolah</summary>
+    <p class="kecil redup">Foto jadwal pelajaran/roster sekolah (maks 4 foto). AI mencari jam yang kamu ajar lalu mengisi tabel di bawah untuk kamu periksa.</p>
+    <label>Nama atau kode guru di jadwal<input id="kode-guru" value="Budi Santoso, S.Pd." placeholder="mis. 12 atau Budi Santoso"></label>
+    <div class="dua-tombol">
+      <label class="tombol">📷 Kamera<input type="file" class="ambil-foto-jadwal" accept="image/*" capture="environment" hidden></label>
+      <label class="tombol">🖼 Galeri<input type="file" class="ambil-foto-jadwal" accept="image/*" multiple hidden></label>
     </div>
-    <div class="baris2">
-      <label>Mulai<input type="time" name="mulai" value=""></label>
-      <label>Selesai<input type="time" name="selesai" value=""></label>
+    <div class="pratinjau-foto kiri" id="foto-jadwal"></div>
+    <button type="button" class="lebar" id="tombol-baca-jadwal">✨ Baca jadwal dari foto</button>
+    <div class="status-ai" id="status-jadwal"></div>
+  </details>
+
+  <div class="tab tab-isi tab-hari">
+    <button type="button" data-hari="1" class="aktif">Sen<small class="jml-hari">7</small></button><button type="button" data-hari="2" class="">Sel<small class="jml-hari">8</small></button><button type="button" data-hari="3" class="">Rab<small class="jml-hari">7</small></button><button type="button" data-hari="4" class="">Kam<small class="jml-hari">6</small></button><button type="button" data-hari="5" class="">Jum<small class="jml-hari">4</small></button><button type="button" data-hari="6" class="">Sab<small class="jml-hari">6</small></button>  </div>
+    <section class="hari-jadwal" data-hari="1" >
+    <h3>Senin</h3>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>1</b><small>07:30–08:10</small></span>
+      <select name="kelas[1][1]" class="pilih-kelas" aria-label="Kelas jam 1">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" selected>VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[1][1]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
     </div>
-    <div class="baris2">
-      <label>Kelas<input name="kelas" list="dl-kelas" required value=""></label>
-      <label>Mata pelajaran<input name="mapel" list="dl-mapel" required value="Prakarya"></label>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>2</b><small>08:10–08:50</small></span>
+      <select name="kelas[1][2]" class="pilih-kelas" aria-label="Kelas jam 2">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" selected>VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[1][2]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
     </div>
-  </fieldset>
-  <button class="utama lebar">Tambah ke jadwal</button>
-  </form>
+        <div class="baris-jam ">
+      <span class="jam-ke"><b>3</b><small>08:50–09:30</small></span>
+      <select name="kelas[1][3]" class="pilih-kelas" aria-label="Kelas jam 3">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[1][3]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>4</b><small>09:45–10:25</small></span>
+      <select name="kelas[1][4]" class="pilih-kelas" aria-label="Kelas jam 4">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" selected>VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[1][4]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>5</b><small>10:25–11:05</small></span>
+      <select name="kelas[1][5]" class="pilih-kelas" aria-label="Kelas jam 5">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" selected>VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[1][5]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>6</b><small>11:05–11:45</small></span>
+      <select name="kelas[1][6]" class="pilih-kelas" aria-label="Kelas jam 6">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" selected>IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[1][6]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>7</b><small>12:15–12:55</small></span>
+      <select name="kelas[1][7]" class="pilih-kelas" aria-label="Kelas jam 7">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" selected>VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[1][7]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>8</b><small>12:55–13:35</small></span>
+      <select name="kelas[1][8]" class="pilih-kelas" aria-label="Kelas jam 8">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" selected>VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[1][8]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <button type="button" class="kecil salin-hari" data-hari="1">Salin dari hari sebelumnya</button>
+  </section>
+    <section class="hari-jadwal" data-hari="2" hidden>
+    <h3>Selasa</h3>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>1</b><small>07:30–08:10</small></span>
+      <select name="kelas[2][1]" class="pilih-kelas" aria-label="Kelas jam 1">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" selected>VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[2][1]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>2</b><small>08:10–08:50</small></span>
+      <select name="kelas[2][2]" class="pilih-kelas" aria-label="Kelas jam 2">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" selected>VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[2][2]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>3</b><small>08:50–09:30</small></span>
+      <select name="kelas[2][3]" class="pilih-kelas" aria-label="Kelas jam 3">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" selected>IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[2][3]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>4</b><small>09:45–10:25</small></span>
+      <select name="kelas[2][4]" class="pilih-kelas" aria-label="Kelas jam 4">
+        <option value="">— kosong —</option>
+        <option value="VII A" selected>VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[2][4]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>5</b><small>10:25–11:05</small></span>
+      <select name="kelas[2][5]" class="pilih-kelas" aria-label="Kelas jam 5">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" selected>VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[2][5]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>6</b><small>11:05–11:45</small></span>
+      <select name="kelas[2][6]" class="pilih-kelas" aria-label="Kelas jam 6">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" selected>IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[2][6]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>7</b><small>12:15–12:55</small></span>
+      <select name="kelas[2][7]" class="pilih-kelas" aria-label="Kelas jam 7">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" selected>VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[2][7]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>8</b><small>12:55–13:35</small></span>
+      <select name="kelas[2][8]" class="pilih-kelas" aria-label="Kelas jam 8">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" selected>IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[2][8]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <button type="button" class="kecil salin-hari" data-hari="2">Salin dari hari sebelumnya</button>
+  </section>
+    <section class="hari-jadwal" data-hari="3" hidden>
+    <h3>Rabu</h3>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>1</b><small>07:30–08:10</small></span>
+      <select name="kelas[3][1]" class="pilih-kelas" aria-label="Kelas jam 1">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" selected>VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[3][1]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>2</b><small>08:10–08:50</small></span>
+      <select name="kelas[3][2]" class="pilih-kelas" aria-label="Kelas jam 2">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" selected>VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[3][2]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>3</b><small>08:50–09:30</small></span>
+      <select name="kelas[3][3]" class="pilih-kelas" aria-label="Kelas jam 3">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" selected>IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[3][3]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>4</b><small>09:45–10:25</small></span>
+      <select name="kelas[3][4]" class="pilih-kelas" aria-label="Kelas jam 4">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" selected>IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[3][4]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>5</b><small>10:25–11:05</small></span>
+      <select name="kelas[3][5]" class="pilih-kelas" aria-label="Kelas jam 5">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" selected>VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[3][5]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam ">
+      <span class="jam-ke"><b>6</b><small>11:05–11:45</small></span>
+      <select name="kelas[3][6]" class="pilih-kelas" aria-label="Kelas jam 6">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[3][6]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>7</b><small>12:15–12:55</small></span>
+      <select name="kelas[3][7]" class="pilih-kelas" aria-label="Kelas jam 7">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" selected>VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[3][7]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>8</b><small>12:55–13:35</small></span>
+      <select name="kelas[3][8]" class="pilih-kelas" aria-label="Kelas jam 8">
+        <option value="">— kosong —</option>
+        <option value="VII A" selected>VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[3][8]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <button type="button" class="kecil salin-hari" data-hari="3">Salin dari hari sebelumnya</button>
+  </section>
+    <section class="hari-jadwal" data-hari="4" hidden>
+    <h3>Kamis</h3>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>1</b><small>07:30–08:10</small></span>
+      <select name="kelas[4][1]" class="pilih-kelas" aria-label="Kelas jam 1">
+        <option value="">— kosong —</option>
+        <option value="VII A" selected>VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[4][1]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam ">
+      <span class="jam-ke"><b>2</b><small>08:10–08:50</small></span>
+      <select name="kelas[4][2]" class="pilih-kelas" aria-label="Kelas jam 2">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[4][2]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>3</b><small>08:50–09:30</small></span>
+      <select name="kelas[4][3]" class="pilih-kelas" aria-label="Kelas jam 3">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" selected>VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[4][3]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>4</b><small>09:45–10:25</small></span>
+      <select name="kelas[4][4]" class="pilih-kelas" aria-label="Kelas jam 4">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" selected>VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[4][4]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>5</b><small>10:25–11:05</small></span>
+      <select name="kelas[4][5]" class="pilih-kelas" aria-label="Kelas jam 5">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" selected>VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[4][5]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>6</b><small>11:05–11:45</small></span>
+      <select name="kelas[4][6]" class="pilih-kelas" aria-label="Kelas jam 6">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" selected>IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[4][6]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>7</b><small>12:15–12:55</small></span>
+      <select name="kelas[4][7]" class="pilih-kelas" aria-label="Kelas jam 7">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" selected>VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[4][7]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam ">
+      <span class="jam-ke"><b>8</b><small>12:55–13:35</small></span>
+      <select name="kelas[4][8]" class="pilih-kelas" aria-label="Kelas jam 8">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[4][8]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <button type="button" class="kecil salin-hari" data-hari="4">Salin dari hari sebelumnya</button>
+  </section>
+    <section class="hari-jadwal" data-hari="5" hidden>
+    <h3>Jumat</h3>
+        <div class="baris-jam ">
+      <span class="jam-ke"><b>1</b><small>07:30–08:05</small></span>
+      <select name="kelas[5][1]" class="pilih-kelas" aria-label="Kelas jam 1">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[5][1]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>2</b><small>08:05–08:40</small></span>
+      <select name="kelas[5][2]" class="pilih-kelas" aria-label="Kelas jam 2">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" selected>VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[5][2]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>3</b><small>08:40–09:15</small></span>
+      <select name="kelas[5][3]" class="pilih-kelas" aria-label="Kelas jam 3">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" selected>IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[5][3]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>4</b><small>09:30–10:05</small></span>
+      <select name="kelas[5][4]" class="pilih-kelas" aria-label="Kelas jam 4">
+        <option value="">— kosong —</option>
+        <option value="VII A" selected>VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[5][4]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>5</b><small>10:05–10:40</small></span>
+      <select name="kelas[5][5]" class="pilih-kelas" aria-label="Kelas jam 5">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" selected>VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[5][5]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam ">
+      <span class="jam-ke"><b>6</b><small>10:40–11:15</small></span>
+      <select name="kelas[5][6]" class="pilih-kelas" aria-label="Kelas jam 6">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[5][6]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <button type="button" class="kecil salin-hari" data-hari="5">Salin dari hari sebelumnya</button>
+  </section>
+    <section class="hari-jadwal" data-hari="6" hidden>
+    <h3>Sabtu</h3>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>1</b><small>07:30–08:10</small></span>
+      <select name="kelas[6][1]" class="pilih-kelas" aria-label="Kelas jam 1">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" selected>VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[6][1]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>2</b><small>08:10–08:50</small></span>
+      <select name="kelas[6][2]" class="pilih-kelas" aria-label="Kelas jam 2">
+        <option value="">— kosong —</option>
+        <option value="VII A" selected>VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[6][2]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>3</b><small>08:50–09:30</small></span>
+      <select name="kelas[6][3]" class="pilih-kelas" aria-label="Kelas jam 3">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" selected>VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[6][3]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>4</b><small>09:45–10:25</small></span>
+      <select name="kelas[6][4]" class="pilih-kelas" aria-label="Kelas jam 4">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" selected>VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[6][4]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>5</b><small>10:25–11:05</small></span>
+      <select name="kelas[6][5]" class="pilih-kelas" aria-label="Kelas jam 5">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" selected>VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[6][5]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam terisi">
+      <span class="jam-ke"><b>6</b><small>11:05–11:45</small></span>
+      <select name="kelas[6][6]" class="pilih-kelas" aria-label="Kelas jam 6">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" selected>IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[6][6]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam ">
+      <span class="jam-ke"><b>7</b><small>12:15–12:55</small></span>
+      <select name="kelas[6][7]" class="pilih-kelas" aria-label="Kelas jam 7">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[6][7]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <div class="baris-jam ">
+      <span class="jam-ke"><b>8</b><small>12:55–13:35</small></span>
+      <select name="kelas[6][8]" class="pilih-kelas" aria-label="Kelas jam 8">
+        <option value="">— kosong —</option>
+        <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" >VIII A</option><option value="VIII B" >VIII B</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>        <option value="__ketik">✎ ketik…</option>
+      </select>
+      <input name="mapel[6][8]" class="mapel-jam" value="" placeholder="(mapel sama)" list="dl-mapel">
+    </div>
+        <button type="button" class="kecil salin-hari" data-hari="6">Salin dari hari sebelumnya</button>
+  </section>
+    <button class="utama lebar" style="margin-top:.8rem">💾 Simpan jadwal</button>
+</form>
 
 <div class="kartu cetak-penuh" style="margin-top:1rem">
   <h2 class="hanya-cetak">Jadwal Mengajar — Budi Santoso, S.Pd.</h2>
-        <h3>Senin</h3>
-    <table class="tabel">
-      <thead><tr><th>Jam</th><th>Waktu</th><th>Kelas</th><th>Mapel</th><th>Ruang</th><th class="tak-cetak"></th></tr></thead>
-      <tbody>
-              <tr><td>1</td><td>07:30–08:50</td>
-          <td>VIII A</td><td>Informatika</td><td>Lab Komputer</td>
-          <td class="tak-cetak nowrap"><a href="jadwal__id-1.html">Ubah</a>
-            <form method="post" class="sebaris" onsubmit="return confirm('Hapus jadwal ini?')"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><input type="hidden" name="aksi" value="hapus"><input type="hidden" name="id" value="1"><button class="kecil bahaya">Hapus</button></form></td></tr>
-              <tr><td>2</td><td>08:50–10:10</td>
-          <td>VII A</td><td>Informatika</td><td>Lab</td>
-          <td class="tak-cetak nowrap"><a href="jadwal__id-10.html">Ubah</a>
-            <form method="post" class="sebaris" onsubmit="return confirm('Hapus jadwal ini?')"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><input type="hidden" name="aksi" value="hapus"><input type="hidden" name="id" value="10"><button class="kecil bahaya">Hapus</button></form></td></tr>
-              <tr><td>3</td><td>10:10–11:30</td>
-          <td>VII A</td><td>Informatika</td><td>Lab Komputer</td>
-          <td class="tak-cetak nowrap"><a href="jadwal__id-2.html">Ubah</a>
-            <form method="post" class="sebaris" onsubmit="return confirm('Hapus jadwal ini?')"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><input type="hidden" name="aksi" value="hapus"><input type="hidden" name="id" value="2"><button class="kecil bahaya">Hapus</button></form></td></tr>
-            </tbody>
-    </table>
-      <h3>Selasa</h3>
-    <table class="tabel">
-      <thead><tr><th>Jam</th><th>Waktu</th><th>Kelas</th><th>Mapel</th><th>Ruang</th><th class="tak-cetak"></th></tr></thead>
-      <tbody>
-              <tr><td>1</td><td>07:30–08:50</td>
-          <td>IX A</td><td>Informatika</td><td>Lab Komputer</td>
-          <td class="tak-cetak nowrap"><a href="jadwal__id-3.html">Ubah</a>
-            <form method="post" class="sebaris" onsubmit="return confirm('Hapus jadwal ini?')"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><input type="hidden" name="aksi" value="hapus"><input type="hidden" name="id" value="3"><button class="kecil bahaya">Hapus</button></form></td></tr>
-              <tr><td>4</td><td>11:30–12:50</td>
-          <td>VIII A</td><td>Prakarya</td><td>R. VIII A</td>
-          <td class="tak-cetak nowrap"><a href="jadwal__id-4.html">Ubah</a>
-            <form method="post" class="sebaris" onsubmit="return confirm('Hapus jadwal ini?')"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><input type="hidden" name="aksi" value="hapus"><input type="hidden" name="id" value="4"><button class="kecil bahaya">Hapus</button></form></td></tr>
-            </tbody>
-    </table>
-      <h3>Rabu</h3>
-    <table class="tabel">
-      <thead><tr><th>Jam</th><th>Waktu</th><th>Kelas</th><th>Mapel</th><th>Ruang</th><th class="tak-cetak"></th></tr></thead>
-      <tbody>
-              <tr><td>2</td><td>08:50–10:10</td>
-          <td>VIII A</td><td>Informatika</td><td>Lab Komputer</td>
-          <td class="tak-cetak nowrap"><a href="jadwal__id-5.html">Ubah</a>
-            <form method="post" class="sebaris" onsubmit="return confirm('Hapus jadwal ini?')"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><input type="hidden" name="aksi" value="hapus"><input type="hidden" name="id" value="5"><button class="kecil bahaya">Hapus</button></form></td></tr>
-            </tbody>
-    </table>
-      <h3>Kamis</h3>
-    <table class="tabel">
-      <thead><tr><th>Jam</th><th>Waktu</th><th>Kelas</th><th>Mapel</th><th>Ruang</th><th class="tak-cetak"></th></tr></thead>
-      <tbody>
-              <tr><td>1</td><td>07:30–08:50</td>
-          <td>VII A</td><td>Informatika</td><td>Lab Komputer</td>
-          <td class="tak-cetak nowrap"><a href="jadwal__id-6.html">Ubah</a>
-            <form method="post" class="sebaris" onsubmit="return confirm('Hapus jadwal ini?')"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><input type="hidden" name="aksi" value="hapus"><input type="hidden" name="id" value="6"><button class="kecil bahaya">Hapus</button></form></td></tr>
-              <tr><td>3</td><td>10:10–11:30</td>
-          <td>IX A</td><td>Prakarya</td><td>R. IX A</td>
-          <td class="tak-cetak nowrap"><a href="jadwal__id-7.html">Ubah</a>
-            <form method="post" class="sebaris" onsubmit="return confirm('Hapus jadwal ini?')"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><input type="hidden" name="aksi" value="hapus"><input type="hidden" name="id" value="7"><button class="kecil bahaya">Hapus</button></form></td></tr>
-            </tbody>
-    </table>
-      <h3>Jumat</h3>
-    <table class="tabel">
-      <thead><tr><th>Jam</th><th>Waktu</th><th>Kelas</th><th>Mapel</th><th>Ruang</th><th class="tak-cetak"></th></tr></thead>
-      <tbody>
-              <tr><td>2</td><td>08:50–10:10</td>
-          <td>IX A</td><td>Informatika</td><td>Lab Komputer</td>
-          <td class="tak-cetak nowrap"><a href="jadwal__id-8.html">Ubah</a>
-            <form method="post" class="sebaris" onsubmit="return confirm('Hapus jadwal ini?')"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><input type="hidden" name="aksi" value="hapus"><input type="hidden" name="id" value="8"><button class="kecil bahaya">Hapus</button></form></td></tr>
-            </tbody>
-    </table>
-      <h3>Sabtu</h3>
-    <table class="tabel">
-      <thead><tr><th>Jam</th><th>Waktu</th><th>Kelas</th><th>Mapel</th><th>Ruang</th><th class="tak-cetak"></th></tr></thead>
-      <tbody>
-              <tr><td>1</td><td>07:30–08:50</td>
-          <td>VII A</td><td>Prakarya</td><td>R. VII A</td>
-          <td class="tak-cetak nowrap"><a href="jadwal__id-9.html">Ubah</a>
-            <form method="post" class="sebaris" onsubmit="return confirm('Hapus jadwal ini?')"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><input type="hidden" name="aksi" value="hapus"><input type="hidden" name="id" value="9"><button class="kecil bahaya">Hapus</button></form></td></tr>
-            </tbody>
-    </table>
+  <h3 class="tak-cetak" style="margin-top:0">Jadwal mingguan <small class="redup">(38 JP)</small></h3>
+    <div class="geser-x"><table class="tabel tabel-minggu">
+    <tr><th>Jam</th><th>Senin</th><th>Selasa</th><th>Rabu</th><th>Kamis</th><th>Jumat</th><th>Sabtu</th></tr>
+        <tr><td><b>1</b></td>
+            <td class="isi">VII B<small>Informatika</small></td>
+            <td class="isi">VII B<small>Informatika</small></td>
+            <td class="isi">VIII A<small>Informatika</small></td>
+            <td class="isi">VII A<small>Informatika</small></td>
+            <td class=""></td>
+            <td class="isi">VIII A<small>Informatika</small></td>
+      </tr>
+        <tr><td><b>2</b></td>
+            <td class="isi">VIII A<small>Informatika</small></td>
+            <td class="isi">VIII B<small>Informatika</small></td>
+            <td class="isi">VIII A<small>Informatika</small></td>
+            <td class=""></td>
+            <td class="isi">VII B<small>Informatika</small></td>
+            <td class="isi">VII A<small>Informatika</small></td>
+      </tr>
+        <tr><td><b>3</b></td>
+            <td class=""></td>
+            <td class="isi">IX A<small>Informatika</small></td>
+            <td class="isi">IX A<small>Informatika</small></td>
+            <td class="isi">VIII B<small>Informatika</small></td>
+            <td class="isi">IX B<small>Informatika</small></td>
+            <td class="isi">VIII A<small>Informatika</small></td>
+      </tr>
+        <tr><td><b>4</b></td>
+            <td class="isi">VIII A<small>Informatika</small></td>
+            <td class="isi">VII A<small>Informatika</small></td>
+            <td class="isi">IX B<small>Informatika</small></td>
+            <td class="isi">VIII B<small>Informatika</small></td>
+            <td class="isi">VII A<small>Informatika</small></td>
+            <td class="isi">VII B<small>Informatika</small></td>
+      </tr>
+        <tr><td><b>5</b></td>
+            <td class="isi">VII B<small>Informatika</small></td>
+            <td class="isi">VII B<small>Informatika</small></td>
+            <td class="isi">VIII A<small>Informatika</small></td>
+            <td class="isi">VII B<small>Informatika</small></td>
+            <td class="isi">VII B<small>Informatika</small></td>
+            <td class="isi">VII B<small>Informatika</small></td>
+      </tr>
+        <tr><td><b>6</b></td>
+            <td class="isi">IX A<small>Informatika</small></td>
+            <td class="isi">IX A<small>Informatika</small></td>
+            <td class=""></td>
+            <td class="isi">IX B<small>Informatika</small></td>
+            <td class=""></td>
+            <td class="isi">IX A<small>Informatika</small></td>
+      </tr>
+        <tr><td><b>7</b></td>
+            <td class="isi">VII B<small>Informatika</small></td>
+            <td class="isi">VII B<small>Informatika</small></td>
+            <td class="isi">VIII A<small>Informatika</small></td>
+            <td class="isi">VIII B<small>Informatika</small></td>
+            <td class=""></td>
+            <td class=""></td>
+      </tr>
+        <tr><td><b>8</b></td>
+            <td class="isi">VIII A<small>Informatika</small></td>
+            <td class="isi">IX B<small>Informatika</small></td>
+            <td class="isi">VII A<small>Informatika</small></td>
+            <td class=""></td>
+            <td class=""></td>
+            <td class=""></td>
+      </tr>
+      </table></div>
   </div>
-<datalist id="dl-kelas"><option value="VII A"><option value="VII B"><option value="VII C"><option value="VIII A"><option value="IX A"><option value="IX B"></datalist>
-<datalist id="dl-mapel"><option value="Informatika"><option value="Prakarya"></datalist>
+
+<details class="kartu tak-cetak">
+  <summary><b>⏰ Jam pelajaran sekolah (admin)</b></summary>
+  <form method="post" class="formulir" style="margin-top:.6rem">
+    <input type="hidden" name="_t" value="e17ed6ffb802ad94c8bffc1f303bedd2"><input type="hidden" name="aksi" value="jam">
+    <p class="kecil redup">Satu baris per jam: <code>nomor mulai-selesai</code>. Istirahat cukup tidak ditulis. Berlaku untuk semua guru.</p>
+    <div class="baris2">
+      <label>Senin–Kamis & Sabtu<textarea name="jam_umum" rows="10">1 07:30-08:10
+2 08:10-08:50
+3 08:50-09:30
+4 09:45-10:25
+5 10:25-11:05
+6 11:05-11:45
+7 12:15-12:55
+8 12:55-13:35</textarea></label>
+      <label>Jumat<textarea name="jam_jumat" rows="10">1 07:30-08:05
+2 08:05-08:40
+3 08:40-09:15
+4 09:30-10:05
+5 10:05-10:40
+6 10:40-11:15</textarea></label>
+    </div>
+    <button class="lebar">Simpan jam pelajaran</button>
+  </form>
+</details>
+<datalist id="dl-mapel"><option value="Informatika"></datalist>
 </main>
-<footer class="bawah tak-cetak">SiGuru v1.2 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.2"></script>
+<footer class="bawah tak-cetak">SiGuru v1.3 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.3"></script>
+<script src="aset/jadwal.js?v=1.3"></script>
 </body>
 </html>
