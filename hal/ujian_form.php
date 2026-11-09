@@ -27,7 +27,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'acak_soal' => post('acak_soal') ? 1 : 0, 'acak_opsi' => post('acak_opsi') ? 1 : 0,
         'token_menit' => in_array((int)post('token_menit'), [0, 5, 10, 15, 30], true) ? (int)post('token_menit') : 10,
         'tampil_nilai' => post('tampil_nilai') ? 1 : 0,
+        'mode' => post('mode') === 'latihan' ? 'latihan' : 'ujian',
+        'pengaman' => post('pengaman') ? 1 : 0,
+        'batas_keluar' => max(1, min(10, (int)post('batas_keluar', 3))),
+        'tampil_hasil' => post('tampil_hasil') ? 1 : 0,
+        'tampil_tertib' => post('tampil_tertib') ? 1 : 0,
+        'tata_tertib' => mb_substr(trim((string)post('tata_tertib')), 0, 3000),
     ];
+    if ($data['mode'] === 'latihan') { $data['pengaman'] = 0; $data['tampil_hasil'] = 1; $data['tampil_nilai'] = 1; }
+    if (post('tertib_bawaan') && $data['tata_tertib'] !== '') setelan_simpan('tertib_ujian:' . uid(), $data['tata_tertib']);
     if ($u) {
         $set = implode(', ', array_map(fn($k) => "$k = ?", array_keys($data)));
         q("UPDATE guru_ujian SET $set WHERE id = ?", array_merge(array_values($data), [$u['id']]));
@@ -65,9 +73,14 @@ judul_baris($u ? 'Pengaturan ujian' : 'Ujian online baru', '<a class="tombol" hr
     <label>Kelas<select name="kelas" required><?= pilihan(array_combine($kl, $kl) ?: [], $u['kelas'] ?? '') ?></select></label>
     <label>Mapel<input name="mapel" value="<?= $v('mapel', $cfg['mapel'] ?? '') ?>"></label>
   </div>
+  <fieldset class="pilih-mode">
+    <legend>Jenis</legend>
+    <label class="kartu-pilih"><input type="radio" name="mode" value="ujian" <?= ($u['mode'] ?? 'ujian') !== 'latihan' ? 'checked' : '' ?>><span><b>Ujian</b><small>Pakai token, satu kali kerja, nilai untuk rapor</small></span></label>
+    <label class="kartu-pilih"><input type="radio" name="mode" value="latihan" <?= ($u['mode'] ?? '') === 'latihan' ? 'checked' : '' ?>><span><b>Latihan</b><small>Tanpa token, boleh diulang, nilai &amp; pembahasan langsung muncul</small></span></label>
+  </fieldset>
   <div class="baris2">
     <label>Durasi (menit)<input type="number" name="durasi" min="5" max="300" value="<?= $v('durasi', 60) ?>"></label>
-    <label>Token berganti tiap<select name="token_menit"><?= pilihan(['0' => 'Tetap (tidak berganti)', '5' => '5 menit', '10' => '10 menit', '15' => '15 menit', '30' => '30 menit'], (string)($u['token_menit'] ?? 10)) ?></select></label>
+    <label class="hanya-ujian">Token berganti tiap<select name="token_menit"><?= pilihan(['0' => 'Tetap (tidak berganti)', '5' => '5 menit', '10' => '10 menit', '15' => '15 menit', '30' => '30 menit'], (string)($u['token_menit'] ?? 10)) ?></select></label>
   </div>
     <label>Boleh mulai sejak (opsional)<span class="tgl-jam"><input type="date" name="mulai_tgl" value="<?= $tg('mulai') ?>"><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="07:30" autocomplete="off" name="mulai_jam" value="<?= $jm('mulai') ?>" aria-label="jam mulai"></span></label>
     <label>Batas akhir (opsional)<span class="tgl-jam"><input type="date" name="selesai_tgl" value="<?= $tg('selesai') ?>"><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="07:30" autocomplete="off" name="selesai_jam" value="<?= $jm('selesai') ?>" aria-label="jam batas"></span></label>
@@ -76,7 +89,27 @@ judul_baris($u ? 'Pengaturan ujian' : 'Ujian online baru', '<a class="tombol" hr
   <?php endif; ?>
   <label class="centang"><input type="checkbox" name="acak_soal" value="1" <?= ($u['acak_soal'] ?? 1) ? 'checked' : '' ?>> Acak urutan soal per siswa</label>
   <label class="centang"><input type="checkbox" name="acak_opsi" value="1" <?= ($u['acak_opsi'] ?? 1) ? 'checked' : '' ?>> Acak urutan pilihan jawaban (A–E)</label>
+  <div class="hanya-ujian">
   <label class="centang"><input type="checkbox" name="tampil_nilai" value="1" <?= ($u['tampil_nilai'] ?? 0) ? 'checked' : '' ?>> Tampilkan nilai ke siswa setelah selesai</label>
+  <label class="centang"><input type="checkbox" name="tampil_hasil" value="1" <?= ($u['tampil_hasil'] ?? 0) ? 'checked' : '' ?>> <span>Setelah ujian <b>ditutup</b>, siswa bisa melihat nilai, jawaban yang salah &amp; pembahasan</span></label>
+  <fieldset class="kotak-pengaman">
+    <legend>🛡 Pengaman ujian</legend>
+    <label class="saklar"><input type="checkbox" name="pengaman" value="1" id="pengaman" <?= ($u['pengaman'] ?? 0) ? 'checked' : '' ?>><span class="saklar-tombol"></span> <b>Aktifkan pengaman</b></label>
+    <div class="pengaman-isi">
+      <label>Jawaban dikumpulkan otomatis bila siswa keluar dari halaman ujian sebanyak
+        <select name="batas_keluar"><?= pilihan(array_combine(range(1, 10), array_map(fn($n) => $n . ' kali', range(1, 10))), (string)($u['batas_keluar'] ?? 3)) ?></select></label>
+      <p class="kecil redup">Siswa melihat peringatan setiap kali keluar (“Peringatan 1 dari 3”). Bila tidak sengaja (HP mati, telepon masuk), tekan <b>Buka ulang</b> di halaman pantau.</p>
+    </div>
+    <p class="kecil redup pengaman-mati">Pengaman mati: siswa yang keluar layar tetap <b>dicatat</b> dan terlihat di halaman pantau, tapi tidak dihentikan.</p>
+  </fieldset>
+  </div>
+  <fieldset>
+    <legend>📋 Tata tertib untuk siswa</legend>
+    <label class="centang"><input type="checkbox" name="tampil_tertib" value="1" <?= ($u['tampil_tertib'] ?? 1) ? 'checked' : '' ?>> <span>Tampilkan tata tertib sebelum siswa mulai (siswa wajib mencentang “sudah membaca”)</span></label>
+    <label>Aturan dari guru <small>(satu baris = satu poin)</small><textarea name="tata_tertib" rows="4"><?= h((string)(($u['tata_tertib'] ?? '') !== '' && $u ? $u['tata_tertib'] : ujian_tertib_bawaan(uid()))) ?></textarea></label>
+    <label class="centang kecil"><input type="checkbox" name="tertib_bawaan" value="1"> Jadikan bawaan untuk ujian berikutnya</label>
+    <p class="kecil redup">Poin tentang waktu, simpan otomatis, pengaman, dan hasil <b>ditambahkan otomatis</b> sesuai pengaturan di atas.</p>
+  </fieldset>
   <?php if ($u && !$sudah_mulai): ?>
   <label class="centang"><input type="checkbox" name="segarkan_soal" value="1"> Ambil ulang soal dari paket (bila paket/bank soal diubah)</label>
   <?php endif; ?>

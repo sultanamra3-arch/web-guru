@@ -67,9 +67,12 @@ function ujian_soal_dari_paket(int $paket_id, float $poin_uraian): ?array
             if (!isset($opsi[strtoupper($kunci)]) || strtoupper($kunci) === 'S') $kunci = preg_match('/^s/i', $kunci) ? 'B' : 'A';
         }
         if (in_array($tipe, ['pg', 'bs'], true)) $kunci = strtoupper(mb_substr($kunci, 0, 1));
+        $go = gambar_opsi($s['gambar_opsi'] ?? null);
         $out[] = [
             'tipe' => $tipe,
             'teks' => (string)$s['pertanyaan'],
+            'gambar' => $s['gambar'] ?? null,
+            'gambar_opsi' => in_array($tipe, ['pg', 'bs'], true) ? $go : [],
             'opsi' => $opsi,
             'kunci' => $kunci,
             'pembahasan' => (string)$s['pembahasan'],
@@ -109,8 +112,8 @@ function ujian_data_siswa(array $u, array $p): array
         if (!isset($soal[$i])) continue;
         $x = $soal[$i];
         $opsi = [];
-        foreach ($ur['o'][$i] ?? array_keys($x['opsi']) as $k) $opsi[] = ['k' => (string)$k, 't' => (string)($x['opsi'][$k] ?? '')];
-        $out[] = ['i' => $i, 'tipe' => $x['tipe'], 'teks' => $x['teks'], 'opsi' => $opsi];
+        foreach ($ur['o'][$i] ?? array_keys($x['opsi']) as $k) $opsi[] = ['k' => (string)$k, 't' => (string)($x['opsi'][$k] ?? ''), 'g' => gambar_url($x['gambar_opsi'][$k] ?? null)];
+        $out[] = ['i' => $i, 'tipe' => $x['tipe'], 'teks' => $x['teks'], 'g' => gambar_url($x['gambar'] ?? null), 'opsi' => $opsi];
     }
     return $out;
 }
@@ -226,6 +229,87 @@ function ujian_contoh_guru(array $u): array
         }
     }
     return $c;
+}
+
+const TERTIB_BAWAAN = "Berdoalah sebelum mulai mengerjakan.\nKerjakan sendiri, tidak boleh bertanya atau mencontek teman.\nPeriksa kembali jawabanmu sebelum menekan Selesai.";
+
+function ujian_tertib_bawaan(int $guru): string
+{
+    return (string)setelan('tertib_ujian:' . $guru, TERTIB_BAWAAN);
+}
+
+function ujian_latihan(array $u): bool
+{
+    return ($u['mode'] ?? 'ujian') === 'latihan';
+}
+
+/** Poin tata tertib yang dibaca siswa: tulisan guru + poin otomatis sesuai pengaturan ujian. */
+function ujian_tata_tertib(array $u): array
+{
+    $guru = $u['tata_tertib'] !== null && $u['tata_tertib'] !== '' ? (string)$u['tata_tertib'] : ujian_tertib_bawaan((int)$u['guru_id']);
+    $poin = array_values(array_filter(array_map('trim', preg_split('/\r\n|\n/', $guru)), fn($x) => $x !== ''));
+    $menit = (int)$u['durasi'];
+    $oto = [];
+    if (ujian_latihan($u)) $oto[] = 'Ini <b>latihan</b>: boleh diulang, nilai dan pembahasan langsung muncul setelah selesai.';
+    $oto[] = "Waktu mengerjakan <b>$menit menit</b>, dihitung sejak kamu menekan Mulai. Saat waktu habis, jawaban dikumpulkan otomatis.";
+    $oto[] = 'Jawaban tersimpan otomatis. Kalau sinyal putus, tetap lanjutkan — jawaban dikirim saat sinyal kembali.';
+    if (!ujian_latihan($u)) {
+        $oto[] = $u['pengaman']
+            ? 'Jangan keluar dari halaman ujian (membuka WA, Google, kamera, dll.). Kalau keluar <b>' . (int)$u['batas_keluar'] . ' kali</b>, jawabanmu <b>langsung dikumpulkan otomatis</b>.'
+            : 'Jangan keluar dari halaman ujian (membuka WA, Google, dll.). Setiap kali keluar akan <b>tercatat</b> dan dilihat guru.';
+        $oto[] = 'Satu nama hanya bisa dipakai di satu HP.';
+        if ($u['tampil_hasil']) $oto[] = 'Setelah ujian ditutup guru, kamu bisa melihat <b>nilai dan pembahasan</b> lewat link yang sama di HP ini.';
+    }
+    return array_merge(array_map('h', $poin), $oto);
+}
+
+/** Alasan tidak bisa mulai (jadwal), '' bila boleh. */
+function ujian_bisa_masuk_kerja(array $u): string
+{
+    if ($u['mulai'] && strtotime($u['mulai']) > time()) return 'belum';
+    if ($u['selesai'] && strtotime($u['selesai']) <= time()) return 'lewat';
+    return '';
+}
+
+/** Hasil (nilai, jawaban benar/salah, pembahasan) boleh dilihat siswa? */
+function ujian_hasil_terbuka(array $u): bool
+{
+    return ujian_latihan($u) || ($u['tampil_hasil'] && $u['status'] === 'tutup');
+}
+
+/** Mulai mengerjakan: buat/isi baris peserta dan kunci ke perangkat ini. */
+function ujian_mulai_peserta(array $u, string $siswa, string $alat_hash): void
+{
+    $p = satu('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ? AND kode = ?', [$u['id'], $siswa]);
+    if (!$p || !$p['mulai']) {
+        $batas = time() + (int)$u['durasi'] * 60;
+        if ($u['selesai']) $batas = min($batas, strtotime($u['selesai']));
+        q('INSERT INTO guru_ujian_peserta (ujian_id, kode, perangkat, mulai, batas, urutan, jawaban, ragu, terakhir) VALUES (?,?,?,?,?,?,?,?,?)
+           ON DUPLICATE KEY UPDATE perangkat = VALUES(perangkat), mulai = VALUES(mulai), batas = VALUES(batas), urutan = VALUES(urutan), terakhir = VALUES(terakhir)',
+            [$u['id'], $siswa, $alat_hash, sekarang(), date('Y-m-d H:i:s', $batas), json_encode(ujian_buat_urutan($u)), '{}', '{}', sekarang()]);
+    } else {
+        q('UPDATE guru_ujian_peserta SET perangkat = ?, terakhir = ? WHERE ujian_id = ? AND kode = ?', [$alat_hash, sekarang(), $u['id'], $siswa]);
+    }
+}
+
+/** Latihan: ulangi dari awal (nilai terbaik disimpan). */
+function ujian_ulang_latihan(array $u, array $p): void
+{
+    $terbaik = max((float)($p['nilai_terbaik'] ?? 0), (float)($p['nilai'] ?? 0));
+    $batas = time() + (int)$u['durasi'] * 60;
+    if ($u['selesai']) $batas = min($batas, strtotime($u['selesai']));
+    q('UPDATE guru_ujian_peserta SET mulai = ?, batas = ?, selesai = NULL, urutan = ?, jawaban = ?, ragu = ?, nomor = 0, keluar = 0, skor = NULL, nilai = NULL,
+       nilai_uraian = NULL, perlu_koreksi = 0, alasan = NULL, percobaan = percobaan + 1, nilai_terbaik = ?, terakhir = ? WHERE ujian_id = ? AND kode = ?',
+        [sekarang(), date('Y-m-d H:i:s', $batas), json_encode(ujian_buat_urutan($u)), '{}', '{}', $terbaik, sekarang(), $u['id'], $p['kode']]);
+}
+
+/** "Senin, 10 November 2026 pukul 07.30" */
+function ujian_waktu_teks(?string $dt): string
+{
+    if (!$dt) return '';
+    $t = strtotime($dt);
+    $hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][(int)date('w', $t)];
+    return $hari . ', ' . tgl_panjang(substr($dt, 0, 10)) . ' pukul ' . date('H.i', $t);
 }
 
 function ujian_status_teks(array $u): string

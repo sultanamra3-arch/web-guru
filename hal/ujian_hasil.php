@@ -23,9 +23,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'kirim_penilaian')
     }
     $n = 0;
     foreach ($peserta as $k => $p) {
-        if (!$p['selesai'] || $p['nilai'] === null) continue;
+        $nl = $p['selesai'] ? $p['nilai'] : null;
+        // latihan: pakai nilai terbaik dari semua percobaan
+        if (ujian_latihan($u) && $p['nilai_terbaik'] !== null) $nl = max((float)$p['nilai_terbaik'], (float)($nl ?? 0));
+        if ($nl === null) continue;
         q('INSERT INTO guru_nilai (penilaian_id, member_id, nilai, catatan) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE nilai = VALUES(nilai), catatan = VALUES(catatan)',
-            [$pid, $k, $p['nilai'], 'Ujian online' . ($p['perlu_koreksi'] ? ' (uraian belum dinilai)' : '')]);
+            [$pid, $k, $nl, (ujian_latihan($u) ? 'Latihan online, nilai terbaik dari ' . (int)$p['percobaan'] . ' percobaan' : 'Ujian online') . ($p['perlu_koreksi'] ? ' (uraian belum dinilai)' : '')]);
         $n++;
     }
     pesan("$n nilai dikirim ke Penilaian.");

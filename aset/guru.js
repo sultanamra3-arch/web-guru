@@ -34,6 +34,20 @@
       img.src = url;
     });
   }
+  /* Gambar soal & gambar pilihan (formulir soal) */
+  $$('.unggah-gambar').forEach(function (k) {
+    var inp = $('input[type=file]', k), sembunyi = $('input[type=hidden]', k), prat = $('.pratinjau-gambar', k);
+    inp.addEventListener('change', function () {
+      var f = inp.files[0]; inp.value = '';
+      if (!f) return;
+      kecilkanFoto(f, k.classList.contains('kecil-gambar') ? 700 : 1200).then(function (d) {
+        sembunyi.value = d;
+        prat.innerHTML = ''; var im = document.createElement('img'); im.src = d; im.className = k.classList.contains('kecil-gambar') ? 'gambar-opsi' : 'gambar-soal'; prat.append(im);
+        var h = $('input[type=checkbox]', k); if (h) h.checked = false;
+      }).catch(function (e) { alert(e.message); });
+    });
+  });
+
   function pasangFoto(form) {
     var foto = [], prat = $('.pratinjau-foto', form);
     function gambar() {
@@ -214,6 +228,19 @@
       });
       p.writeFile({ fileName: (data.judul || 'presentasi').replace(/[^\w\- ]+/g, '').slice(0, 60) + '.pptx' });
     });
+  }
+
+  /* ---------- Form ujian: jenis & pengaman ---------- */
+  var fm = $('.pilih-mode');
+  if (fm) {
+    var f = fm.closest('form');
+    function aturMode() {
+      var lat = ($('input[name=mode]:checked', f) || {}).value === 'latihan';
+      $$('.hanya-ujian', f).forEach(function (e) { e.hidden = lat; });
+      var pg = $('#pengaman', f);
+      if (pg) { $('.pengaman-isi', f).hidden = !pg.checked; $('.pengaman-mati', f).hidden = pg.checked; }
+    }
+    f.addEventListener('change', aturMode); aturMode();
   }
 
   /* ---------- Absensi ---------- */

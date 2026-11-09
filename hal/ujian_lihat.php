@@ -20,8 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
         case 'buka_ulang':
             // izinkan masuk dari perangkat lain / lanjut lagi setelah dikumpulkan
-            q('UPDATE guru_ujian_peserta SET perangkat = NULL, selesai = NULL,
-               batas = GREATEST(COALESCE(batas, NOW()), NOW() + INTERVAL 5 MINUTE) WHERE ujian_id = ? AND kode = ?', [$id, $kode]);
+            // pengaman: hitungan keluar direset, jumlah "pernah dikunci" dicatat
+            q("UPDATE guru_ujian_peserta SET dikunci = dikunci + (alasan = 'pengaman'), keluar = IF(alasan = 'pengaman', 0, keluar), alasan = NULL,
+               perangkat = NULL, selesai = NULL,
+               batas = GREATEST(COALESCE(batas, NOW()), NOW() + INTERVAL 5 MINUTE) WHERE ujian_id = ? AND kode = ?", [$id, $kode]);
             pesan(h(nama_siswa($kode)) . ' boleh masuk lagi (perangkat apa pun, token tetap diperlukan).');
             break;
         case 'tambah_waktu':
@@ -61,7 +63,7 @@ kepala($u['judul'], 'kelas');
 judul_baris(h($u['judul']), '<a class="tombol" href="?p=ujian">‹ Ujian</a>');
 ?>
 <div class="kartu">
-  <p style="margin-top:0">Kelas <b><?= h($u['kelas']) ?></b> · <?= $jumlah_soal ?> soal · <?= (int)$u['durasi'] ?> menit
+  <p style="margin-top:0"><?= ujian_latihan($u) ? '<span class="lencana">latihan</span> ' : '' ?>Kelas <b><?= h($u['kelas']) ?></b> · <?= $jumlah_soal ?> soal · <?= (int)$u['durasi'] ?> menit
     <?= $u['mulai'] ? ' · mulai ' . h(tgl(substr($u['mulai'], 0, 10)) . ' ' . substr($u['mulai'], 11, 5)) : '' ?>
     <?= $u['selesai'] ? ' · batas ' . h(tgl(substr($u['selesai'], 0, 10)) . ' ' . substr($u['selesai'], 11, 5)) : '' ?></p>
   <p><span class="lencana st-<?= h($u['status']) ?>"><?= h(ujian_status_teks($u)) ?></span></p>
@@ -73,7 +75,9 @@ judul_baris(h($u['judul']), '<a class="tombol" href="?p=ujian">‹ Ujian</a>');
     <?php endif; ?>
     <a class="tombol" href="?p=ujian_hasil&amp;id=<?= $id ?>">📊 Hasil & nilai</a>
   </div>
-  <p class="kecil"><a href="?p=ujian_form&amp;id=<?= $id ?>">⚙ Pengaturan</a></p>
+  <p class="kecil"><a href="?p=ujian_form&amp;id=<?= $id ?>">⚙ Pengaturan</a>
+    · <?= !ujian_latihan($u) ? ($u['pengaman'] ? '🛡 pengaman <b>aktif</b> (' . (int)$u['batas_keluar'] . '× keluar)' : '🛡 pengaman mati') : 'tanpa token, boleh diulang' ?>
+    <?= $u['tampil_tertib'] ? ' · 📋 tata tertib' : '' ?><?= !ujian_latihan($u) && $u['tampil_hasil'] ? ' · hasil terlihat setelah ditutup' : '' ?></p>
 </div>
 
 <div class="kartu layar-token" id="layar-token" data-id="<?= $id ?>" data-url="<?= h($url) ?>">
@@ -82,12 +86,47 @@ judul_baris(h($u['judul']), '<a class="tombol" href="?p=ujian">‹ Ujian</a>');
     <div class="url-siswa"><?= h(preg_replace('#^https?://#', '', $url)) ?></div>
     <div class="kecil redup" style="margin-top:.4rem">Kode ujian</div>
     <div class="kode-ujian"><?= h($u['kode']) ?></div>
+    <?php if (!ujian_latihan($u)): ?>
     <div class="kecil redup" style="margin-top:.4rem">Token</div>
     <div class="token-besar" id="token">····</div>
     <div class="kecil redup" id="token-sisa"></div>
+    <?php else: ?><div class="kecil redup" style="margin-top:.4rem">Latihan: siswa tidak perlu token</div><div id="token" hidden></div><div id="token-sisa" hidden></div><?php endif; ?>
   </div>
   <div class="token-qr" id="qr"></div>
-  <button type="button" class="kecil" id="tombol-layar-penuh">⛶ Tampilkan di proyektor</button>
+  <div class="token-tombol">
+    <button type="button" class="utama kecil" id="tombol-bagikan">📤 Bagikan</button>
+    <button type="button" class="kecil" id="tombol-layar-penuh">⛶ Tampilkan di proyektor</button>
+  </div>
+</div>
+
+<div class="kartu panel-bagikan" id="panel-bagikan" hidden
+  data-judul="<?= h($u['judul']) ?>" data-kelas="<?= h($u['kelas']) ?>" data-mapel="<?= h((string)$u['mapel']) ?>"
+  data-soal="<?= $jumlah_soal ?>" data-durasi="<?= (int)$u['durasi'] ?>" data-kode="<?= h($u['kode']) ?>" data-url="<?= h($url) ?>"
+  data-mulai="<?= h(ujian_waktu_teks($u['mulai'])) ?>"
+  data-batas="<?= h(ujian_waktu_teks($u['selesai'])) ?>"
+  data-sekolah="<?= h((string)k('sekolah', '')) ?>" data-latihan="<?= ujian_latihan($u) ? 1 : 0 ?>" data-tertib="<?= (int)$u['tampil_tertib'] ?>"
+  data-token-menit="<?= (int)$u['token_menit'] ?>">
+  <div class="judul-panel"><h3 style="margin:0">📤 Bagikan <?= ujian_latihan($u) ? 'latihan' : 'ujian' ?></h3><button type="button" class="kecil" id="tutup-bagikan" aria-label="Tutup">✕</button></div>
+  <?php if (!ujian_latihan($u)): ?>
+  <label class="centang"><input type="checkbox" id="sertakan-token"> <b>Sertakan token</b> <small class="redup">(untuk ujian dari rumah)</small></label>
+  <div class="pilih-token" hidden>
+    <?php if ((int)$u['token_menit'] > 0): ?>
+    <label class="centang kecil"><input type="radio" name="jenis_token" value="tetap" checked> Ubah ke <b>token tetap</b> selama ujian dibuka <span class="lencana">disarankan</span></label>
+    <label class="centang kecil"><input type="radio" name="jenis_token" value="sekarang"> Token sekarang saja <span id="ket-token-sekarang" class="redup"></span></label>
+    <?php else: ?><p class="kecil redup" style="margin:.2rem 0">Token ujian ini sudah tetap (tidak berganti).</p><?php endif; ?>
+  </div>
+  <?php endif; ?>
+  <small class="redup">Pesan yang dikirim:</small>
+  <div class="pratinjau-pesan" id="pratinjau-pesan"></div>
+  <small class="redup">Gambar yang ikut dikirim:</small>
+  <canvas id="kartu-bagikan" width="1080" height="1200" class="kartu-gambar"></canvas>
+  <button type="button" class="utama lebar" id="bagikan-sekarang">📤 Bagikan (tulisan + gambar)</button>
+  <div class="tombol-bagikan-lain">
+    <a class="tombol kecil" id="bagikan-wa" target="_blank" rel="noopener">WhatsApp</a>
+    <button type="button" class="kecil" id="salin-teks">Salin teks</button>
+    <button type="button" class="kecil" id="unduh-gambar">Unduh gambar</button>
+  </div>
+  <p class="kecil redup" id="status-bagikan"></p>
 </div>
 
 <div class="kartu">

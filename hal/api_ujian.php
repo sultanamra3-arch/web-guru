@@ -45,12 +45,23 @@ function ujian_baris_pantau(string $kode, string $nama, ?array $p, int $n_soal, 
         'online' => $p['terakhir'] && $sekarang - strtotime((string)$p['terakhir']) < 50,
         'sisa' => $p['selesai'] ? 0 : max(0, strtotime((string)$p['batas']) - $sekarang),
         'nilai' => $p['nilai'] !== null ? (float)$p['nilai'] : null,
+        'alasan' => (string)($p['alasan'] ?? ''), 'dikunci' => (int)($p['dikunci'] ?? 0),
+        'percobaan' => (int)($p['percobaan'] ?? 1), 'terbaik' => $p['nilai_terbaik'] !== null ? (float)$p['nilai_terbaik'] : null,
         'perlu' => (bool)$p['perlu_koreksi'],
         'perangkat' => $p['perangkat'] !== null,
     ];
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') jawab_json(['ok' => false, 'galat' => 'Metode tidak didukung']);
+
+if ($aksi === 'token_tetap') {
+    // untuk dibagikan lewat WA: token tidak berganti lagi selama ujian dibuka
+    if ((int)$u['token_menit'] !== 0) {
+        q('UPDATE guru_ujian SET token_menit = 0 WHERE id = ?', [$u['id']]);
+        $u['token_menit'] = 0;
+    }
+    jawab_json(['ok' => true, 'token' => ujian_token($u)]);
+}
 
 if ($aksi === 'nilai_ai') {
     $p = satu('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ? AND kode = ? AND selesai IS NOT NULL', [$u['id'], (string)post('kode')]);

@@ -33,7 +33,11 @@
   var timerKirim = null;
   function jadwalKirim(jeda) { clearTimeout(timerKirim); timerKirim = setTimeout(kirim, jeda == null ? 350 : jeda); }
   function kirim(aksi) {
-    if (mengirim) { if (!aksi) jadwalKirim(600); return Promise.resolve(null); }
+    if (mengirim) {
+      if (!aksi) { jadwalKirim(600); return Promise.resolve(null); }
+      // aksi (keluar/selesai/detak) jangan sampai hilang: coba lagi setelah kiriman berjalan selesai
+      return new Promise(function (ok) { setTimeout(function () { ok(kirim(aksi)); }, 700); });
+    }
     var paket = { jawab: tunda.jawab, ragu: tunda.ragu };
     var adaIsi = Object.keys(paket.jawab).length || Object.keys(paket.ragu).length;
     if (!adaIsi && !aksi) return Promise.resolve(null);
@@ -94,12 +98,15 @@
     elSoal.innerHTML = '';
     elSoal.append(el('div', 'ujian-no', 'Soal ' + (pos + 1) + ' dari ' + soal.length));
     var t = el('div', 'ujian-teks'); teksBaris(t, s.teks); elSoal.append(t);
+    if (s.g) { var gs = document.createElement('img'); gs.src = s.g; gs.className = 'ujian-gambar'; gs.alt = ''; gs.onclick = function () { perbesar(s.g); }; elSoal.append(gs); }
     if (s.tipe === 'pg' || s.tipe === 'bs') {
       var ol = el('div', 'ujian-opsi');
       s.opsi.forEach(function (o, n) {
         var b = el('button', String(jw[s.i]) === o.k ? 'pilih' : ''); b.type = 'button';
         b.append(el('span', 'huruf', HURUF[n] || ''));
-        var tt = el('span', 'isi'); teksBaris(tt, o.t); b.append(tt);
+        var tt = el('span', 'isi'); teksBaris(tt, o.t);
+        if (o.g) { var go = document.createElement('img'); go.src = o.g; go.className = 'ujian-gambar-opsi'; go.alt = ''; tt.append(go); }
+        b.append(tt);
         b.onclick = function () { catatJawab(s.i, String(jw[s.i]) === o.k ? '' : o.k); gambarSoal(); jadwalKirim(); };
         ol.append(b);
       });
@@ -117,6 +124,11 @@
     tSesudah.textContent = pos === soal.length - 1 ? 'Selesai ✓' : 'Lanjut ›';
     gambarNomor();
     var kini = elNomor.querySelector('.kini'); if (kini && kini.scrollIntoView) kini.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }
+  function perbesar(src) {
+    var t = el('div', 'ujian-tirai gambar-besar'), im = document.createElement('img'); im.src = src; im.alt = '';
+    t.append(im, el('small', null, 'ketuk untuk menutup')); t.onclick = function () { t.remove(); };
+    document.body.append(t);
   }
   function ke(n) { pos = Math.max(0, Math.min(soal.length - 1, n)); gambarSoal(); window.scrollTo(0, 0); jadwalKirim(1500); }
   tSebelum.onclick = function () { ke(pos - 1); };
@@ -166,7 +178,20 @@
   var pernahSembunyi = false;
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'hidden') { pernahSembunyi = true; return; }
-    if (pernahSembunyi && !selesaiDikirim) { pernahSembunyi = false; $('tirai-keluar').hidden = false; kirim('keluar'); }
+    if (pernahSembunyi && !selesaiDikirim) {
+      pernahSembunyi = false;
+      D.keluar = (D.keluar || 0) + 1;
+      if (D.pengaman) {
+        var sisaK = D.batas_keluar - D.keluar;
+        $('judul-keluar').textContent = sisaK > 0 ? '⚠ Peringatan ' + D.keluar + ' dari ' + D.batas_keluar : '🔒 Batas keluar tercapai';
+        $('teks-keluar').textContent = sisaK > 0
+          ? 'Kamu keluar dari halaman ujian. Kalau keluar ' + sisaK + ' kali lagi, jawabanmu dikumpulkan otomatis.'
+          : 'Jawabanmu sedang dikumpulkan otomatis…';
+      }
+      $('tirai-keluar').hidden = false;
+      // jawaban yang belum terkirim ikut dikirim bersama catatan keluar
+      kirim('keluar').then(function (r) { if (r && typeof r.keluar === 'number') D.keluar = r.keluar; });
+    }
   });
   $('tutup-tirai').onclick = function () { $('tirai-keluar').hidden = true; };
   window.addEventListener('online', function () { jadwalKirim(0); });

@@ -47,6 +47,7 @@ judul_baris('Jawaban siswa', '<a class="tombol" href="?p=ujian_hasil&amp;id=' . 
   <?php foreach ($soal as $i => $s): $a = (string)($jw[$i] ?? ''); $r = $h['rinci'][$i]; ?>
     <li class="<?= $r['skor'] >= $r['maks'] ? 'benar' : ($r['skor'] > 0 ? 'sebagian' : 'salah') ?>">
       <div class="tanya"><?= nl2br(h($s['teks'])) ?></div>
+      <?= gambar_html($s['gambar'] ?? null, 'gambar-soal kecil') ?>
       <?php if (in_array($s['tipe'], ['pg', 'bs'], true)): ?>
         <div>Jawaban: <b><?= $a === '' ? '–' : h($a . '. ' . ($s['opsi'][$a] ?? '')) ?></b> · Kunci: <b><?= h($s['kunci'] . '. ' . ($s['opsi'][$s['kunci']] ?? '')) ?></b>
           <?= $r['skor'] >= $r['maks'] ? '✓' : '✗' ?></div>

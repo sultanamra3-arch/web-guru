@@ -63,11 +63,12 @@ function lembar_soal(array $d, array $isi, array $soal, bool $kunci, bool $word 
   $no = 0; $bag_kini = null; $romawi = ['I', 'II', 'III', 'IV'];  $bi = 0;
   foreach ($soal as $s):
       if ($s['tipe'] !== $bag_kini) { $bag_kini = $s['tipe']; echo '<h3 class="bagian-soal">' . $romawi[$bi++ % 4] . '. ' . h($bagian[$bag_kini] ?? $bag_kini) . '</h3>'; }
-      $no++; $opsi = json_decode((string)$s['opsi'], true) ?: []; ?>
+      $no++; $opsi = json_decode((string)$s['opsi'], true) ?: []; $go = gambar_opsi($s['gambar_opsi'] ?? null); ?>
     <div class="soal-cetak">
       <div class="no"><?= $no ?>.</div>
       <div class="badan"><?= nl2br(h($s['pertanyaan'])) ?>
-        <?php if ($opsi): ?><table class="opsi-cetak"><?php foreach ($opsi as $hk => $ov): ?><tr><td><?= h($hk) ?>.</td><td><?= h($ov) ?></td></tr><?php endforeach; ?></table>
+        <?php if (!empty($s['gambar'])): ?><div class="gambar-cetak"><img src="<?= h(gambar_url($s['gambar'], $word)) ?>" alt=""<?= $word ? ' width="300"' : '' ?>></div><?php endif; ?>
+        <?php if ($opsi): ?><table class="opsi-cetak"><?php foreach ($opsi as $hk => $ov): ?><tr><td><?= h($hk) ?>.</td><td><?= h($ov) ?><?php if (isset($go[$hk])): ?><br><img class="gambar-opsi-cetak" src="<?= h(gambar_url($go[$hk], $word)) ?>" alt=""<?= $word ? ' width="140"' : '' ?>><?php endif; ?></td></tr><?php endforeach; ?></table>
         <?php elseif ($s['tipe'] === 'esai' && !$kunci): ?><div class="ruang-jawab"></div>
         <?php elseif ($s['tipe'] === 'isian' && !$kunci): ?><div>Jawab: ........................................................</div><?php endif; ?>
         <?php if ($kunci): ?><div class="kunci-cetak"><b>Kunci:</b> <?= nl2br(h((string)$s['kunci'])) ?><?= $s['pembahasan'] ? '<br><b>Pembahasan:</b> ' . nl2br(h($s['pembahasan'])) : '' ?><?= $s['level'] ? ' <i>(' . h($s['level']) . ')</i>' : '' ?></div><?php endif; ?>
@@ -109,7 +110,7 @@ kepala($d['judul'], 'soal');
   <?php foreach ($soal as $i => $s): ?>
     <li>
       <div class="ps-isi"><small class="meta"><b>No. <?= $i + 1 ?></b> · <?= h(TIPE_SOAL[$s['tipe']] ?? $s['tipe']) ?><?= $s['tipe'] === 'pg' || $s['tipe'] === 'bs' ? ' · kunci ' . h((string)$s['kunci']) : '' ?></small>
-        <span><?= h(mb_strimwidth((string)$s['pertanyaan'], 0, 140, '…')) ?></span></div>
+        <span><?= !empty($s['gambar']) ? '🖼 ' : '' ?><?= h(mb_strimwidth((string)$s['pertanyaan'], 0, 140, '…')) ?></span></div>
       <div class="ps-aksi">
         <a class="tombol kecil" href="?p=soal_form&amp;id=<?= (int)$s['id'] ?>&amp;paket=<?= $id ?>">Ubah</a>
         <form method="post" class="sebaris"><?= input_token() ?><input type="hidden" name="soal" value="<?= (int)$s['id'] ?>">

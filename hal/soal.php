@@ -71,14 +71,15 @@ judul_baris('Bank soal', '<a class="tombol" href="?p=soal_manual">＋ Manual</a>
   </div>
   <ul class="daftar kartu bank-soal">
   <?php if (!$daftar): ?><li class="redup"><?= $dipaket ? 'Semua soalmu sudah masuk paket. Buat soal baru dengan' : 'Belum ada soal. Mulai dengan' ?> <a href="?p=soal_ai">✨ Buat dengan AI</a> atau <a href="?p=soal_manual">＋ Manual</a>.</li><?php endif; ?>
-  <?php foreach ($daftar as $i => $s): $opsi = json_decode((string)$s['opsi'], true) ?: []; ?>
+  <?php foreach ($daftar as $i => $s): $opsi = json_decode((string)$s['opsi'], true) ?: []; $go = gambar_opsi($s['gambar_opsi'] ?? null); ?>
     <li>
       <label class="soal-baris">
         <input type="checkbox" name="pilih[]" value="<?= (int)$s['id'] ?>">
         <span class="soal-isi">
           <small class="meta"><?= h($s['mapel']) ?><?= $s['kelas'] ? ' · Kls ' . h($s['kelas']) : '' ?> · <?= h(TIPE_SOAL[$s['tipe']] ?? $s['tipe']) ?> · <?= h(TINGKAT_SOAL[$s['tingkat']] ?? $s['tingkat']) ?><?= $s['level'] ? ' · ' . h($s['level']) : '' ?><?= $s['topik'] ? ' · ' . h($s['topik']) : '' ?></small>
           <span class="tanya"><?= nl2br(h($s['pertanyaan'])) ?></span>
-          <?php if ($opsi): ?><ol class="opsi" type="A"><?php foreach ($opsi as $hk => $ov): ?><li class="<?= strtoupper(trim((string)$s['kunci'])) === $hk ? 'benar' : '' ?>"><?= h($ov) ?></li><?php endforeach; ?></ol>
+          <?= gambar_html($s['gambar'] ?? null, 'gambar-soal kecil') ?>
+          <?php if ($opsi): ?><ol class="opsi" type="A"><?php foreach ($opsi as $hk => $ov): ?><li class="<?= strtoupper(trim((string)$s['kunci'])) === $hk ? 'benar' : '' ?>"><?= h($ov) ?><?= gambar_html($go[$hk] ?? null, 'gambar-opsi') ?></li><?php endforeach; ?></ol>
           <?php elseif ($s['kunci']): ?><small class="kunci">Kunci: <?= h(mb_strimwidth($s['kunci'], 0, 160, '…')) ?></small><?php endif; ?>
         </span>
       </label>

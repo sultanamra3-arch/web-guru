@@ -10,7 +10,7 @@ Aplikasi web (bisa dipasang di HP) untuk guru:
 | ✨ LKPD | siap cetak, dengan pedoman guru |
 | ✨ Presentasi | tayang layar penuh di browser + unduh PowerPoint (.pptx) |
 | 👩‍🎓 Data siswa | diatur masing-masing guru (kelas & siswa milik sendiri, guru lain tidak melihat), terpisah dari perpustakaan, per tahun ajaran; isi lewat foto daftar hadir (AI), tempel nama, atau Excel/CSV (ekspor Dapodik bisa langsung); no. absen, ganti nama/hapus kelas, naik kelas massal |
-| 💻 Ujian online | paket soal dikerjakan siswa di HP lewat link/QR + kode + token berganti; satu nama satu HP; simpan otomatis & tahan sinyal putus; acak soal/opsi; pantau langsung (keluar layar tercatat); nilai otomatis, uraian dinilai AI; analisis butir; kirim ke Penilaian |
+| 💻 Ujian online | paket soal dikerjakan siswa di HP lewat link/QR + kode + token; **bagikan ke WA** (tulisan + gambar kartu ujian, token opsional); **tata tertib** dibaca siswa sebelum mulai; **pengaman** bisa ON/OFF (dikumpulkan otomatis setelah N kali keluar layar, guru bisa Buka ulang); **mode latihan** (tanpa token, boleh diulang, nilai terbaik); siswa bisa melihat **hasil & pembahasan** setelah ujian ditutup; **soal bergambar**; simpan otomatis & tahan sinyal putus; acak soal/opsi; pantau langsung; uraian dinilai AI; analisis butir; kirim ke Penilaian |
 | ✅ Absensi | H/S/I/A per kelas & tanggal, rekap bulanan, unduh Excel |
 | 📊 Penilaian | input nilai, KKTP, rekap per mapel, unduh Excel, cetak |
 | ✨ Asisten AI (khusus admin) | chat untuk mengubah data milik admin sendiri: siswa & kelas, penilaian & nilai, absensi, jadwal, bank soal, dokumen; setiap perubahan tampil sebagai kartu dan baru tersimpan setelah tombol Simpan |

@@ -55,16 +55,23 @@ foreach ((array)json_decode((string)post('ragu', '{}'), true) as $i => $v) {
 $set['jawaban'] = json_encode((object)$jw, JSON_UNESCAPED_UNICODE);
 $set['ragu'] = json_encode((object)$rg);
 if (post('nomor') !== '') $set['nomor'] = max(0, min($n_soal - 1, (int)post('nomor')));
-if ($aksi === 'keluar') $set['keluar'] = (int)$p['keluar'] + 1;
-if ($aksi === 'selesai') $set['selesai'] = sekarang();
+$kunci_pengaman = false;
+if ($aksi === 'keluar') {
+    $set['keluar'] = (int)$p['keluar'] + 1;
+    // pengaman aktif: sudah mencapai batas keluar → kumpulkan otomatis
+    if ((int)$u['pengaman'] === 1 && !ujian_latihan($u) && $set['keluar'] >= max(1, (int)$u['batas_keluar'])) {
+        $set['selesai'] = sekarang(); $set['alasan'] = 'pengaman'; $kunci_pengaman = true;
+    }
+}
+if ($aksi === 'selesai') { $set['selesai'] = sekarang(); $set['alasan'] = 'siswa'; }
 
 $sql = implode(', ', array_map(fn($k) => "$k = ?", array_keys($set)));
 q("UPDATE guru_ujian_peserta SET $sql WHERE ujian_id = ? AND kode = ?", array_merge(array_values($set), [$id, $kode]));
 db()->commit();
 
-if ($aksi === 'selesai') {
+if ($aksi === 'selesai' || $kunci_pengaman) {
     $p = satu('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ? AND kode = ?', [$id, $kode]);
     ujian_simpan_hitung($u, $p);
     balas_u(['ok' => true, 'selesai' => true]);
 }
-balas_u(['ok' => true, 'sisa' => max(0, $sisa)]);
+balas_u(['ok' => true, 'sisa' => max(0, $sisa), 'keluar' => (int)($set['keluar'] ?? $p['keluar'])]);

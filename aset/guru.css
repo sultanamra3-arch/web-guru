@@ -347,3 +347,75 @@ html.apl input,html.apl select,html.apl textarea{font-size:max(16px,1em)}
 .info-paket .lencana{margin-right:.2rem}
 .aksi-bank select.kecil{min-height:36px;max-width:150px;font-size:.85rem}
 b.merah{color:var(--merah)}
+/* Gambar soal */
+.gambar-soal{display:block;max-width:100%;max-height:340px;border-radius:10px;border:1px solid var(--garis);margin:.4rem 0;background:#fff;object-fit:contain}
+.gambar-opsi{display:block;max-width:180px;max-height:130px;border-radius:8px;border:1px solid var(--garis);background:#fff;object-fit:contain}
+.unggah-gambar{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin:.2rem 0 .6rem}
+.unggah-gambar .pratinjau-gambar:empty{display:none}
+.unggah-gambar .pratinjau-gambar{flex-basis:100%}
+.unggah-gambar.kecil-gambar .pratinjau-gambar{flex-basis:auto}
+.pilih-gambar{display:inline-flex;align-items:center;gap:.35rem;cursor:pointer}
+.pilih-gambar .ikon{width:18px;height:18px}
+.opsi-dengan-gambar{display:flex;gap:.5rem;align-items:flex-end}
+.opsi-dengan-gambar>label{flex:1;min-width:0}
+.opsi-dengan-gambar .unggah-gambar{margin:0 0 .55rem;flex:none;flex-wrap:nowrap}
+.opsi-dengan-gambar .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.opsi-dengan-gambar .gambar-opsi{max-width:70px;max-height:56px}
+.gambar-soal.kecil{max-height:160px}
+.bank-soal .opsi .gambar-opsi{max-width:120px;max-height:80px;margin-top:.2rem}
+.gambar-cetak img{max-width:min(100%,380px);max-height:260px;margin:.3rem 0;display:block}
+.gambar-opsi-cetak{max-width:160px;max-height:110px;margin:.15rem 0}
+.ujian-gambar{display:block;max-width:100%;max-height:45vh;margin:-.4rem auto 1rem;border-radius:10px;border:1px solid var(--garis);background:#fff;cursor:zoom-in}
+.ujian-gambar-opsi{display:block;max-width:100%;max-height:150px;margin-top:.35rem;border-radius:8px;background:#fff}
+.ujian-tirai.gambar-besar{flex-direction:column;gap:.5rem;background:rgba(10,12,30,.92);color:#fff}
+.ujian-tirai.gambar-besar img{max-width:100%;max-height:85vh;border-radius:8px;background:#fff}
+/* Form ujian */
+.pilih-mode{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.pilih-mode legend{grid-column:1/-1}
+.kartu-pilih{display:flex!important;gap:.5rem;align-items:flex-start;border:1.5px solid var(--garis);border-radius:12px;padding:.6rem .65rem;cursor:pointer;margin:0!important}
+.kartu-pilih input{margin-top:.2rem}
+.kartu-pilih span{display:flex;flex-direction:column;gap:.15rem;min-width:0}
+.kartu-pilih small{color:var(--redup);font-weight:400;line-height:1.3}
+.kartu-pilih:has(input:checked){border-color:var(--navy);background:#eef0fb}
+.kotak-pengaman{border:1.5px solid var(--garis);border-radius:12px;padding:.6rem .8rem;margin:.6rem 0}
+.saklar{display:flex!important;align-items:center;gap:.55rem;cursor:pointer;margin:.2rem 0 .5rem}
+.saklar input{position:absolute;opacity:0;width:1px;height:1px}
+.saklar-tombol{width:46px;height:26px;border-radius:99px;background:#c9ccd8;position:relative;flex:none;transition:background .2s}
+.saklar-tombol:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s}
+.saklar input:checked+.saklar-tombol{background:#2E9E48}
+.saklar input:checked+.saklar-tombol:after{left:23px}
+.saklar input:focus-visible+.saklar-tombol{outline:2px solid var(--navy);outline-offset:2px}
+.pengaman-isi select{width:auto;display:inline-block;margin-left:.3rem}
+@media (max-width:420px){.pilih-mode{grid-template-columns:1fr}}
+/* Bagikan ujian */
+.token-tombol{display:flex;gap:.4rem;flex-wrap:wrap}
+.panel-bagikan{border:2px solid var(--navy)}
+.judul-panel{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.pilih-token{margin:.2rem 0 .5rem 1.6rem;display:flex;flex-direction:column;gap:.25rem}
+.pratinjau-pesan{background:#e7f8e9;border-radius:10px;padding:.6rem .75rem;font-size:.86rem;line-height:1.45;margin:.25rem 0 .7rem;white-space:pre-wrap;overflow-wrap:anywhere}
+.kartu-gambar{display:block;width:100%;max-width:360px;height:auto;border-radius:12px;margin:.3rem 0 .8rem;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.tombol-bagikan-lain{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-top:.45rem}
+.tombol-bagikan-lain .tombol,.tombol-bagikan-lain button{text-align:center;justify-content:center;padding-left:.2rem;padding-right:.2rem}
+.pantau li.pantau-dikunci{background:#fff4f4}
+/* Tata tertib siswa */
+.tata-tertib{border:2px solid var(--emas)}
+.poin-tertib{padding-left:1.25rem;margin:.3rem 0 .7rem;line-height:1.45}
+.poin-tertib li{margin:.35rem 0}
+.setuju-tertib{display:flex;gap:.55rem;align-items:flex-start;background:#f3f6ff;border-radius:10px;padding:.65rem .7rem;cursor:pointer}
+.setuju-tertib input{margin-top:.25rem;width:1.15rem;height:1.15rem;flex:none}
+/* Hasil & pembahasan siswa */
+.ulasan-siswa{list-style:none;padding:0;margin:0}
+.ulasan-siswa>li{border-left:5px solid var(--garis)}
+.ulasan-siswa>li.benar{border-left-color:#2E9E48}.ulasan-siswa>li.salah{border-left-color:#c0392b}.ulasan-siswa>li.sebagian,.ulasan-siswa>li.tunggu{border-left-color:var(--emas)}
+.ulasan-kepala{display:flex;justify-content:space-between;margin-bottom:.35rem}
+.ulasan-siswa li.benar .ulasan-kepala span{color:#1d6b33;font-weight:700}.ulasan-siswa li.salah .ulasan-kepala span{color:#c0392b;font-weight:700}
+.ulasan-opsi{list-style:none;padding:0;margin:.2rem 0;display:grid;gap:.35rem}
+.ulasan-opsi li{display:flex;gap:.55rem;align-items:flex-start;border:1.5px solid var(--garis);border-radius:10px;padding:.45rem .55rem;flex-wrap:wrap}
+.ulasan-opsi .huruf{flex:none;width:1.7rem;height:1.7rem;border-radius:50%;border:1.5px solid var(--redup);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem}
+.ulasan-opsi li>span:nth-child(2){flex:1;min-width:0}
+.ulasan-opsi small{font-weight:700;color:#c0392b}.ulasan-opsi small.ok{color:#1d6b33}
+.ulasan-opsi li.kunci{border-color:#2E9E48;background:#eaf7ee}.ulasan-opsi li.kunci .huruf{background:#2E9E48;border-color:#2E9E48;color:#fff}
+.ulasan-opsi li.dipilih:not(.kunci){border-color:#c0392b;background:#fdecee}.ulasan-opsi li.dipilih:not(.kunci) .huruf{background:#c0392b;border-color:#c0392b;color:#fff}
+.pembahasan-siswa{margin-top:.5rem;background:#f3f6ff;border-radius:8px;padding:.5rem .6rem;font-size:.92rem;line-height:1.45}
+.kartu-pilih input[type=radio]{width:1.15rem!important;height:1.15rem;flex:none;margin:.15rem 0 0;min-height:0;padding:0}
+.kartu-pilih span{flex:1}

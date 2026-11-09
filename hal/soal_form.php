@@ -21,7 +21,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'pertanyaan' => trim((string)post('pertanyaan')), 'opsi' => $opsi ? json_encode($opsi, JSON_UNESCAPED_UNICODE) : null,
         'kunci' => trim((string)post('kunci')), 'pembahasan' => trim((string)post('pembahasan')),
     ];
-    if ($d['mapel'] === '' || $d['pertanyaan'] === '') {
+    // gambar soal & gambar pilihan (dikecilkan di HP sebelum dikirim)
+    $g = $s['gambar'] ?? null;
+    if (post('hapus_gambar')) $g = null;
+    if ((string)post('gambar_data') !== '') $g = gambar_simpan((string)post('gambar_data')) ?? $g;
+    $d['gambar'] = $g;
+    $go = gambar_opsi($s['gambar_opsi'] ?? null);
+    foreach (['A', 'B', 'C', 'D', 'E'] as $h) {
+        if (!empty($_POST['hapus_gambar_opsi'][$h])) unset($go[$h]);
+        $x = (string)($_POST['gambar_opsi_data'][$h] ?? '');
+        if ($x !== '' && ($f = gambar_simpan($x))) $go[$h] = $f;
+    }
+    if (!in_array($tipe, ['pg', 'bs'], true)) $go = [];
+    $d['gambar_opsi'] = $go ? json_encode($go) : null;
+    // pilihan yang hanya berupa gambar tetap dihitung sebagai pilihan
+    if (in_array($tipe, ['pg', 'bs'], true)) {
+        foreach ($go as $h => $_) if (!isset($opsi[$h])) $opsi[$h] = '';
+        ksort($opsi);
+        $d['opsi'] = $opsi ? json_encode($opsi, JSON_UNESCAPED_UNICODE) : null;
+    }
+    if ($d['mapel'] === '' && $d['pertanyaan'] === '') {
+        pesan('Mapel dan pertanyaan wajib diisi.', 'galat');
+    } elseif ($d['mapel'] === '' || ($d['pertanyaan'] === '' && !$g)) {
         pesan('Mapel dan pertanyaan wajib diisi.', 'galat');
     } else {
         if ($s) {
@@ -40,12 +61,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 $opsi = $s ? (json_decode((string)$s['opsi'], true) ?: []) : [];
+$g_opsi = gambar_opsi($s['gambar_opsi'] ?? null);
 
 kepala('Soal', 'soal');
 judul_baris($s ? 'Ubah soal' : ($pk ? 'Tambah soal ke paket' : 'Tambah soal manual'), '<a class="tombol" href="' . h($kembali) . '">‹ ' . ($pk ? 'Kembali ke paket' : 'Bank soal') . '</a>');
 if ($pk): ?><p class="kecil redup">Paket: <b><?= h($pk['judul']) ?></b><?= $s ? '. Perubahan langsung terlihat di lembar soal paket ini (ujian online yang sudah dibuat tidak ikut berubah).' : '' ?></p><?php endif;
 ?>
-<form method="post" class="formulir">
+<form method="post" class="formulir" id="form-soal">
   <?= input_token() ?>
   <fieldset><legend>Identitas</legend>
     <div class="baris3">
@@ -60,11 +82,26 @@ if ($pk): ?><p class="kecil redup">Paket: <b><?= h($pk['judul']) ?></b><?= $s ? 
     </div>
   </fieldset>
   <fieldset><legend>Soal</legend>
-    <label>Pertanyaan<textarea name="pertanyaan" rows="4" required><?= h($s['pertanyaan'] ?? '') ?></textarea></label>
+    <label>Pertanyaan<textarea name="pertanyaan" rows="4"><?= h($s['pertanyaan'] ?? '') ?></textarea></label>
+    <div class="unggah-gambar" data-nama="gambar_data">
+      <div class="pratinjau-gambar"><?= gambar_html($s['gambar'] ?? null, 'gambar-soal') ?></div>
+      <label class="tombol kecil pilih-gambar"><?= ikon('galeri') ?> <span><?= !empty($s['gambar']) ? 'Ganti gambar soal' : 'Tambah gambar soal' ?></span><input type="file" accept="image/*" hidden></label>
+      <?php if (!empty($s['gambar'])): ?><label class="centang kecil"><input type="checkbox" name="hapus_gambar" value="1"> Hapus gambar</label><?php endif; ?>
+      <input type="hidden" name="gambar_data">
+    </div>
     <div id="bagian-opsi">
       <?php foreach (['A', 'B', 'C', 'D', 'E'] as $h): ?>
-        <label>Opsi <?= $h ?><input name="opsi[<?= $h ?>]" value="<?= h($opsi[$h] ?? '') ?>"></label>
+        <div class="opsi-dengan-gambar">
+          <label>Opsi <?= $h ?><input name="opsi[<?= $h ?>]" value="<?= h($opsi[$h] ?? '') ?>"></label>
+          <div class="unggah-gambar kecil-gambar" data-nama="gambar_opsi_data[<?= $h ?>]">
+            <div class="pratinjau-gambar"><?= gambar_html($g_opsi[$h] ?? null, 'gambar-opsi') ?></div>
+            <label class="tombol kecil pilih-gambar" title="Gambar untuk opsi <?= $h ?>"><?= ikon('galeri') ?><span class="sr"><?= isset($g_opsi[$h]) ? 'Ganti' : 'Gambar' ?></span><input type="file" accept="image/*" hidden></label>
+            <?php if (isset($g_opsi[$h])): ?><label class="centang kecil"><input type="checkbox" name="hapus_gambar_opsi[<?= $h ?>]" value="1"> hapus</label><?php endif; ?>
+            <input type="hidden" name="gambar_opsi_data[<?= $h ?>]">
+          </div>
+        </div>
       <?php endforeach; ?>
+      <p class="kecil redup">Pilihan boleh berupa gambar saja (isi teks opsi dengan keterangan singkat, mis. "Gambar 1").</p>
     </div>
     <label>Kunci jawaban <small>(huruf untuk pilihan ganda; jawaban/pedoman untuk isian & uraian)</small><textarea name="kunci" rows="2"><?= h($s['kunci'] ?? '') ?></textarea></label>
     <label>Pembahasan<textarea name="pembahasan" rows="3"><?= h($s['pembahasan'] ?? '') ?></textarea></label>

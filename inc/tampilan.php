@@ -80,8 +80,10 @@ function kaki(bool $polos = false): void
 function pilihan(array $daftar, $terpilih, ?string $kolom_id = null, ?string $kolom_nama = null): string
 {
     $o = '';
+    // daftar biasa ['a','b'] → nilai = teks; daftar berkunci (termasuk kunci angka seperti 7/8/9) → nilai = kunci
+    $berkunci = !array_is_list($daftar);
     foreach ($daftar as $k => $r) {
-        $id = $kolom_id ? $r[$kolom_id] : (is_string($k) ? $k : $r);
+        $id = $kolom_id ? $r[$kolom_id] : ($berkunci || is_string($k) ? $k : $r);
         $nm = $kolom_nama ? $r[$kolom_nama] : $r;
         $s = ((string)$id === (string)$terpilih) ? ' selected' : '';
         $o .= '<option value="' . h($id) . '"' . $s . '>' . h($nm) . '</option>';

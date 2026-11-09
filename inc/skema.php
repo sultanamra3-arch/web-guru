@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 4;
+const SKEMA_VERSI = 5;
 
 function pastikan_skema(): void
 {
@@ -206,6 +206,7 @@ function pastikan_skema(): void
     ];
     foreach ($sql as $q) db()->exec($q);
     skema_migrasi_4();
+    skema_migrasi_5();
     @file_put_contents($f, date('c'));
 }
 
@@ -228,4 +229,23 @@ function skema_migrasi_4(): void
         q('UPDATE guru_siswa SET guru_id = ? WHERE guru_id = 0', [$pemilik]);
         q('UPDATE guru_kelas SET guru_id = ? WHERE guru_id = 0', [$pemilik]);
     }
+}
+
+/** v5: soal bergambar, mode latihan, pengaman ujian, tata tertib, hasil & pembahasan untuk siswa. */
+function skema_migrasi_5(): void
+{
+    $kolom = [
+        'guru_soal' => ['gambar' => 'VARCHAR(40) NULL', 'gambar_opsi' => 'TEXT NULL'],
+        'guru_ujian' => ['mode' => "VARCHAR(10) NOT NULL DEFAULT 'ujian'", 'pengaman' => 'TINYINT NOT NULL DEFAULT 0',
+            'batas_keluar' => 'TINYINT NOT NULL DEFAULT 3', 'tampil_tertib' => 'TINYINT NOT NULL DEFAULT 1',
+            'tata_tertib' => 'TEXT NULL', 'tampil_hasil' => 'TINYINT NOT NULL DEFAULT 0'],
+        'guru_ujian_peserta' => ['alasan' => 'VARCHAR(20) NULL', 'dikunci' => 'SMALLINT NOT NULL DEFAULT 0',
+            'percobaan' => 'SMALLINT NOT NULL DEFAULT 1', 'nilai_terbaik' => 'DECIMAL(5,2) NULL'],
+    ];
+    foreach ($kolom as $t => $daftar) {
+        foreach ($daftar as $k => $def) if (!kolom_ada($t, $k)) db()->exec("ALTER TABLE $t ADD COLUMN $k $def");
+    }
+    // perbaiki data lama: pilihan kelas dulu terkirim sebagai "Kelas 8"
+    db()->exec("UPDATE guru_soal SET kelas = TRIM(SUBSTRING(kelas, 7)) WHERE kelas LIKE 'Kelas %'");
+    db()->exec("UPDATE guru_dokumen SET kelas = TRIM(SUBSTRING(kelas, 7)) WHERE kelas LIKE 'Kelas %' AND jenis IN ('modul', 'lkpd', 'presentasi')");
 }
