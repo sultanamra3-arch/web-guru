@@ -16,14 +16,14 @@ $id = (int)post('id');
 $kode = $_SESSION['ujian'][$id] ?? null;
 session_write_close();
 $u = ujian_ambil($id, false);
-if (!$u || !$kode) balas_u(['ok' => false, 'keluar' => true, 'galat' => 'Sesi ujian berakhir. Masuk lagi.']);
+if (!$u || !$kode) balas_u(['ok' => false, 'keluar' => true, 'galat' => 'Sesi berakhir. Pilih namamu lagi untuk melanjutkan — jawabanmu tetap tersimpan.']);
 
 db()->beginTransaction();
 $p = satu('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ? AND kode = ? FOR UPDATE', [$id, $kode]);
 $alat = hash('sha256', (string)($_COOKIE['sgu_alat'] ?? ''));
 if (!$p || !$p['perangkat'] || !hash_equals((string)$p['perangkat'], $alat)) {
     db()->rollBack();
-    balas_u(['ok' => false, 'keluar' => true, 'galat' => 'Nama ini dipakai di perangkat lain.']);
+    balas_u(['ok' => false, 'keluar' => true, 'galat' => ujian_latihan($u) ? 'Latihan ini sekarang dibuka di HP/browser lain.' : 'Nama ini dipakai di HP/browser lain. Minta guru menekan "Buka ulang".']);
 }
 if ($p['selesai']) { db()->commit(); balas_u(['ok' => false, 'selesai' => true]); }
 $sisa = strtotime((string)$p['batas']) - time();

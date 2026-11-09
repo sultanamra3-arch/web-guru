@@ -49,12 +49,24 @@
     fd.append('jawab', JSON.stringify(paket.jawab)); fd.append('ragu', JSON.stringify(paket.ragu));
     if (aksi) fd.append('aksi', aksi);
     return fetch('?p=api_u', { method: 'POST', body: fd, credentials: 'same-origin' })
-      .then(function (r) { return r.json(); })
+      .then(function (r) {
+        // 400 = sesi di server sudah hilang → bukan masalah sinyal
+        if (r.status === 400) return { ok: false, keluar: true, galat: 'Sesi berakhir. Pilih namamu lagi untuk melanjutkan — jawabanmu tetap tersimpan.' };
+        return r.json();
+      })
       .then(function (r) {
         mengirim = false; gagal = 0;
         if (r.ok && typeof r.sisa === 'number') sisa = r.sisa;
         if (r.selesai) { bersihLokal(); location.reload(); return r; }
-        if (r.keluar) { bersihLokal(); status('⚠ ' + (r.galat || 'Sesi berakhir.'), 'galat'); setTimeout(function () { location.href = '?p=u'; }, 2500); return r; }
+        if (r.keluar) {
+          // jawaban yang belum terkirim tetap disimpan di HP, dikirim lagi setelah masuk ulang
+          Object.keys(paket.jawab).forEach(function (i) { if (!(i in tunda.jawab)) tunda.jawab[i] = paket.jawab[i]; });
+          Object.keys(paket.ragu).forEach(function (i) { if (!(i in tunda.ragu)) tunda.ragu[i] = paket.ragu[i]; });
+          simpanLokal(); selesaiDikirim = true;
+          status('⚠ ' + (r.galat || 'Sesi berakhir.'), 'galat');
+          setTimeout(function () { location.href = '?p=u' + (D.kode_ujian ? '&k=' + encodeURIComponent(D.kode_ujian) : ''); }, 3500);
+          return r;
+        }
         if (!r.ok) throw new Error('gagal');
         if (!Object.keys(tunda.jawab).length && !Object.keys(tunda.ragu).length) { bersihLokal(); status('✓ Semua jawaban tersimpan', 'ok'); }
         else jadwalKirim(200);

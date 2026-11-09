@@ -98,6 +98,7 @@ judul_baris($u ? 'Pengaturan ujian' : 'Ujian online baru', '<a class="tombol" hr
     <div class="pengaman-isi">
       <label>Jawaban dikumpulkan otomatis bila siswa keluar dari halaman ujian sebanyak
         <select name="batas_keluar"><?= pilihan(array_combine(range(1, 10), array_map(fn($n) => $n . ' kali', range(1, 10))), (string)($u['batas_keluar'] ?? 3)) ?></select></label>
+      <p class="kecil peringatan-batas">⚠ Jangan pilih <b>1 kali</b>: telepon masuk, notifikasi, atau layar HP mati sebentar saja sudah langsung mengumpulkan jawaban. Disarankan 3 kali.</p>
       <p class="kecil redup">Siswa melihat peringatan setiap kali keluar (“Peringatan 1 dari 3”). Bila tidak sengaja (HP mati, telepon masuk), tekan <b>Buka ulang</b> di halaman pantau.</p>
     </div>
     <p class="kecil redup pengaman-mati">Pengaman mati: siswa yang keluar layar tetap <b>dicatat</b> dan terlihat di halaman pantau, tapi tidak dihentikan.</p>

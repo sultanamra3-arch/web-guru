@@ -51,8 +51,14 @@ if ($u && $_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') !== 'mulai') {
         $alat_hash = hash('sha256', $alat);
         if ($p && $p['selesai'] && !ujian_latihan($u)) {
             $galat = 'Kamu sudah mengumpulkan ujian ini. Bila ada masalah, hubungi guru.';
-        } elseif ($p && !$p['selesai'] && $p['perangkat'] && !hash_equals((string)$p['perangkat'], $alat_hash)) {
-            $galat = 'Nama ini sedang dipakai di HP lain. Bila HP-mu bermasalah, minta guru menekan "Buka ulang".';
+        } elseif ($p && !$p['selesai'] && $p['perangkat'] && !hash_equals((string)$p['perangkat'], $alat_hash) && !ujian_latihan($u)) {
+            $galat = 'Nama ini sedang dipakai di HP/browser lain. Kalau tadi kamu membuka link dari WhatsApp lalu sekarang dari Chrome (atau sebaliknya), buka lagi di aplikasi yang sama seperti tadi. Kalau tetap tidak bisa, minta guru menekan "Buka ulang".';
+        } elseif ($p && !$p['selesai'] && $p['mulai'] && ujian_latihan($u)) {
+            // latihan: boleh lanjut dari HP/browser mana saja (pindah ke perangkat ini)
+            q('UPDATE guru_ujian_peserta SET perangkat = ? WHERE ujian_id = ? AND kode = ?', [$alat_hash, $u['id'], $siswa]);
+            session_regenerate_id(true);
+            $_SESSION['ujian'][(int)$u['id']] = $siswa;
+            ke('?p=u_kerja&id=' . $u['id']);
         } elseif ($p && $p['selesai']) {
             // latihan yang sudah selesai: buka halaman hasil (ada tombol ulangi)
             q('UPDATE guru_ujian_peserta SET perangkat = ? WHERE ujian_id = ? AND kode = ?', [$alat_hash, $u['id'], $siswa]);
@@ -80,7 +86,7 @@ if ($u && $siap && $_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'mu
     $p = satu('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ? AND kode = ?', [$u['id'], $siap['kode']]);
     if (($m = ujian_bisa_masuk($u)) !== '') $galat = $m;
     elseif (!post('setuju')) $galat = 'Centang dulu “Saya sudah membaca”.';
-    elseif ($p && $p['perangkat'] && !$p['selesai'] && !hash_equals((string)$p['perangkat'], $alat_hash)) $galat = 'Nama ini sedang dipakai di HP lain.';
+    elseif ($p && $p['perangkat'] && !$p['selesai'] && !hash_equals((string)$p['perangkat'], $alat_hash) && !ujian_latihan($u)) $galat = 'Nama ini sedang dipakai di HP/browser lain. Minta guru menekan "Buka ulang".';
     else {
         ujian_mulai_peserta($u, (string)$siap['kode'], $alat_hash);
         unset($_SESSION['ujian_siap'][(int)$u['id']]);

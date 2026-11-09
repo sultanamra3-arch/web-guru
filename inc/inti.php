@@ -5,7 +5,7 @@ declare(strict_types=1);
 date_default_timezone_set('Asia/Jakarta');
 mb_internal_encoding('UTF-8');
 
-const VERSI = '1.29';
+const VERSI = '1.30';
 
 $__konfig = __DIR__ . '/../config.php';
 if (!is_file($__konfig)) $__konfig = __DIR__ . '/../config.contoh.php';
@@ -110,6 +110,16 @@ function mulai_sesi(): void
         'samesite' => 'Lax',
     ]);
     ini_set('session.gc_maxlifetime', (string)(60 * 60 * 24 * 7));
+    // simpan sesi di folder SiGuru sendiri (data/sesi) agar tidak ikut dihapus
+    // oleh aplikasi lain di hosting yang sama (SLiMS dll. menghapus sesi > 24 menit)
+    $sesi = __DIR__ . '/../data/sesi';
+    if (!is_dir($sesi)) @mkdir($sesi, 0700, true);
+    if (is_dir($sesi) && is_writable($sesi)) {
+        if (!is_file(__DIR__ . '/../data/.htaccess')) @file_put_contents(__DIR__ . '/../data/.htaccess', "Require all denied\n");
+        session_save_path($sesi);
+        ini_set('session.gc_probability', '1');
+        ini_set('session.gc_divisor', '200');
+    }
     session_start();
 }
 

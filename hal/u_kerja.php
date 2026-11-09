@@ -99,7 +99,7 @@ if ($p['selesai']):
 endif;
 
 $data = [
-    'id' => $id, 'nama' => $nama, 'judul' => $u['judul'],
+    'id' => $id, 'kode_ujian' => $u['kode'], 'nama' => $nama, 'judul' => $u['judul'],
     'soal' => ujian_data_siswa($u, $p),
     'jawaban' => (object)(json_decode((string)$p['jawaban'], true) ?: []),
     'ragu' => (object)(json_decode((string)$p['ragu'], true) ?: []),
