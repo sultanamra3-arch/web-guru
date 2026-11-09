@@ -256,4 +256,20 @@
       cs.addEventListener('change', function () { $$('input[name="siswa[]"]', cs.closest('.blok-kelas')).forEach(function (c) { c.checked = cs.checked; }); });
     });
   }
+
+  /* ---------- Isian jam 24 jam (tanpa AM/PM): ketik 0715 → 07:15 ---------- */
+  document.addEventListener('input', function (e) {
+    var i = e.target;
+    if (!i.classList || !i.classList.contains('jam24')) return;
+    var d = i.value.replace(/[^0-9]/g, '').slice(0, 4);
+    i.value = d.length > 2 ? d.slice(0, 2) + ':' + d.slice(2) : d;
+  });
+  document.addEventListener('blur', function (e) {
+    var i = e.target;
+    if (!i.classList || !i.classList.contains('jam24') || !i.value) return;
+    var d = i.value.replace(/[^0-9]/g, '');
+    if (d.length === 3) d = '0' + d;
+    if (d.length === 1 || d.length === 2) d = ('0' + d).slice(-2) + '00';
+    if (d.length === 4 && +d.slice(0, 2) < 24 && +d.slice(2) < 60) i.value = d.slice(0, 2) + ':' + d.slice(2);
+  }, true);
 })();

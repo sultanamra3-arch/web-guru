@@ -5,7 +5,7 @@ declare(strict_types=1);
 date_default_timezone_set('Asia/Jakarta');
 mb_internal_encoding('UTF-8');
 
-const VERSI = '1.5';
+const VERSI = '1.6';
 
 $__konfig = __DIR__ . '/../config.php';
 if (!is_file($__konfig)) $__konfig = __DIR__ . '/../config.contoh.php';
@@ -258,6 +258,15 @@ function wajib_admin(): void
         http_response_code(403);
         exit('Halaman ini khusus admin.');
     }
+}
+
+/** "7.5", "0715", "7:15" → "07:15" (format 24 jam); kosong bila tidak valid. */
+function jam_rapi(string $s): string
+{
+    $s = trim(str_replace('.', ':', $s));
+    if (preg_match('/^(\d{3,4})$/', $s)) $s = substr($s, 0, -2) . ':' . substr($s, -2);
+    if (!preg_match('/^(\d{1,2}):(\d{2})$/', $s, $m) || (int)$m[1] > 23 || (int)$m[2] > 59) return '';
+    return sprintf('%02d:%02d', $m[1], $m[2]);
 }
 
 function uid(): int

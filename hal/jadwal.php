@@ -38,7 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mulai = array_values((array)($_POST['mulai'][$h] ?? []));
             $selesai = array_values((array)($_POST['selesai'][$h] ?? []));
             foreach ($mulai as $i => $m) {
-                $s = (string)($selesai[$i] ?? '');
+                $m = jam_rapi((string)$m);
+                $s = jam_rapi((string)($selesai[$i] ?? ''));
                 if (preg_match('/^\d{2}:\d{2}$/', (string)$m) && preg_match('/^\d{2}:\d{2}$/', $s)) $baris[] = (count($baris) + 1) . " $m-$s";
             }
             // hari tanpa jam (libur) disimpan sebagai "0" agar tidak kembali ke contoh
@@ -159,7 +160,7 @@ judul_baris('Jadwal pelajaran', '<button type="button" class="tombol" onclick="w
     <?php foreach (HARI as $no => $nm): ?>
     <fieldset class="daftar-jam" data-hari="<?= $no ?>" <?= $no === 1 ? '' : 'hidden' ?>><legend><?= $nm ?></legend>
       <?php foreach (jam_hari($no) as $ke => [$m, $s]): ?>
-      <div class="baris-waktu"><b><?= $ke ?></b><input type="time" name="mulai[<?= $no ?>][]" value="<?= h($m) ?>" required><span>–</span><input type="time" name="selesai[<?= $no ?>][]" value="<?= h($s) ?>" required></div>
+      <div class="baris-waktu"><b><?= $ke ?></b><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="07:30" autocomplete="off" name="mulai[<?= $no ?>][]" value="<?= h($m) ?>" required><span>–</span><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="07:30" autocomplete="off" name="selesai[<?= $no ?>][]" value="<?= h($s) ?>" required></div>
       <?php endforeach; ?>
       <div class="dua-tombol"><button type="button" class="kecil tambah-jam">＋ Jam</button><button type="button" class="kecil kurang-jam">－ Jam terakhir</button></div>
       <?php if ($no > 1): ?><button type="button" class="kecil salin-jam">Salin jam dari <?= HARI[$no - 1] ?></button><?php endif; ?>

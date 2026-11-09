@@ -14,7 +14,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $kelas = (string)post('kelas');
     $judul = mb_substr(trim((string)post('judul')), 0, 200);
     if (!kelas_valid($kelas) || $judul === '') { pesan('Judul dan kelas wajib diisi.', 'galat'); ke($_SERVER['REQUEST_URI']); }
-    $tgl = fn($k) => preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', (string)post($k)) ? str_replace('T', ' ', (string)post($k)) . ':00' : null;
+    $tgl = function ($k) {
+        $d = (string)post($k . '_tgl');
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) return null;
+        $j = jam_rapi((string)post($k . '_jam')) ?: ($k === 'selesai' ? '23:59' : '00:00');
+        return "$d $j:00";
+    };
     $data = [
         'judul' => $judul, 'kelas' => $kelas, 'mapel' => mb_substr(trim((string)post('mapel')), 0, 120),
         'mulai' => $tgl('mulai'), 'selesai' => $tgl('selesai'),
@@ -43,7 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $kl = kelas_saya();
 $v = fn($k, $d = '') => h((string)($u[$k] ?? $d));
-$dt = fn($k) => !empty($u[$k]) ? substr(str_replace(' ', 'T', (string)$u[$k]), 0, 16) : '';
+$tg = fn($k) => !empty($u[$k]) ? substr((string)$u[$k], 0, 10) : '';
+$jm = fn($k) => !empty($u[$k]) ? substr((string)$u[$k], 11, 5) : '';
 $jumlah = $u ? count(ujian_soal($u)) : count((array)($cfg['ids'] ?? []));
 $ada_uraian = $u ? (bool)array_filter(ujian_soal($u), fn($s) => $s['tipe'] === 'esai') : true;
 $poin = $u ? (float)(array_values(array_filter(ujian_soal($u), fn($s) => $s['tipe'] === 'esai'))[0]['maks'] ?? 5) : 5;
@@ -64,8 +70,8 @@ judul_baris($u ? 'Pengaturan ujian' : 'Ujian online baru', '<a class="tombol" hr
     <label>Token berganti tiap<select name="token_menit"><?= pilihan(['0' => 'Tetap (tidak berganti)', '5' => '5 menit', '10' => '10 menit', '15' => '15 menit', '30' => '30 menit'], (string)($u['token_menit'] ?? 10)) ?></select></label>
   </div>
   <div class="baris2">
-    <label>Boleh mulai sejak (opsional)<input type="datetime-local" name="mulai" value="<?= $dt('mulai') ?>"></label>
-    <label>Batas akhir (opsional)<input type="datetime-local" name="selesai" value="<?= $dt('selesai') ?>"></label>
+    <label>Boleh mulai sejak (opsional)<span class="tgl-jam"><input type="date" name="mulai_tgl" value="<?= $tg('mulai') ?>"><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="07:30" autocomplete="off" name="mulai_jam" value="<?= $jm('mulai') ?>" aria-label="jam mulai"></span></label>
+    <label>Batas akhir (opsional)<span class="tgl-jam"><input type="date" name="selesai_tgl" value="<?= $tg('selesai') ?>"><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="07:30" autocomplete="off" name="selesai_jam" value="<?= $jm('selesai') ?>" aria-label="jam batas"></span></label>
   </div>
   <?php if ($ada_uraian && !$sudah_mulai): ?>
   <label>Poin per soal uraian (PG/isian = 1 poin)<input type="number" name="poin_uraian" min="1" max="50" step="0.5" value="<?= h((string)$poin) ?>"></label>
