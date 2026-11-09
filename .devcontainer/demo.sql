@@ -156,8 +156,8 @@ CREATE TABLE `guru_akun` (
 LOCK TABLES `guru_akun` WRITE;
 /*!40000 ALTER TABLE `guru_akun` DISABLE KEYS */;
 INSERT INTO `guru_akun` VALUES
-(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47',NULL),
-(2,'guru','Rina Marlina, S.Pd.','','Bahasa Indonesia','$2y$10$Yw3mhbCfjooqB0Du1toAHOUjFDbN9QrzkiWwGmppHqYXAPc4C3aKS','guru',1,'2026-11-08 07:19:47',NULL);
+(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 10:23:53'),
+(2,'guru','Rina Marlina, S.Pd.','','Bahasa Indonesia','$2y$10$Yw3mhbCfjooqB0Du1toAHOUjFDbN9QrzkiWwGmppHqYXAPc4C3aKS','guru',1,'2026-11-08 07:19:47','2026-11-09 10:23:52');
 /*!40000 ALTER TABLE `guru_akun` ENABLE KEYS */;
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `guru_dokumen`;
@@ -203,7 +203,7 @@ CREATE TABLE `guru_jadwal` (
   `ruang` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `guru_id` (`guru_id`,`hari`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `guru_jadwal` WRITE;
@@ -217,8 +217,48 @@ INSERT INTO `guru_jadwal` VALUES
 (6,1,4,1,'07:30:00','08:50:00','VII A','Informatika','Lab Komputer'),
 (7,1,4,3,'10:10:00','11:30:00','IX A','Prakarya','R. IX A'),
 (8,1,5,2,'08:50:00','10:10:00','IX A','Informatika','Lab Komputer'),
-(9,1,6,1,'07:30:00','08:50:00','VII A','Prakarya','R. VII A');
+(9,1,6,1,'07:30:00','08:50:00','VII A','Prakarya','R. VII A'),
+(10,1,1,2,'08:50:00','10:10:00','VII A','Informatika','Lab');
 /*!40000 ALTER TABLE `guru_jadwal` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `guru_koreksi`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `guru_koreksi` (
+  `penilaian_id` int(11) NOT NULL,
+  `member_id` varchar(20) NOT NULL,
+  `detail` mediumtext DEFAULT NULL,
+  `nilai` decimal(5,2) DEFAULT NULL,
+  `oleh` varchar(200) DEFAULT NULL,
+  `dibuat` datetime DEFAULT NULL,
+  PRIMARY KEY (`penilaian_id`,`member_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `guru_koreksi` WRITE;
+/*!40000 ALTER TABLE `guru_koreksi` DISABLE KEYS */;
+INSERT INTO `guru_koreksi` VALUES
+(1,'9000000013','{\"soal\":[{\"no\":\"1\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"B\",\"jawaban\":\"B\",\"skor\":1,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"\"},{\"no\":\"2\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"D\",\"jawaban\":\"D\",\"skor\":1,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"\"},{\"no\":\"3\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"A\",\"jawaban\":\"A\",\"skor\":1,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"\"},{\"no\":\"4\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"C\",\"jawaban\":\"D\",\"skor\":0,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"ditulis huruf kecil d\"},{\"no\":\"5\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"B\",\"jawaban\":\"C\",\"skor\":0,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"\"},{\"no\":\"6\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"A\",\"jawaban\":\"D\",\"skor\":0,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"C dicoret dua garis, D ditulis di samping kotak\"},{\"no\":\"7\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"D\",\"jawaban\":\"C\",\"skor\":0,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"\"},{\"no\":\"8\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"C\",\"jawaban\":\"B\",\"skor\":0,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"\"},{\"no\":\"9\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"B\",\"jawaban\":\"B\",\"skor\":1,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"huruf dalam kotak ditimpa coretan, B ditulis di samping kotak\"},{\"no\":\"10\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"A\",\"jawaban\":\"B\",\"skor\":0,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"\"},{\"no\":\"11\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"C\",\"jawaban\":\"A\",\"skor\":0,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"\"},{\"no\":\"12\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"D\",\"jawaban\":\"\",\"skor\":0,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"kosong\"},{\"no\":\"13\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"B\",\"jawaban\":\"B\",\"skor\":1,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"\"},{\"no\":\"14\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"A\",\"jawaban\":\"B\",\"skor\":0,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"kotak kosong, huruf B ditulis di samping kanan kotak\"},{\"no\":\"15\",\"jenis\":\"pg\",\"maks\":1,\"kunci\":\"C\",\"jawaban\":\"A\",\"skor\":0,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"\"},{\"no\":\"16\",\"jenis\":\"bs\",\"maks\":1,\"kunci\":\"B\",\"jawaban\":\"B\",\"skor\":1,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"\"},{\"no\":\"17\",\"jenis\":\"bs\",\"maks\":1,\"kunci\":\"S\",\"jawaban\":\"S\",\"skor\":1,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"\"},{\"no\":\"18\",\"jenis\":\"bs\",\"maks\":1,\"kunci\":\"S\",\"jawaban\":\"S\",\"skor\":1,\"skor_ai\":null,\"ragu\":false,\"catatan\":\"\"},{\"no\":\"19\",\"jenis\":\"isian\",\"maks\":1,\"kunci\":\"\",\"jawaban\":\"debuging\",\"skor\":1,\"skor_ai\":1,\"ragu\":false,\"catatan\":\"Terdapat kesalahan ejaan kecil (\'debuging\'), namun maknanya sama dengan kunci sehingga mendapat skor penuh.\"},{\"no\":\"20\",\"jenis\":\"esai\",\"maks\":10,\"kunci\":\"\",\"jawaban\":\"1. datang ke perpustakaan\\n2. cari buku di rak\\/katalog\\n3. bawa buku ke petugas\\n4. tunjukkan kartu anggota\",\"skor\":6,\"skor_ai\":6,\"ragu\":false,\"catatan\":\"Langkah logis dan urut, tetapi hanya 4 langkah (kurang dari syarat minimal 5) serta belum memuat poin pencatatan dan tanggal kembali.\"}],\"skor\":15,\"maks\":29,\"komentar\":\"Usaha yang bagus! Jangan lupa untuk lebih teliti membaca instruksi soal mengenai jumlah minimal langkah dan melengkapi detail proses pencatatan pinjaman, ya.\"}',52.00,'Google Gemini · gemini-3.5-flash + Google Gemini · gemini-3.6-flash','2026-11-09 10:23:07');
+/*!40000 ALTER TABLE `guru_koreksi` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `guru_koreksi_kunci`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `guru_koreksi_kunci` (
+  `penilaian_id` int(11) NOT NULL,
+  `format_lj` varchar(10) NOT NULL DEFAULT 'otomatis',
+  `teks` mediumtext DEFAULT NULL,
+  `diubah` datetime DEFAULT NULL,
+  PRIMARY KEY (`penilaian_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `guru_koreksi_kunci` WRITE;
+/*!40000 ALTER TABLE `guru_koreksi_kunci` DISABLE KEYS */;
+INSERT INTO `guru_koreksi_kunci` VALUES
+(1,'lj','1. B\n2. D\n3. A\n4. C\n5. B\n6. A\n7. D\n8. C\n9. B\n10. A\n11. C\n12. D\n13. B\n14. A\n15. C\n16. (bs) B\n17. (bs) S\n18. (bs) S\n19. (isian) debugging\n20. (esai, 10 poin) Buatlah algoritma meminjam buku di perpustakaan (minimal 5 langkah). Poin kunci: urut, lengkap, logis, ada pencatatan & tanggal kembali.','2026-11-09 10:10:49'),
+(2,'lingkar','1. B\n2. C\n3. B\n4. C\n5. B\n6. C\n7. (bs) S\n8. (isian) debugging\n9. (esai, 10 poin) Soal: Buatlah algoritma (minimal 6 langkah) untuk meminjam buku di perpustakaan sekolah! Pedoman: Langkah logis: datang, cari buku di katalog, ambil buku, ke meja petugas, tunjukkan kartu, buku dicatat/discan, terima buku & tanggal kembali. Nilai penuh bila urut, lengkap, dan logis.\n10. B','2026-11-09 10:23:53');
+/*!40000 ALTER TABLE `guru_koreksi_kunci` ENABLE KEYS */;
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `guru_nilai`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -237,7 +277,7 @@ LOCK TABLES `guru_nilai` WRITE;
 INSERT INTO `guru_nilai` VALUES
 (1,'9000000011',74.00,'remedial'),
 (1,'9000000012',84.00,''),
-(1,'9000000013',89.00,''),
+(1,'9000000013',52.00,'Foto: benar 8/18 PG'),
 (1,'9000000014',93.00,''),
 (1,'9000000015',65.00,'remedial'),
 (1,'9000000016',86.00,''),

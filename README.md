@@ -11,6 +11,7 @@ Aplikasi web (bisa dipasang di HP) untuk guru:
 | ✨ Presentasi | tayang layar penuh di browser + unduh PowerPoint (.pptx) |
 | ✅ Absensi | H/S/I/A per kelas & tanggal, rekap bulanan, unduh Excel |
 | 📊 Penilaian | input nilai, KKTP, rekap per mapel, unduh Excel, cetak |
+| 📷 Nilai dari foto | foto lembar jawaban → AI membaca, program menilai PG/benar-salah dari kunci, AI menilai isian/uraian; dibaca dua AI berbeda, nomor meragukan ditandai kuning; lembar jawaban siap cetak |
 | 🗓 Jadwal | jadwal mengajar per hari, tampil di beranda |
 | 🏅 Sertifikat | A4 mendatar, banyak penerima sekaligus (dari kelas atau ketik nama) |
 

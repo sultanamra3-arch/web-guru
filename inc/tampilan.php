@@ -59,6 +59,8 @@ function kaki(bool $polos = false): void
 </main>
 <?php if (!$polos): ?><footer class="bawah tak-cetak">SiGuru v<?= VERSI ?> · <?= h((string)k('sekolah', '')) ?></footer><?php endif; ?>
 <script src="aset/guru.js?v=<?= VERSI ?>"></script>
+<?php foreach ((array)($GLOBALS['skrip_tambahan'] ?? []) as $sk): ?><script src="<?= h($sk) ?>?v=<?= VERSI ?>"></script>
+<?php endforeach; ?>
 </body>
 </html>
 <?php

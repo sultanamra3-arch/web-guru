@@ -59,6 +59,7 @@ judul_baris(h($p['judul']), '<a class="tombol" href="?p=penilaian">‹ Penilaian
   </div>
   <p class="kecil"><a href="?p=nilai&amp;id=<?= $id ?>&amp;unduh=1">⬇ Unduh Excel</a></p>
 </div>
+<a class="tombol utama tombol-foto-nilai" href="?p=koreksi&amp;id=<?= $id ?>">📷 Nilai otomatis dari foto lembar jawaban</a>
 <form method="post" class="tabel-nilai" data-kktp="<?= h($p['kktp']) ?>">
   <?= input_token() ?>
   <ul class="daftar kartu">

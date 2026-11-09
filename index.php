@@ -7,6 +7,7 @@ require __DIR__ . '/inc/skema.php';
 require __DIR__ . '/inc/siswa.php';
 require __DIR__ . '/inc/tampilan.php';
 require __DIR__ . '/inc/guru_ai.php';
+require __DIR__ . '/inc/koreksi.php';
 
 header('X-Frame-Options: SAMEORIGIN');
 header('X-Content-Type-Options: nosniff');
@@ -16,7 +17,7 @@ mulai_sesi();
 
 $halaman = [
     'masuk', 'keluar', 'beranda', 'lainnya', 'akun', 'profil', 'pengaturan_ai',
-    'kelas', 'jadwal', 'absensi', 'absensi_rekap', 'penilaian', 'nilai', 'nilai_rekap',
+    'kelas', 'jadwal', 'absensi', 'absensi_rekap', 'penilaian', 'nilai', 'nilai_rekap', 'koreksi', 'koreksi_lj', 'koreksi_lihat',
     'soal', 'soal_form', 'soal_ai', 'paket', 'paket_cetak',
     'perangkat', 'dokumen', 'dokumen_buat', 'dokumen_lihat', 'presentasi',
     'sertifikat', 'sertifikat_form', 'sertifikat_cetak',

@@ -262,6 +262,7 @@ function ai_minta(array $pesan, array $opsi = []): array
     foreach ($kandidat as $k) {
         $p = $k['p'];
         $kunci_status = $p['id'] . '|' . $k['model'];
+        if (in_array($kunci_status, (array)($opsi['kecuali'] ?? []), true)) continue;
         if (($status[$kunci_status]['sampai'] ?? 0) > time()) {
             $rincian[] = $p['nama'] . ' · ' . $k['model'] . ': dilewati (' . $status[$kunci_status]['pesan'] . ')';
             continue;
@@ -283,7 +284,7 @@ function ai_minta(array $pesan, array $opsi = []): array
         $m = $j['choices'][0]['message'] ?? null;
         if ($kode === 200 && is_array($m) && !isset($j['error'])) {
             ai_status_hapus($kunci_status);
-            return ['ok' => true, 'pesan' => ai_rapikan_pesan($m), 'oleh' => $p['nama'] . ' · ' . $k['model'], 'rincian' => $rincian];
+            return ['ok' => true, 'pesan' => ai_rapikan_pesan($m), 'oleh' => $p['nama'] . ' · ' . $k['model'], 'kunci' => $kunci_status, 'rincian' => $rincian];
         }
         $teks = ai_pesan_galat($kode, $isi, $gc);
         $rincian[] = $p['nama'] . ' · ' . $k['model'] . ': ' . $teks;
