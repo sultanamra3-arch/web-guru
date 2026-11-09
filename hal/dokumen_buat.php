@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 $jenis = (string)get('jenis', 'modul');
-if (!in_array($jenis, ['modul', 'lkpd', 'presentasi'], true)) $jenis = 'modul';
+if (!in_array($jenis, ['modul', 'presentasi'], true)) $jenis = 'modul';
 $judul = ['modul' => '✨ Buat modul ajar', 'lkpd' => '✨ Buat LKPD', 'presentasi' => '✨ Buat presentasi'][$jenis];
 
 kepala(strip_tags($judul), 'perangkat');

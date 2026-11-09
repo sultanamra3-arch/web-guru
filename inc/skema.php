@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 5;
+const SKEMA_VERSI = 6;
 
 function pastikan_skema(): void
 {
@@ -202,6 +202,44 @@ function pastikan_skema(): void
             nama VARCHAR(150) NOT NULL,
             keterangan VARCHAR(255) NULL,
             KEY (sertifikat_id)
+        ) DEFAULT CHARSET=utf8mb4",
+        "CREATE TABLE IF NOT EXISTS guru_tugas (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            guru_id INT NOT NULL,
+            kelas VARCHAR(50) NOT NULL,
+            tahun VARCHAR(9) NULL,
+            mapel VARCHAR(120) NULL,
+            judul VARCHAR(200) NOT NULL,
+            petunjuk TEXT NULL,
+            lampiran VARCHAR(40) NULL,
+            kode VARCHAR(10) NOT NULL UNIQUE,
+            batas DATETIME NULL,
+            terima_telat TINYINT NOT NULL DEFAULT 1,
+            maks_foto TINYINT NOT NULL DEFAULT 5,
+            tampil_tertib TINYINT NOT NULL DEFAULT 1,
+            tata_tertib TEXT NULL,
+            kunci TEXT NULL,
+            status VARCHAR(10) NOT NULL DEFAULT 'buka',
+            penilaian_id INT NULL,
+            nilai_dikirim DATETIME NULL,
+            dibuat DATETIME NULL,
+            KEY (guru_id)
+        ) DEFAULT CHARSET=utf8mb4",
+        "CREATE TABLE IF NOT EXISTS guru_tugas_kirim (
+            tugas_id INT NOT NULL,
+            kode VARCHAR(20) NOT NULL,
+            perangkat VARCHAR(64) NULL,
+            foto TEXT NULL,
+            teks TEXT NULL,
+            dikirim DATETIME NULL,
+            telat TINYINT NOT NULL DEFAULT 0,
+            kali SMALLINT NOT NULL DEFAULT 0,
+            status VARCHAR(12) NOT NULL DEFAULT 'kirim',
+            nilai DECIMAL(5,2) NULL,
+            komentar TEXT NULL,
+            saran_ai TEXT NULL,
+            dinilai DATETIME NULL,
+            PRIMARY KEY (tugas_id, kode)
         ) DEFAULT CHARSET=utf8mb4",
     ];
     foreach ($sql as $q) db()->exec($q);

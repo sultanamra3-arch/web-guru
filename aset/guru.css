@@ -426,3 +426,34 @@ b.merah{color:var(--merah)}
   .ulasan-opsi li.kunci,.ulasan-opsi li.dipilih,.pembahasan-siswa,.ulasan-opsi .huruf{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .ulasan-siswa .gambar-soal{max-height:200px}
 }
+/* Kisi-kisi */
+.tabel-kisi{width:100%;font-size:.88rem}
+.tabel-kisi th,.tabel-kisi td{vertical-align:top}
+.tabel-kisi td:nth-child(1),.tabel-kisi td:nth-child(4),.tabel-kisi td:nth-child(5){text-align:center;white-space:nowrap}
+.ttd-kisi{display:flex;justify-content:flex-end;margin-top:1rem}.ttd-kisi p{min-width:220px}
+.ubah-kisi{padding-left:1.3rem}.ubah-kisi li{padding:.5rem 0;border-bottom:1px solid var(--garis)}
+.aksi-kisi{display:flex;gap:.4rem;flex-wrap:wrap}
+.alat-dokumen .tombol .ikon{width:16px;height:16px;vertical-align:-3px}
+@media (max-width:560px){.tabel-kisi{font-size:.78rem}.tabel-kisi th:nth-child(6),.tabel-kisi td:nth-child(6){max-width:70px;overflow-wrap:anywhere}}
+@media print{.lembar-kisi .kop-cetak{display:flex}.tabel-kisi{font-size:10pt}.tabel-kisi th,.tabel-kisi td{border:1px solid #000!important;padding:3px 5px}}
+/* Tugas online */
+.daftar-tugas li{display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.nilai-tugas{font-size:1.25rem;font-weight:800;color:var(--navy);text-decoration:none;min-width:2.5rem;text-align:right}
+.foto-tugas{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.5rem;margin-bottom:.8rem}
+.foto-kiriman{display:block;text-decoration:none;color:var(--redup)}
+.foto-kiriman img,.foto-tugas.kecil-foto img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;border:1px solid var(--garis);background:#fff;display:block}
+.foto-kiriman small{display:block;font-size:.72rem;margin-top:.15rem}
+.foto-tugas.kecil-foto{grid-template-columns:repeat(4,1fr)}
+.saran-ai{background:#eef3ff;border-color:#c9d6ff}
+.nav-tugas{display:flex;justify-content:space-between;margin:.5rem 0 1rem}
+.isi-nilai-tugas{font-size:1.4rem!important;font-weight:700;max-width:140px}
+.foto-pilih{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;margin:.7rem 0 .3rem}
+.foto-mini{position:relative}.foto-mini img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;border:1px solid var(--garis);display:block}
+.foto-mini button{position:absolute;top:4px;right:4px;width:28px;height:28px;min-height:0;padding:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--merah);font-weight:700}
+.tambah-foto{aspect-ratio:3/4;border-radius:8px;border:2px dashed #b9c2e6;display:flex!important;flex-direction:column;align-items:center;justify-content:center;color:var(--navy);cursor:pointer;margin:0!important}
+.tambah-foto b{font-size:1.6rem}
+.sisa-tugas{background:#fdecee;color:var(--merah);border-radius:8px;padding:.4rem .6rem;font-weight:600;font-size:.9rem;margin-top:.5rem}
+.nilai-kartu{text-align:center}
+.isi-nilai-tugas{display:block}
+@media (max-width:360px){.token-qr{width:7rem}.layar-token .url-siswa{overflow-wrap:anywhere}}
+.layar-token>*{min-width:0}

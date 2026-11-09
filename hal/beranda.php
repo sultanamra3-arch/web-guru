@@ -18,7 +18,7 @@ kepala('Beranda', 'beranda');
 <div class="tombol-besar">
   <a class="utama" href="?p=soal_ai"><?= ikon('ai') ?><span>Buat soal</span></a>
   <a href="?p=dokumen_buat&amp;jenis=modul"><?= ikon('modul') ?><span>Modul ajar</span></a>
-  <a href="?p=dokumen_buat&amp;jenis=lkpd"><?= ikon('lkpd') ?><span>LKPD</span></a>
+  <a href="?p=kisi"><?= ikon('kisi') ?><span>Kisi-kisi</span></a>
   <a href="?p=dokumen_buat&amp;jenis=presentasi"><?= ikon('presentasi') ?><span>Presentasi</span></a>
   <a href="?p=absensi"><?= ikon('absensi') ?><span>Absensi</span></a>
   <a href="?p=penilaian"><?= ikon('nilai') ?><span>Nilai</span></a>

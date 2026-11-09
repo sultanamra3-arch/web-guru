@@ -98,6 +98,7 @@ kepala($d['judul'], 'soal');
   <button class="utama" onclick="document.body.classList.remove('tampil-kunci');window.print()">🖨 Cetak soal</button>
   <button onclick="document.body.classList.add('tampil-kunci');window.print();document.body.classList.remove('tampil-kunci')">🖨 Cetak kunci</button>
   <a class="tombol utama" href="?p=ujian_form&amp;paket=<?= $id ?>">💻 Jadikan ujian online</a>
+  <a class="tombol" href="?p=kisi&amp;paket=<?= $id ?>"><?= ikon('kisi') ?> Kisi-kisi</a>
   <a class="tombol" href="?p=paket_cetak&amp;id=<?= $id ?>&amp;word=1">⬇ Word (soal)</a>
   <a class="tombol" href="?p=paket_cetak&amp;id=<?= $id ?>&amp;word=1&amp;kunci=1">⬇ Word (kunci)</a>
   <label class="centang"><input type="checkbox" onchange="document.body.classList.toggle('tampil-kunci', this.checked)"> Tampilkan kunci</label>

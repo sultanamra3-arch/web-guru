@@ -95,3 +95,38 @@ function judul_baris(string $judul, string $kanan = ''): void
 {
     echo '<div class="judul-baris"><h1>' . $judul . '</h1>' . ($kanan ? '<span>' . $kanan . '</span>' : '') . '</div>';
 }
+
+/** Panel "Bagikan" (tulisan + gambar kartu) untuk ujian/latihan/tugas; perilakunya di aset/bagikan.js. */
+function panel_bagikan(array $d): void
+{
+    $jenis = (string)$d['jenis'];
+    $attr = '';
+    foreach ($d as $k => $v) $attr .= ' data-' . $k . '="' . h((string)$v) . '"';
+    $attr .= ' data-sekolah="' . h((string)k('sekolah', '')) . '"';
+    $nama = ['ujian' => 'ujian', 'latihan' => 'latihan', 'tugas' => 'tugas'][$jenis] ?? 'ujian';
+    ?>
+<div class="kartu panel-bagikan" id="panel-bagikan" hidden<?= $attr ?>>
+  <div class="judul-panel"><h3 style="margin:0">📤 Bagikan <?= $nama ?></h3><button type="button" class="kecil" id="tutup-bagikan" aria-label="Tutup">✕</button></div>
+  <?php if ($jenis === 'ujian'): ?>
+  <label class="centang"><input type="checkbox" id="sertakan-token"> <b>Sertakan token</b> <small class="redup">(untuk ujian dari rumah)</small></label>
+  <div class="pilih-token" hidden>
+    <?php if ((int)($d['token-menit'] ?? 0) > 0): ?>
+    <label class="centang kecil"><input type="radio" name="jenis_token" value="tetap" checked> <span>Ubah ke <b>token tetap</b> selama ujian dibuka <span class="lencana">disarankan</span></span></label>
+    <label class="centang kecil"><input type="radio" name="jenis_token" value="sekarang"> <span>Token sekarang saja (berganti tiap <?= (int)$d['token-menit'] ?> menit)</span></label>
+    <?php else: ?><p class="kecil redup" style="margin:.2rem 0">Token ujian ini sudah tetap (tidak berganti).</p><?php endif; ?>
+  </div>
+  <?php endif; ?>
+  <small class="redup">Pesan yang dikirim:</small>
+  <div class="pratinjau-pesan" id="pratinjau-pesan"></div>
+  <small class="redup">Gambar yang ikut dikirim:</small>
+  <canvas id="kartu-bagikan" width="1080" height="1200" class="kartu-gambar"></canvas>
+  <button type="button" class="utama lebar" id="bagikan-sekarang">📤 Bagikan (tulisan + gambar)</button>
+  <div class="tombol-bagikan-lain">
+    <a class="tombol kecil" id="bagikan-wa" target="_blank" rel="noopener">WhatsApp</a>
+    <button type="button" class="kecil" id="salin-teks">Salin teks</button>
+    <button type="button" class="kecil" id="unduh-gambar">Unduh gambar</button>
+  </div>
+  <p class="kecil redup" id="status-bagikan"></p>
+</div>
+<?php
+}

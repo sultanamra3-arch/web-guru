@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/Parsedown.php';
 
-const JENIS_DOKUMEN = ['modul' => 'Modul ajar', 'lkpd' => 'LKPD', 'presentasi' => 'Presentasi', 'paket' => 'Paket soal'];
+const JENIS_DOKUMEN = ['modul' => 'Modul ajar', 'presentasi' => 'Presentasi', 'paket' => 'Paket soal', 'kisi' => 'Kisi-kisi', 'lkpd' => 'LKPD'];
 const TIPE_SOAL = ['pg' => 'Pilihan ganda', 'bs' => 'Benar/Salah', 'isian' => 'Isian singkat', 'esai' => 'Uraian/esai'];
 const TINGKAT_SOAL = ['mudah' => 'Mudah', 'sedang' => 'Sedang', 'sulit' => 'Sulit (HOTS)'];
 const LEVEL_KOGNITIF = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'];
@@ -175,6 +175,37 @@ Baris identitas isian: Nama, Kelas, Kelompok, Tanggal (dengan garis titik-titik)
 ## Refleksi (3 pertanyaan singkat + skala bintang)
 Sertakan di akhir, terpisah dengan garis, "Kunci/Pedoman untuk Guru" singkat.
 TXT;
+
+/**
+ * Kisi-kisi dari soal paket: AI mengisi materi, indikator soal, dan level kognitif.
+ * $soal: [['no'=>1,'tipe'=>'pg','pertanyaan'=>..,'opsi'=>[..],'kunci'=>..,'level'=>..], ...]
+ */
+function ai_kisi_kisi(array $soal, string $mapel, string $kelas): array
+{
+    $daftar = [];
+    foreach ($soal as $s) {
+        $o = $s['opsi'] ? ' | Opsi: ' . implode('; ', array_map(fn($k, $v) => "$k. $v", array_keys($s['opsi']), $s['opsi'])) : '';
+        $daftar[] = $s['no'] . '. [' . (TIPE_SOAL[$s['tipe']] ?? $s['tipe']) . '] ' . mb_substr(preg_replace('/\s+/', ' ', $s['pertanyaan']), 0, 400) . $o . ' | Kunci: ' . mb_substr((string)$s['kunci'], 0, 150);
+    }
+    $perintah = "Susun kisi-kisi soal untuk asesmen berikut.\nMata pelajaran: $mapel\nKelas: $kelas — " . fase_dari_kelas($kelas) . "\n\nDaftar soal:\n" . implode("\n", $daftar)
+        . "\n\nUntuk SETIAP nomor soal tentukan:\n- materi: materi/sub-materi singkat (2–5 kata)\n"
+        . "- indikator: indikator soal dalam satu kalimat, diawali \"Peserta didik dapat ...\" dengan kata kerja operasional yang sesuai level (mis. menyebutkan, menjelaskan, menentukan, menganalisis); bila soal memakai stimulus, boleh diawali \"Disajikan ..., peserta didik dapat ...\"\n"
+        . "- level: level kognitif C1–C6 sesuai tuntutan soal\n"
+        . ATURAN_UMUM . "\n\nBalas HANYA JSON tanpa teks lain: {\"kisi\":[{\"no\":1,\"materi\":\"...\",\"indikator\":\"...\",\"level\":\"C2\"}]}";
+    $r = ai_minta([['role' => 'user', 'content' => $perintah]], ['maks_token' => min(14000, 3000 + 250 * count($soal)), 'waktu' => 170, 'suhu' => 0.2]);
+    if (!$r['ok']) return $r;
+    $j = ai_ambil_json((string)$r['pesan']['content']);
+    $baris = $j['kisi'] ?? (is_array($j) && array_is_list($j) ? $j : null);
+    if (!$baris) return ['ok' => false, 'galat' => 'AI membalas dengan format yang tidak dikenali. Coba lagi.', 'rincian' => [$r['oleh']]];
+    $peta = [];
+    foreach ($baris as $b) {
+        if (!is_array($b) || !isset($b['no'])) continue;
+        $lv = strtoupper(trim((string)($b['level'] ?? '')));
+        $peta[(int)$b['no']] = ['materi' => mb_substr(trim((string)($b['materi'] ?? '')), 0, 150), 'indikator' => mb_substr(trim((string)($b['indikator'] ?? '')), 0, 500),
+            'level' => in_array($lv, LEVEL_KOGNITIF, true) ? $lv : ''];
+    }
+    return ['ok' => true, 'peta' => $peta, 'oleh' => $r['oleh']];
+}
 
 function ai_buat_dokumen(string $jenis, array $in, array $foto = []): array
 {

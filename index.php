@@ -11,6 +11,7 @@ require __DIR__ . '/inc/guru_ai.php';
 require __DIR__ . '/inc/koreksi.php';
 require __DIR__ . '/inc/gambar.php';
 require __DIR__ . '/inc/ujian.php';
+require __DIR__ . '/inc/tugas.php';
 require __DIR__ . '/inc/asisten.php';
 
 header('X-Frame-Options: SAMEORIGIN');
@@ -21,14 +22,15 @@ mulai_sesi();
 
 $halaman = [
     'masuk', 'keluar', 'beranda', 'lainnya', 'akun', 'profil', 'pengaturan_ai',
-    'kelas', 'siswa', 'siswa_tambah', 'siswa_ubah', 'siswa_naik', 'jadwal', 'absensi', 'absensi_rekap', 'penilaian', 'nilai', 'nilai_rekap', 'koreksi', 'koreksi_lj', 'koreksi_lihat',
-    'soal', 'soal_form', 'soal_manual', 'soal_ai', 'paket', 'paket_cetak',
+    'kelas', 'erapor', 'cadangan', 'siswa', 'siswa_tambah', 'siswa_ubah', 'siswa_naik', 'jadwal', 'absensi', 'absensi_rekap', 'penilaian', 'nilai', 'nilai_rekap', 'koreksi', 'koreksi_lj', 'koreksi_lihat',
+    'soal', 'soal_form', 'soal_manual', 'soal_ai', 'paket', 'paket_cetak', 'kisi',
     'perangkat', 'dokumen', 'dokumen_buat', 'dokumen_lihat', 'presentasi',
     'sertifikat', 'sertifikat_form', 'sertifikat_cetak',
     'ujian', 'ujian_form', 'ujian_lihat', 'ujian_hasil', 'ujian_jawaban', 'u', 'u_kerja', 'gambar',
+    'tugas', 'tugas_form', 'tugas_lihat', 'tugas_nilai', 'tugas_foto', 'api_tugas', 't', 'api_t',
     'asisten', 'api_ai', 'api_ujian', 'api_u',
 ];
-const HALAMAN_UMUM = ['masuk', 'u', 'u_kerja', 'api_u', 'gambar'];
+const HALAMAN_UMUM = ['masuk', 'u', 'u_kerja', 'api_u', 'gambar', 't', 'api_t', 'tugas_foto'];
 $p = (string)($_GET['p'] ?? '');
 if (!in_array($p, $halaman, true)) $p = pengguna() ? 'beranda' : 'masuk';
 
@@ -57,7 +59,7 @@ try {
 } catch (Throwable $e) {
     if (db()->inTransaction()) db()->rollBack();
     error_log('[siguru] ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
-    if (in_array($p, ['api_ai', 'api_ujian', 'api_u'], true)) {
+    if (in_array($p, ['api_ai', 'api_ujian', 'api_u', 'api_tugas', 'api_t'], true)) {
         echo json_encode(['ok' => false, 'galat' => 'Kesalahan server: ' . $e->getMessage()]);
         exit;
     }

@@ -99,35 +99,11 @@ judul_baris(h($u['judul']), '<a class="tombol" href="?p=ujian">‹ Ujian</a>');
   </div>
 </div>
 
-<div class="kartu panel-bagikan" id="panel-bagikan" hidden
-  data-judul="<?= h($u['judul']) ?>" data-kelas="<?= h($u['kelas']) ?>" data-mapel="<?= h((string)$u['mapel']) ?>"
-  data-soal="<?= $jumlah_soal ?>" data-durasi="<?= (int)$u['durasi'] ?>" data-kode="<?= h($u['kode']) ?>" data-url="<?= h($url) ?>"
-  data-mulai="<?= h(ujian_waktu_teks($u['mulai'])) ?>"
-  data-batas="<?= h(ujian_waktu_teks($u['selesai'])) ?>"
-  data-sekolah="<?= h((string)k('sekolah', '')) ?>" data-latihan="<?= ujian_latihan($u) ? 1 : 0 ?>" data-tertib="<?= (int)$u['tampil_tertib'] ?>"
-  data-token-menit="<?= (int)$u['token_menit'] ?>">
-  <div class="judul-panel"><h3 style="margin:0">📤 Bagikan <?= ujian_latihan($u) ? 'latihan' : 'ujian' ?></h3><button type="button" class="kecil" id="tutup-bagikan" aria-label="Tutup">✕</button></div>
-  <?php if (!ujian_latihan($u)): ?>
-  <label class="centang"><input type="checkbox" id="sertakan-token"> <b>Sertakan token</b> <small class="redup">(untuk ujian dari rumah)</small></label>
-  <div class="pilih-token" hidden>
-    <?php if ((int)$u['token_menit'] > 0): ?>
-    <label class="centang kecil"><input type="radio" name="jenis_token" value="tetap" checked> Ubah ke <b>token tetap</b> selama ujian dibuka <span class="lencana">disarankan</span></label>
-    <label class="centang kecil"><input type="radio" name="jenis_token" value="sekarang"> Token sekarang saja <span id="ket-token-sekarang" class="redup"></span></label>
-    <?php else: ?><p class="kecil redup" style="margin:.2rem 0">Token ujian ini sudah tetap (tidak berganti).</p><?php endif; ?>
-  </div>
-  <?php endif; ?>
-  <small class="redup">Pesan yang dikirim:</small>
-  <div class="pratinjau-pesan" id="pratinjau-pesan"></div>
-  <small class="redup">Gambar yang ikut dikirim:</small>
-  <canvas id="kartu-bagikan" width="1080" height="1200" class="kartu-gambar"></canvas>
-  <button type="button" class="utama lebar" id="bagikan-sekarang">📤 Bagikan (tulisan + gambar)</button>
-  <div class="tombol-bagikan-lain">
-    <a class="tombol kecil" id="bagikan-wa" target="_blank" rel="noopener">WhatsApp</a>
-    <button type="button" class="kecil" id="salin-teks">Salin teks</button>
-    <button type="button" class="kecil" id="unduh-gambar">Unduh gambar</button>
-  </div>
-  <p class="kecil redup" id="status-bagikan"></p>
-</div>
+<?php panel_bagikan([
+    'id' => $id, 'jenis' => ujian_latihan($u) ? 'latihan' : 'ujian', 'judul' => $u['judul'], 'kelas' => $u['kelas'], 'mapel' => (string)$u['mapel'],
+    'soal' => $jumlah_soal, 'durasi' => (int)$u['durasi'], 'kode' => $u['kode'], 'url' => $url,
+    'mulai' => ujian_waktu_teks($u['mulai']), 'batas' => ujian_waktu_teks($u['selesai']), 'tertib' => (int)$u['tampil_tertib'], 'token-menit' => (int)$u['token_menit'],
+]); ?>
 
 <div class="kartu">
   <h3 style="margin-top:0">Pantau siswa <small class="redup" id="pantau-waktu"></small></h3>
@@ -149,4 +125,5 @@ $tanya = $n_peserta ? "Hapus ujian ini? Jawaban $n_peserta siswa ikut terhapus" 
 <?php
 $GLOBALS['skrip_tambahan'][] = 'aset/lib/qrcode.js';
 $GLOBALS['skrip_tambahan'][] = 'aset/ujian_guru.js';
+$GLOBALS['skrip_tambahan'][] = 'aset/bagikan.js';
 kaki();

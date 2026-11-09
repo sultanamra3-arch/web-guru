@@ -32,7 +32,7 @@ if (get('unduh')) {
 }
 
 kepala('Rekap nilai', 'kelas');
-judul_baris('Rekap nilai', '<button type="button" class="tombol" onclick="window.print()">🖨 Cetak</button>');
+judul_baris('Rekap nilai', '<a class="tombol" href="?p=erapor&amp;kelas=' . h(rawurlencode($kelas)) . '&amp;mapel=' . h(rawurlencode($mapel)) . '">📤 e-Rapor</a> <button type="button" class="tombol" onclick="window.print()">🖨 Cetak</button>');
 ?>
 <?php if (!$kelas_list): ?><p class="pesan">Belum ada kelas. <a href="?p=siswa_tambah">Tambahkan kelas &amp; siswamu dulu →</a></p><?php endif; ?>
 <form class="cari tak-cetak" method="get">

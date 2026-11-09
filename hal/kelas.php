@@ -29,7 +29,7 @@ judul_baris('Kelas & siswa', '<a class="tombol" href="?p=siswa_tambah">＋ Siswa
   <a class="utama" href="?p=absensi"><?= ikon('absensi') ?><span>Isi absensi</span></a>
   <a href="?p=penilaian"><?= ikon('nilai') ?><span>Penilaian</span></a>
   <a href="?p=ujian"><?= ikon('ujian') ?><span>Ujian online</span></a>
-  <a href="?p=absensi_rekap"><?= ikon('rekap') ?><span>Rekap absensi</span></a>
+  <a href="?p=tugas"><?= ikon('tugas') ?><span>Tugas online</span></a>
 </div>
 <p class="redup kecil">Kelas & siswa milikmu sendiri (guru lain tidak melihatnya) · tahun ajaran <b><?= h($tahun) ?></b> ·
   <a href="?p=siswa_naik">Naik kelas / tahun ajaran baru</a></p>

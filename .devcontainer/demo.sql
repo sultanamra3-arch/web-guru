@@ -166,7 +166,7 @@ CREATE TABLE `guru_akun` (
 LOCK TABLES `guru_akun` WRITE;
 /*!40000 ALTER TABLE `guru_akun` DISABLE KEYS */;
 INSERT INTO `guru_akun` VALUES
-(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 18:38:28'),
+(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 18:53:06'),
 (2,'guru','Rina Marlina, S.Pd.','','Bahasa Indonesia','$2y$10$Yw3mhbCfjooqB0Du1toAHOUjFDbN9QrzkiWwGmppHqYXAPc4C3aKS','guru',1,'2026-11-08 07:19:47','2026-11-09 16:02:32');
 /*!40000 ALTER TABLE `guru_akun` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -185,7 +185,7 @@ CREATE TABLE `guru_dokumen` (
   `diubah` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `guru_id` (`guru_id`,`jenis`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `guru_dokumen` WRITE;
@@ -465,7 +465,7 @@ CREATE TABLE `guru_penilaian` (
   `dibuat` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `guru_id` (`guru_id`,`kelas`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `guru_penilaian` WRITE;
@@ -542,6 +542,7 @@ CREATE TABLE `guru_setelan` (
 LOCK TABLES `guru_setelan` WRITE;
 /*!40000 ALTER TABLE `guru_setelan` DISABLE KEYS */;
 INSERT INTO `guru_setelan` VALUES
+('cadangan_terakhir:1','2026-11-09 18:52:37'),
 ('jam_h1:1','1 07:00-08:10\n2 08:10-08:50\n3 08:50-09:30\n4 09:45-10:25\n5 10:25-11:05\n6 11:05-11:45\n7 12:15-12:55\n8 12:55-13:35\n9 13:35-14:15'),
 ('jam_h1:2','1 07:15-07:45\n2 07:45-08:30\n3 08:30-09:15'),
 ('jam_h2:1','1 07:30-08:10\n2 08:10-08:50\n3 08:50-09:30\n4 09:45-10:25\n5 10:25-11:05\n6 11:05-11:45\n7 12:15-12:55\n8 12:55-13:35'),
@@ -705,6 +706,64 @@ INSERT INTO `guru_soal` VALUES
 (38,1,'Informatika','8','Jaringan','pg','sedang',NULL,'Perangkat penghubung LAN adalah ...','{\"A\":\"Switch\",\"B\":\"Monitor\",\"C\":\"Printer\",\"D\":\"Scanner\"}','A','',0,'2026-11-09 16:29:05',NULL,NULL),
 (39,1,'Informatika','8','Jaringan','esai','sedang',NULL,'Jelaskan fungsi router!',NULL,'','',0,'2026-11-09 16:29:05',NULL,NULL);
 /*!40000 ALTER TABLE `guru_soal` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `guru_tugas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `guru_tugas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `guru_id` int(11) NOT NULL,
+  `kelas` varchar(50) NOT NULL,
+  `tahun` varchar(9) DEFAULT NULL,
+  `mapel` varchar(120) DEFAULT NULL,
+  `judul` varchar(200) NOT NULL,
+  `petunjuk` text DEFAULT NULL,
+  `lampiran` varchar(40) DEFAULT NULL,
+  `kode` varchar(10) NOT NULL,
+  `batas` datetime DEFAULT NULL,
+  `terima_telat` tinyint(4) NOT NULL DEFAULT 1,
+  `maks_foto` tinyint(4) NOT NULL DEFAULT 5,
+  `tampil_tertib` tinyint(4) NOT NULL DEFAULT 1,
+  `tata_tertib` text DEFAULT NULL,
+  `kunci` text DEFAULT NULL,
+  `status` varchar(10) NOT NULL DEFAULT 'buka',
+  `penilaian_id` int(11) DEFAULT NULL,
+  `nilai_dikirim` datetime DEFAULT NULL,
+  `dibuat` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `kode` (`kode`),
+  KEY `guru_id` (`guru_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `guru_tugas` WRITE;
+/*!40000 ALTER TABLE `guru_tugas` DISABLE KEYS */;
+/*!40000 ALTER TABLE `guru_tugas` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `guru_tugas_kirim`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `guru_tugas_kirim` (
+  `tugas_id` int(11) NOT NULL,
+  `kode` varchar(20) NOT NULL,
+  `perangkat` varchar(64) DEFAULT NULL,
+  `foto` text DEFAULT NULL,
+  `teks` text DEFAULT NULL,
+  `dikirim` datetime DEFAULT NULL,
+  `telat` tinyint(4) NOT NULL DEFAULT 0,
+  `kali` smallint(6) NOT NULL DEFAULT 0,
+  `status` varchar(12) NOT NULL DEFAULT 'kirim',
+  `nilai` decimal(5,2) DEFAULT NULL,
+  `komentar` text DEFAULT NULL,
+  `saran_ai` text DEFAULT NULL,
+  `dinilai` datetime DEFAULT NULL,
+  PRIMARY KEY (`tugas_id`,`kode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `guru_tugas_kirim` WRITE;
+/*!40000 ALTER TABLE `guru_tugas_kirim` DISABLE KEYS */;
+/*!40000 ALTER TABLE `guru_tugas_kirim` ENABLE KEYS */;
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `guru_ujian`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
