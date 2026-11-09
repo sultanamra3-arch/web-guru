@@ -5,6 +5,7 @@ require __DIR__ . '/inc/inti.php';
 require __DIR__ . '/inc/ai.php';
 require __DIR__ . '/inc/skema.php';
 require __DIR__ . '/inc/siswa.php';
+require __DIR__ . '/inc/ikon.php';
 require __DIR__ . '/inc/tampilan.php';
 require __DIR__ . '/inc/guru_ai.php';
 require __DIR__ . '/inc/koreksi.php';

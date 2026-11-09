@@ -2,11 +2,11 @@
 declare(strict_types=1);
 
 const MENU = [
-    'beranda' => ['Beranda', '⌂'],
-    'kelas' => ['Kelas', '🧑‍🎓'],
-    'soal' => ['Soal', '📝'],
-    'perangkat' => ['Perangkat', '📘'],
-    'lainnya' => ['Lainnya', '☰'],
+    'beranda' => ['Beranda', 'beranda'],
+    'kelas' => ['Kelas', 'kelas'],
+    'soal' => ['Soal', 'soal'],
+    'perangkat' => ['Perangkat', 'perangkat'],
+    'lainnya' => ['Lainnya', 'lainnya'],
 ];
 
 function kepala(string $judul, string $aktif = '', bool $polos = false): void
@@ -53,7 +53,7 @@ function kepala(string $judul, string $aktif = '', bool $polos = false): void
 <?php if ($u): ?>
 <nav class="menu">
   <?php foreach (MENU as $p => [$t, $i]): ?>
-  <a href="?p=<?= $p ?>" class="<?= $aktif === $p ? 'aktif' : '' ?>"><span class="ik"><?= $i ?></span><?= $t ?></a>
+  <a href="?p=<?= $p ?>" class="<?= $aktif === $p ? 'aktif' : '' ?>"><span class="ik"><?= ikon($i) ?></span><?= $t ?></a>
   <?php endforeach; ?>
 </nav>
 <?php endif; ?>

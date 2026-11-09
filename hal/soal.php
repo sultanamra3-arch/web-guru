@@ -31,7 +31,7 @@ $mapel_list = q('SELECT DISTINCT mapel FROM guru_soal WHERE guru_id = ? OR berba
 $paket = semua("SELECT id, judul, diubah FROM guru_dokumen WHERE guru_id = ? AND jenis = 'paket' ORDER BY diubah DESC LIMIT 5", [uid()]);
 
 kepala('Bank soal', 'soal');
-judul_baris('Bank soal', '<a class="tombol" href="?p=soal_form">＋ Manual</a> <a class="tombol utama" href="?p=soal_ai">✨ Buat dengan AI</a>');
+judul_baris('Bank soal', '<a class="tombol" href="?p=soal_form">＋ Manual</a> <a class="tombol utama" href="?p=soal_ai">' . ikon('ai') . ' Buat dengan AI</a>');
 ?>
 <form class="cari" method="get">
   <input type="hidden" name="p" value="soal">

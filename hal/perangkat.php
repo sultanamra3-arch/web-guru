@@ -11,10 +11,10 @@ kepala('Perangkat ajar', 'perangkat');
 judul_baris('Perangkat ajar');
 ?>
 <div class="tombol-besar">
-  <a class="utama" href="?p=dokumen_buat&amp;jenis=modul">✨ Modul ajar</a>
-  <a href="?p=dokumen_buat&amp;jenis=lkpd">✨ LKPD</a>
-  <a href="?p=dokumen_buat&amp;jenis=presentasi">✨ Presentasi</a>
-  <a href="?p=soal_ai">✨ Soal</a>
+  <a class="utama" href="?p=dokumen_buat&amp;jenis=modul"><?= ikon('modul') ?><span>Modul ajar</span></a>
+  <a href="?p=dokumen_buat&amp;jenis=lkpd"><?= ikon('lkpd') ?><span>LKPD</span></a>
+  <a href="?p=dokumen_buat&amp;jenis=presentasi"><?= ikon('presentasi') ?><span>Presentasi</span></a>
+  <a href="?p=soal_ai"><?= ikon('ai') ?><span>Soal</span></a>
 </div>
 <div class="tab">
   <a href="?p=perangkat" class="<?= $jenis === '' ? 'aktif' : '' ?>">Semua</a>

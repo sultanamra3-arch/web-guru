@@ -281,3 +281,18 @@ code{word-break:break-all}
 /* aplikasi terpasang: tanpa zoom ketuk-dua-kali & tanpa zoom otomatis saat mengetik */
 html.apl{touch-action:manipulation;-webkit-text-size-adjust:100%}
 html.apl input,html.apl select,html.apl textarea{font-size:max(16px,1em)}
+/* ---------- Ikon garis (pengganti emoji) ---------- */
+.ikon{width:1.25em;height:1.25em;vertical-align:-.25em;flex:none}
+.menu .ik{display:flex;justify-content:center;height:1.75rem;align-items:center;line-height:1}
+.menu .ik .ikon{width:24px;height:24px;stroke-width:1.9}
+.menu a.aktif .ik{transform:none}
+.menu a.aktif .ik .ikon{stroke-width:2.4}
+.menu a.aktif .ik::after{content:'';position:absolute}
+.tombol-besar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35rem;font-weight:700}
+.tombol-besar a .ikon{width:26px;height:26px;color:var(--navy);stroke-width:1.9}
+.tombol-besar a.utama .ikon{color:var(--navy2)}
+.menu-lainnya li>a{display:grid;grid-template-columns:auto 1fr;column-gap:.8rem;align-items:center}
+.menu-lainnya li>a .ikon-kotak{grid-row:span 2;width:2.6rem;height:2.6rem;border-radius:12px;background:var(--biru,#EAF6FD);color:var(--navy);display:flex;align-items:center;justify-content:center}
+.menu-lainnya li>a .ikon-kotak .ikon{width:22px;height:22px}
+.menu-lainnya li>a small{grid-column:2}
+.tombol .ikon,button .ikon{margin-right:.15rem}

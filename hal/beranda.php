@@ -16,12 +16,12 @@ kepala('Beranda', 'beranda');
 <p class="redup" style="margin-top:-.5rem"><?= HARI[$hari] ?? 'Minggu' ?>, <?= tgl_panjang(hari_ini()) ?></p>
 
 <div class="tombol-besar">
-  <a class="utama" href="?p=soal_ai">✨ Buat soal</a>
-  <a href="?p=dokumen_buat&amp;jenis=modul">✨ Modul ajar</a>
-  <a href="?p=dokumen_buat&amp;jenis=lkpd">✨ LKPD</a>
-  <a href="?p=dokumen_buat&amp;jenis=presentasi">✨ Presentasi</a>
-  <a href="?p=absensi">✅ Absensi</a>
-  <a href="?p=penilaian">📊 Nilai</a>
+  <a class="utama" href="?p=soal_ai"><?= ikon('ai') ?><span>Buat soal</span></a>
+  <a href="?p=dokumen_buat&amp;jenis=modul"><?= ikon('modul') ?><span>Modul ajar</span></a>
+  <a href="?p=dokumen_buat&amp;jenis=lkpd"><?= ikon('lkpd') ?><span>LKPD</span></a>
+  <a href="?p=dokumen_buat&amp;jenis=presentasi"><?= ikon('presentasi') ?><span>Presentasi</span></a>
+  <a href="?p=absensi"><?= ikon('absensi') ?><span>Absensi</span></a>
+  <a href="?p=penilaian"><?= ikon('nilai') ?><span>Nilai</span></a>
 </div>
 
 <div class="kartu">

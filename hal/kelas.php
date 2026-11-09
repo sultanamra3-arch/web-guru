@@ -26,10 +26,10 @@ kepala('Kelas', 'kelas');
 judul_baris('Kelas & siswa', '<a class="tombol" href="?p=siswa_tambah">＋ Siswa</a>');
 ?>
 <div class="tombol-besar">
-  <a class="utama" href="?p=absensi">✅ Isi absensi</a>
-  <a href="?p=penilaian">📊 Penilaian</a>
-  <a href="?p=ujian">💻 Ujian online</a>
-  <a href="?p=absensi_rekap">📋 Rekap absensi</a>
+  <a class="utama" href="?p=absensi"><?= ikon('absensi') ?><span>Isi absensi</span></a>
+  <a href="?p=penilaian"><?= ikon('nilai') ?><span>Penilaian</span></a>
+  <a href="?p=ujian"><?= ikon('ujian') ?><span>Ujian online</span></a>
+  <a href="?p=absensi_rekap"><?= ikon('rekap') ?><span>Rekap absensi</span></a>
 </div>
 <p class="redup kecil">Kelas & siswa milikmu sendiri (guru lain tidak melihatnya) · tahun ajaran <b><?= h($tahun) ?></b> ·
   <a href="?p=siswa_naik">Naik kelas / tahun ajaran baru</a></p>
