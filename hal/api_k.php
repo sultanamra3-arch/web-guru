@@ -11,6 +11,7 @@ $k = kuis_ambil($kid, false);
 if (!$k || !$kode) { echo json_encode(['ok' => false, 'keluar' => true]); exit; }
 $p = satu('SELECT * FROM guru_kuis_peserta WHERE kuis_id = ? AND kode = ?', [$kid, $kode]);
 if (!$p) { echo json_encode(['ok' => false, 'keluar' => true, 'galat' => 'Kamu dikeluarkan dari kuis oleh guru.']); exit; }
+$k = kuis_maju($k);
 $soal = kuis_soal($k);
 $no = (int)$k['nomor'];
 $jw = json_decode((string)$p['jawaban'], true) ?: [];
@@ -33,12 +34,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'jawab') {
     q('UPDATE guru_kuis_peserta SET terakhir = ? WHERE kuis_id = ? AND kode = ?', [sekarang(), $kid, $kode]);
 }
 
-if ($k['status'] === 'soal' && kuis_sisa_ms($k) <= 0 && kuis_ms() > (int)$k['mulai_ms'] + 1500) $k['status'] = 'jawab'; // menunggu guru
 $s = $soal[$no] ?? null;
 $rank = null;
 $jumlah = 0;
-if (in_array($k['status'], ['jawab', 'selesai'], true)) {
+$rekap = null;
+if ($k['status'] === 'selesai') {
     foreach (kuis_peringkat($kid) as $r) { $jumlah++; if ($r['kode'] === $kode) $rank = $r['rank']; }
+    $rekap = [];
+    foreach ($soal as $i => $x) $rekap[] = ['no' => $i + 1, 'teks' => $x['teks'], 'kunci' => $x['kunci'], 'kunci_teks' => (string)($x['opsi'][$x['kunci']] ?? ''),
+        'jawabku' => $jw[$i]['p'] ?? null, 'poin' => (int)($jw[$i]['poin'] ?? 0), 'pembahasan' => (string)$x['pembahasan']];
 } else {
     $jumlah = (int)nilai('SELECT COUNT(*) FROM guru_kuis_peserta WHERE kuis_id = ?', [$kid]);
 }
@@ -47,7 +51,9 @@ echo json_encode([
     'sisa_ms' => kuis_sisa_ms($k), 'mulai_dalam' => max(0, (int)$k['mulai_ms'] - kuis_ms()),
     'soal' => $s && $k['status'] === 'soal' ? ['teks' => $s['teks'], 'g' => gambar_url($s['gambar'] ?? null),
         'opsi' => array_map(fn($h, $t) => ['k' => $h, 't' => $t], array_keys($s['opsi']), $s['opsi'])] : null,
-    'jawabku' => $jw[$no] ?? null,
-    'kunci' => in_array($k['status'], ['jawab', 'selesai'], true) && $s ? $s['kunci'] : null,
-    'poin' => (int)$p['poin'], 'benar' => (int)$p['benar'], 'rank' => $rank, 'jumlah' => $jumlah,
+    // selama kuis berjalan siswa hanya tahu pilihannya sendiri; benar/salah & poin dibuka di akhir
+    'jawabku' => isset($jw[$no]) ? ['p' => $jw[$no]['p']] : null,
+    'rekap' => $rekap,
+    'poin' => $k['status'] === 'selesai' ? (int)$p['poin'] : null, 'benar' => $k['status'] === 'selesai' ? (int)$p['benar'] : null,
+    'rank' => $rank, 'jumlah' => $jumlah,
 ], JSON_UNESCAPED_UNICODE);

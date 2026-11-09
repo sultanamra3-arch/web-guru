@@ -16,10 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'berikut':
             $n = $k['status'] === 'lobi' ? 0 : (int)$k['nomor'] + 1;
             if ($n >= count($soal)) q("UPDATE guru_kuis SET status = 'selesai' WHERE id = ?", [$kid]);
-            else q("UPDATE guru_kuis SET status = 'soal', nomor = ?, mulai_ms = ? WHERE id = ?", [$n, kuis_ms() + 1500, $kid]); // 1,5 detik hitung mundur
-            break;
-        case 'tampil':
-            if ($k['status'] === 'soal') q("UPDATE guru_kuis SET status = 'jawab' WHERE id = ?", [$kid]);
+            else q("UPDATE guru_kuis SET status = 'soal', nomor = ?, mulai_ms = ? WHERE id = ?", [$n, kuis_ms() + 3000, $kid]); // 3 detik hitung mundur
             break;
         case 'selesai':
             q("UPDATE guru_kuis SET status = 'selesai' WHERE id = ?", [$kid]);
@@ -52,33 +49,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $k = kuis_ambil($kid);
 }
 
-// waktu habis → tampilkan jawaban otomatis
-if ($k['status'] === 'soal' && kuis_sisa_ms($k) <= 0 && kuis_ms() > (int)$k['mulai_ms']) {
-    q("UPDATE guru_kuis SET status = 'jawab' WHERE id = ? AND status = 'soal'", [$kid]);
-    $k['status'] = 'jawab';
-}
+// kuis berjalan sendiri: waktu habis / semua menjawab → soal berikutnya (jawaban baru dibuka di akhir)
+$k = kuis_maju($k);
 $peringkat = kuis_peringkat($kid);
 $no = (int)$k['nomor'];
-$sebaran = [];
 $dijawab = 0;
-foreach ($peringkat as $p) {
-    $j = json_decode((string)$p['jawaban'], true) ?: [];
-    if (isset($j[$no])) { $dijawab++; $sebaran[$j[$no]['p']] = ($sebaran[$j[$no]['p']] ?? 0) + 1; }
-}
-// semua sudah menjawab → tampilkan jawaban
-if ($k['status'] === 'soal' && $peringkat && $dijawab >= count($peringkat)) {
-    q("UPDATE guru_kuis SET status = 'jawab' WHERE id = ? AND status = 'soal'", [$kid]);
-    $k['status'] = 'jawab';
-}
+foreach ($peringkat as $p) if (isset((json_decode((string)$p['jawaban'], true) ?: [])[$no])) $dijawab++;
 $s = $soal[$no] ?? null;
 echo json_encode([
     'ok' => true, 'status' => $k['status'], 'nomor' => $no, 'total' => count($soal), 'detik' => (int)$k['detik'],
     'sisa_ms' => kuis_sisa_ms($k), 'mulai_dalam' => max(0, (int)$k['mulai_ms'] - kuis_ms()),
-    'soal' => $s && $k['status'] !== 'lobi' ? ['teks' => $s['teks'], 'g' => gambar_url($s['gambar'] ?? null),
+    'soal' => $s && $k['status'] === 'soal' ? ['teks' => $s['teks'], 'g' => gambar_url($s['gambar'] ?? null),
         'opsi' => array_map(fn($h, $t) => ['k' => $h, 't' => $t, 'g' => gambar_url($s['gambar_opsi'][$h] ?? null)], array_keys($s['opsi']), $s['opsi'])] : null,
-    'kunci' => in_array($k['status'], ['jawab', 'selesai'], true) && $s ? $s['kunci'] : null,
-    'pembahasan' => $k['status'] === 'jawab' && $s ? (string)$s['pembahasan'] : '',
-    'sebaran' => in_array($k['status'], ['jawab', 'selesai'], true) ? $sebaran : (object)[],
+    'rekap' => $k['status'] === 'selesai' ? kuis_rekap($k, $peringkat) : null,
     'dijawab' => $dijawab,
-    'peserta' => array_map(fn($p) => ['kode' => $p['kode'], 'nama' => $p['nama'], 'poin' => (int)$p['poin'], 'benar' => (int)$p['benar'], 'rank' => $p['rank']], $peringkat),
+    'peserta' => array_map(fn($p) => ['kode' => $p['kode'], 'nama' => $p['nama'], 'poin' => $k['status'] === 'selesai' ? (int)$p['poin'] : null,
+        'benar' => $k['status'] === 'selesai' ? (int)$p['benar'] : null, 'rank' => $k['status'] === 'selesai' ? $p['rank'] : null], $peringkat),
 ], JSON_UNESCAPED_UNICODE);

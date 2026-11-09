@@ -529,3 +529,27 @@ b.merah{color:var(--merah)}
 .tombol-besar a:last-child:nth-child(odd){grid-column:1/-1}
 .baris-kuis{display:flex;align-items:center;gap:.4rem}.baris-kuis>a{flex:1;min-width:0}
 .pg-cek{position:static!important;margin-left:.2rem}
+/* Kuis: hitung mundur, rekap akhir */
+.pg-siap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;min-height:40vh}
+.pg-siap .pg-no{font-size:1.6em}
+.pg-angka{font-size:7em;font-weight:800;line-height:1;color:#F2C230}
+.pg-rekap{background:rgba(255,255,255,.08);border-radius:12px;padding:.6rem .8rem}
+.pg-rekap summary{cursor:pointer;font-weight:700;font-size:1.05em}
+.pg-rekap-soal{background:#fff;color:#1b2160;border-radius:12px;padding:.7rem .8rem;margin-top:.6rem;display:grid;gap:.35rem}
+.pg-rekap-kepala{display:flex;justify-content:space-between}
+.pg-rekap-teks{font-weight:600}
+.pg-rekap-pil{position:relative;display:flex;align-items:center;gap:.5rem;border-radius:8px;padding:.4rem .6rem;background:#f1f3f9;overflow:hidden}
+.pg-rekap-pil:before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--isi,0);background:var(--warna);opacity:.18}
+.pg-rekap-pil>*{position:relative}
+.pg-rekap-pil.kunci{outline:2px solid #26890c;background:#eaf7ee;font-weight:700}
+.pg-rekap-pil .pg-bentuk{color:var(--warna);font-size:1.1em}
+.pg-rekap .pg-pembahasan{background:#f3f6ff;color:#1b2160}
+.ks-rekap{list-style:none;padding:0;margin:0;display:grid;gap:.5rem;text-align:left}
+.ks-rekap li{background:#fff;color:#1b2160;border-radius:12px;padding:.6rem .7rem;border-left:6px solid #b3261e}
+.ks-rekap li.benar{border-left-color:#26890c}
+.ks-rekap-kepala{display:flex;justify-content:space-between;margin-bottom:.2rem}
+.ks-rekap li.benar .ks-rekap-kepala span{color:#26890c;font-weight:700}.ks-rekap li.salah .ks-rekap-kepala span{color:#b3261e;font-weight:700}
+.ks-rekap-jawab{font-size:.88rem;margin-top:.3rem;font-weight:600}
+.ks-rekap-bahas{font-size:.85rem;margin-top:.3rem;background:#f3f6ff;border-radius:8px;padding:.4rem .5rem}
+.kuis-siswa.st-selesai .kuis-isi{justify-content:flex-start}
+.kuis-siswa h3{color:#fff;margin:.8rem 0 .2rem;text-align:left}

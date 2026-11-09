@@ -72,3 +72,48 @@ function kuis_poin(int $sisa_ms, int $detik): int
 {
     return 500 + (int)round(500 * max(0, min(1, $sisa_ms / max(1, $detik * 1000))));
 }
+
+/**
+ * Kuis berjalan sendiri sampai akhir: bila waktu soal habis atau semua peserta sudah menjawab,
+ * langsung lanjut ke soal berikutnya (jeda hitung mundur 3 detik); setelah soal terakhir → selesai.
+ * Dipanggil oleh layar guru maupun HP siswa (siapa pun yang lebih dulu), aman dari lompatan ganda.
+ */
+function kuis_maju(array $k): array
+{
+    if (!in_array($k['status'], ['soal', 'jawab'], true)) return $k;
+    $sekarang = kuis_ms();
+    $habis = $sekarang > (int)$k['mulai_ms'] + (int)$k['detik'] * 1000 + 800;
+    $semua = false;
+    if (!$habis && $k['status'] === 'soal' && $sekarang > (int)$k['mulai_ms']) {
+        $n = (int)nilai('SELECT COUNT(*) FROM guru_kuis_peserta WHERE kuis_id = ?', [$k['id']]);
+        $jawab = (int)nilai('SELECT COUNT(*) FROM guru_kuis_peserta WHERE kuis_id = ? AND JSON_EXTRACT(jawaban, ?) IS NOT NULL', [$k['id'], '$."' . (int)$k['nomor'] . '"']);
+        $semua = $n > 0 && $jawab >= $n;
+    }
+    if ($k['status'] !== 'jawab' && !$habis && !$semua) return $k;
+    $berikut = (int)$k['nomor'] + 1;
+    $total = count(kuis_soal($k));
+    $ok = $berikut >= $total
+        ? q("UPDATE guru_kuis SET status = 'selesai' WHERE id = ? AND nomor = ? AND status IN ('soal','jawab')", [$k['id'], $k['nomor']])->rowCount()
+        : q("UPDATE guru_kuis SET status = 'soal', nomor = ?, mulai_ms = ? WHERE id = ? AND nomor = ? AND status IN ('soal','jawab')", [$berikut, $sekarang + 3000, $k['id'], $k['nomor']])->rowCount();
+    return $ok ? (kuis_ambil((int)$k['id'], false) ?? $k) : (kuis_ambil((int)$k['id'], false) ?? $k);
+}
+
+/** Rekap per soal (dipakai di akhir): kunci, sebaran pilihan, jumlah benar. */
+function kuis_rekap(array $k, array $peringkat): array
+{
+    $out = [];
+    foreach (kuis_soal($k) as $i => $s) {
+        $seb = [];
+        $benar = 0;
+        foreach ($peringkat as $p) {
+            $j = json_decode((string)$p['jawaban'], true) ?: [];
+            if (!isset($j[$i])) continue;
+            $seb[$j[$i]['p']] = ($seb[$j[$i]['p']] ?? 0) + 1;
+            if ($j[$i]['p'] === $s['kunci']) $benar++;
+        }
+        $out[] = ['no' => $i + 1, 'teks' => $s['teks'], 'g' => gambar_url($s['gambar'] ?? null), 'kunci' => $s['kunci'],
+            'opsi' => array_map(fn($h, $t) => ['k' => $h, 't' => $t, 'n' => $seb[$h] ?? 0], array_keys($s['opsi']), $s['opsi']),
+            'benar' => $benar, 'pembahasan' => (string)$s['pembahasan']];
+    }
+    return $out;
+}

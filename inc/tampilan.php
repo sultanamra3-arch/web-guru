@@ -103,7 +103,7 @@ function panel_bagikan(array $d): void
     $attr = '';
     foreach ($d as $k => $v) $attr .= ' data-' . $k . '="' . h((string)$v) . '"';
     $attr .= ' data-sekolah="' . h((string)k('sekolah', '')) . '"';
-    $nama = ['ujian' => 'ujian', 'latihan' => 'latihan', 'tugas' => 'tugas'][$jenis] ?? 'ujian';
+    $nama = ['ujian' => 'ujian', 'latihan' => 'latihan', 'tugas' => 'tugas', 'kuis' => 'kuis'][$jenis] ?? 'ujian';
     ?>
 <div class="kartu panel-bagikan" id="panel-bagikan" hidden<?= $attr ?>>
   <div class="judul-panel"><h3 style="margin:0">📤 Bagikan <?= $nama ?></h3><button type="button" class="kecil" id="tutup-bagikan" aria-label="Tutup">✕</button></div>

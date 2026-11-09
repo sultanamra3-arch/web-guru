@@ -3,30 +3,31 @@
   'use strict';
   var P = document.getElementById('panel-bagikan');
   if (!P) return;
-  var d = P.dataset, jenis = d.jenis || 'ujian', latihan = jenis === 'latihan', tugas = jenis === 'tugas';
+  var d = P.dataset, jenis = d.jenis || 'ujian', latihan = jenis === 'latihan', tugas = jenis === 'tugas', kuis = jenis === 'kuis';
   var cb = document.getElementById('sertakan-token'), pilihToken = P.querySelector('.pilih-token');
   var cv = document.getElementById('kartu-bagikan'), prat = document.getElementById('pratinjau-pesan'), st = document.getElementById('status-bagikan');
   var tok = '', tokSisa = 0, menit = +(d.tokenMenit || 0), gambarSiap = null;
   var tokenEl = document.querySelector('input[name=_t]');
-  var label = tugas ? 'Tugas Online' : (latihan ? 'Latihan Soal' : 'Ujian Online');
-  var labelKode = tugas ? 'KODE TUGAS' : (latihan ? 'KODE LATIHAN' : 'KODE UJIAN');
+  var label = kuis ? 'Kuis Cepat' : (tugas ? 'Tugas Online' : (latihan ? 'Latihan Soal' : 'Ujian Online'));
+  var labelKode = kuis ? 'KODE KUIS' : (tugas ? 'KODE TUGAS' : (latihan ? 'KODE LATIHAN' : 'KODE UJIAN'));
 
   document.addEventListener('siguru:token', function (e) { tok = e.detail.token; tokSisa = e.detail.sisa; if (!P.hidden && sertakan()) segarkan(); });
 
   function jenisToken() { var r = P.querySelector('input[name=jenis_token]:checked'); return r ? r.value : 'tetap'; }
-  function sertakan() { return !latihan && !tugas && cb && cb.checked; }
+  function sertakan() { return !latihan && !tugas && !kuis && cb && cb.checked; }
   function jamBerlaku() {
     var t = new Date(Date.now() + (tokSisa + menit * 60) * 1000);
     return ('0' + t.getHours()).slice(-2) + '.' + ('0' + t.getMinutes()).slice(-2);
   }
   function teks() {
-    var b = ['📝 *' + (tugas ? 'Tugas: ' : '') + d.judul + '*', 'Kelas ' + d.kelas + (d.mapel ? ' · ' + d.mapel : '') + (tugas ? '' : ' · ' + d.soal + ' soal · ' + d.durasi + ' menit')];
+    var b = [(kuis ? '⚡ *Kuis: ' : '📝 *' + (tugas ? 'Tugas: ' : '')) + d.judul + '*', 'Kelas ' + d.kelas + (d.mapel ? ' · ' + d.mapel : '') + (tugas ? '' : ' · ' + d.soal + ' soal · ' + (kuis ? d.durasi + ' detik per soal' : d.durasi + ' menit'))];
     if (d.mulai) b.push('🗓 Mulai: ' + d.mulai);
     if (d.batas) b.push('⏰ Batas: ' + d.batas);
     b.push('', 'Buka: ' + d.url, labelKode.charAt(0) + labelKode.slice(1).toLowerCase() + ': *' + d.kode + '*');
     if (sertakan() && tok) b.push('Token: *' + tok + '*' + (menit > 0 ? ' (berlaku s.d. ' + jamBerlaku() + ')' : ''));
     if (latihan) b.push('Latihan: tanpa token, boleh diulang 💪');
     if (tugas) b.push('Foto tugasmu lalu kirim lewat link di atas ya 📷');
+    if (kuis) { b.push('', 'Siapkan HP, masuk sekarang, lalu lihat layar guru. Jawab cepat & tepat untuk poin terbanyak! 🏆'); return b.join('\n'); }
     b.push('', d.tertib === '1' ? 'Baca tata tertib dulu, kerjakan dengan jujur ya 🙏' : 'Kerjakan dengan jujur ya 🙏');
     return b.join('\n');
   }
@@ -53,15 +54,17 @@
       c.font = '700 64px ' + huruf;
       var y = 290; bungkus(c, d.judul, W - 144).slice(0, 2).forEach(function (b) { c.fillText(b, 72, y); y += 76; });
       c.fillStyle = 'rgba(255,255,255,.85)'; c.font = '500 32px ' + huruf;
-      c.fillText('Kelas ' + d.kelas + (d.mapel ? ' · ' + d.mapel : '') + (tugas ? '' : ' · ' + d.durasi + ' menit'), 72, y); y += 46;
+      c.fillText('Kelas ' + d.kelas + (d.mapel ? ' · ' + d.mapel : '') + (tugas ? '' : (kuis ? ' · ' + d.soal + ' soal' : ' · ' + d.durasi + ' menit')), 72, y); y += 46;
       if (d.mulai) { c.fillText('Mulai ' + d.mulai, 72, y); y += 46; }
       y += 20;
       var bh = 470; c.fillStyle = '#fff'; kotakBulat(c, 72, y, W - 144, bh, 40); c.fill();
       if (g[1]) c.drawImage(g[1], 112, y + 40, 390, 390);
       var x = 550;
       c.fillStyle = '#667'; c.font = '600 28px ' + huruf; c.fillText(labelKode, x, y + 120);
-      c.fillStyle = '#1b2160'; c.font = '800 ' + (d.kode.length > 6 ? 80 : 92) + 'px ' + huruf; c.fillText(d.kode.split('').join(String.fromCharCode(8202)), x, y + 220);
-      if (tugas) {
+      c.fillStyle = '#1b2160'; c.font = '800 ' + (d.kode.length > 6 ? 80 : 92) + 'px ' + huruf; c.fillText(kuis ? d.kode.replace(/(\d{3})(\d{3})/, '$1 $2') : d.kode.split('').join(String.fromCharCode(8202)), x, y + 220);
+      if (kuis) {
+        c.fillStyle = '#1d6b33'; c.font = '700 30px ' + huruf; c.fillText('Masuk sekarang,', x, y + 310); c.fillText('lihat layar guru ⚡', x, y + 352);
+      } else if (tugas) {
         c.fillStyle = '#667'; c.font = '600 28px ' + huruf; c.fillText('BATAS', x, y + 300);
         c.fillStyle = '#b3261e'; c.font = '700 32px ' + huruf;
         bungkus(c, d.batas || 'tanpa batas', 410).slice(0, 3).forEach(function (b, i) { c.fillText(b, x, y + 345 + i * 40); });
