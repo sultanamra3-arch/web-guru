@@ -166,7 +166,9 @@
       var siap = r.status === 'soal' && r.mulai_dalam > 0;
       if (r.status === 'soal') { tMulai = Date.now() + r.mulai_dalam; tAkhir = siap ? tMulai + r.detik * 1000 : Date.now() + r.sisa_ms; }
       var habis = r.status === 'soal' && !siap && r.sisa_ms <= 0 && r.mode !== 'mandiri';
-      var kunci = r.status + ':' + r.nomor + ':' + (r.jawabku ? 1 : 0) + ':' + (siap ? 'siap' : '') + ':' + (habis ? 'habis' : '') + ':' + (r.status === 'lobi' ? r.jumlah : '') + ':' + (r.soal ? 1 : 0);
+      var mulaiSaya = r.status === 'mandiri' && r.mulai_saya;
+      var mulaiSayaSisa = r.status === 'mandiri' && r.mulai_saya ? (r.sisa_ms_saya != null ? parseInt(r.sisa_ms_saya, 10) : 0) : 0;
+      var kunci = r.status + ':' + r.nomor + ':' + (r.jawabku ? 1 : 0) + ':' + (siap ? 'siap' : '') + ':' + (habis ? 'habis' : '') + ':' + (r.status === 'lobi' ? r.jumlah : '') + ':' + (r.soal ? 1 : 0) + ':' + (r.mode === 'mandiri' ? (r.mulai_saya ? 1 : 0) : 0);
       if (kunci === kunciTampil) return;
       kunciTampil = kunci; isi.innerHTML = '';
       K.className = 'kuis-siswa st-' + r.status;
@@ -175,10 +177,14 @@
       } else if (r.status === 'tunggu') {
         isi.append(el('div', 'ks-besar', '🏁'), el('h2', null, 'Kamu selesai' + (r.urut_selesai ? ' ke-' + r.urut_selesai : '') + '!'),
           el('p', null, 'Hebat! Tunggu teman-temanmu. Nilai, peringkat, dan pembahasan muncul setelah kuis berakhir.'));
-      } else if (siap) {
-        var a = el('div', 'ks-besar', ''); a.id = 'ks-angka';
-        isi.append(el('h2', null, r.mode === 'mandiri' ? 'Kuis dimulai!' : 'Soal ' + (r.nomor + 1) + ' dari ' + r.total), a, el('p', null, 'Siap-siap!'));
-      } else if (r.status === 'soal' && r.mode === 'mandiri' && !r.soal) {
+      } else if (r.mode === 'mandiri' && r.status === 'jalan' && !r.mulai_saya) {
+        var m = el('div', 'ks-besar'); m.id = 'ks-angka';
+        isi.append(el('h2', null, 'Kuis sedang menunggu…'), m, el('p', null, 'Tekan Mulai sebelum mengerjakan.'), el('p', 'redup small', 'Waktu soal hidup saat tombol ini ditekan.'));
+        var tgMulai = el('button', 'tombol utama lebar'); tgMulai.textContent = '● Mulai kuis';
+        tgMulai.id = 'ks-mulai';
+        tgMulai.onclick = function () { if (mengirim) return; mengirim = true; kirim('?p=api_k', { _t: token, id: id, aksi: 'mulai_saya' }).then(function (x) { mengirim = false; if (x && x.ok) { S = x; tampil(x); } }).catch(function () { mengirim = false; }); };
+        isi.append(tgMulai, el('button', 'kecil', 'Batal'));
+      } else if (mulaiSaya && r.status === 'soal' && !r.soal) {
         isi.append(el('p', null, 'Memuat soal berikutnya…'));
       } else if (r.status === 'soal' && r.jawabku) {
         var c = el('div', 'ks-terkirim'); c.style.background = WARNA[r.jawabku.p] || '#555';
@@ -191,19 +197,22 @@
         var t = el('div', 'ks-teks'); baris(t, r.soal.teks); isi.append(t);
         var g = el('div', 'ks-opsi n' + r.soal.opsi.length);
         if (r.soal.g) { var gi = el('img', 'ks-gambar'); gi.src = r.soal.g; isi.append(gi); }
+        var mulaiSisa = (r.mode === 'mandiri' && r.mulai_saya) ? mulaiSayaSisa : null;
+        var tMulaiSiswa = Date.now(), tAkhirSiswa = tMulaiSiswa + (mulaiSisa > 0 ? mulaiSisa : 0);
         r.soal.opsi.forEach(function (o, idx) {
           var hf = HURUF[idx] || o.k;   // warna & bentuk mengikuti posisi tombol (pilihan bisa diacak)
           var b = el('button', 'ks-pil'); b.type = 'button'; b.style.background = WARNA[hf] || '#555';
           b.append(el('span', 'ks-bentuk', BENTUK[hf] || hf)); var tx = el('span', 'ks-pil-teks'); baris(tx, o.t); b.append(tx);
           b.onclick = function () {
             if (mengirim) return; mengirim = true;
+            var w = document.querySelector('.ks-waktu'); if (w) w.textContent = '-- dtk';
             Array.prototype.forEach.call(g.children, function (x) { x.disabled = true; x.style.opacity = x === b ? 1 : .35; });
             kirim('?p=api_k', { _t: token, id: id, aksi: 'jawab', nomor: r.nomor, pilihan: o.k }).then(function (x) { mengirim = false; if (x.ok) { S = x; tampil(x); } })
               .catch(function () { mengirim = false; Array.prototype.forEach.call(g.children, function (x) { x.disabled = false; x.style.opacity = 1; }); });
           };
           g.append(b);
         });
-        isi.append(g);
+        isi.append(g, el('p', 'redup small', mulaiSisa > 0 ? '⏱ sisa ' + Math.ceil(mulaiSisa / 1000) + ' detik' : ''));
       } else if (r.status === 'selesai') {
         isi.append(el('div', 'ks-besar', r.rank && r.rank <= 3 ? ['🥇', '🥈', '🥉'][r.rank - 1] : '🏁'), el('h2', null, 'Kuis selesai!'),
           el('p', 'ks-rank', 'Peringkat ke-' + r.rank + ' dari ' + r.jumlah), el('p', null, r.poin + ' poin · ' + r.benar + ' dari ' + r.total + ' benar'));
@@ -230,10 +239,16 @@
       if (!S || (S.status !== 'soal' && S.status !== 'jalan')) return;
       var a = document.getElementById('ks-angka'); if (a) a.textContent = String(hitungMundur(tMulai - Date.now()));
       var w = document.querySelector('.ks-waktu');
+      var mulaiSiswaSisa = (S.mode === 'mandiri' && S.mulai_saya) ? (S.sisa_ms_saya != null ? parseInt(S.sisa_ms_saya, 10) : 0) : null;
       if (w) {
-        var dd = Math.max(0, Math.ceil((tAkhir - Date.now()) / 1000)); w.textContent = dd + ' dtk';
-        // mode mandiri: waktu soal habis → minta soal berikutnya
-        if (S.mode === 'mandiri' && dd === 0 && !minta && !mengirim) { minta = true; setTimeout(function () { minta = false; muat(); }, 1100); }
+        var dd;
+        if (mulaiSiswaSisa != null) {
+          dd = Math.max(0, Math.ceil((tAkhirSiswa - Date.now()) / 1000));
+          w.textContent = dd + ' dtk';
+          if (dd === 0 && !minta && !mengirim) { minta = true; setTimeout(function () { minta = false; muat(); }, 1100); }
+        } else {
+          dd = Math.max(0, Math.ceil((tAkhir - Date.now()) / 1000)); w.textContent = dd + ' dtk';
+        }
       }
     }, 250);
     muat(); setInterval(muat, 1500);

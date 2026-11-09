@@ -30,6 +30,19 @@ if (kuis_mandiri($k)) {
     // ---------- mode mandiri: tiap siswa maju sendiri ----------
     $p = kuis_mandiri_langkah($k, $p);
     $total = count($soal);
+    $aku_mulai = (int)$p['pos'] > 0 || $p['selesai_ms'] !== null;
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'mulai_saya') {
+        if (!$aku_mulai && $k['status'] === 'jalan') {
+            $now = kuis_ms();
+            q('UPDATE guru_kuis_peserta SET mulai_soal_ms = ?, terakhir = ? WHERE kuis_id = ? AND kode = ? AND mulai_soal_ms IS NULL',
+                [$now, sekarang(), $kid, $kode]);
+            $p = satu('SELECT * FROM guru_kuis_peserta WHERE kuis_id = ? AND kode = ?', [$kid, $kode]);
+            $aku_mulai = (int)$p['pos'] > 0 || $p['selesai_ms'] !== null;
+            $out = ['ok' => true, 'mulai_saya' => true, 'mulai_dalam_saya' => 0, 'jawabku' => null, 'soal' => null, 'sisa_ms_saya' => 0];
+            echo json_encode($out, JSON_UNESCAPED_UNICODE); exit;
+        }
+        $p = satu('SELECT * FROM guru_kuis_peserta WHERE kuis_id = ? AND kode = ?', [$kid, $kode]);
+    }
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'jawab' && $k['status'] === 'jalan') {
         $ur = json_decode((string)$p['urutan'], true) ?: [];
         $pos = (int)$p['pos'];
@@ -54,15 +67,19 @@ if (kuis_mandiri($k)) {
     }
     $out = ['ok' => true, 'mode' => 'mandiri', 'status' => $k['status'], 'total' => $total, 'detik' => (int)$k['detik'],
         'mulai_dalam' => max(0, (int)$k['mulai_ms'] - kuis_ms()), 'nomor' => (int)$p['pos'], 'soal' => null, 'sisa_ms' => 0,
-        'selesai_saya' => $p['selesai_ms'] !== null, 'poin' => null, 'benar' => null, 'rank' => null,
-        'jumlah' => (int)nilai('SELECT COUNT(*) FROM guru_kuis_peserta WHERE kuis_id = ?', [$kid])];
-    if ($k['status'] === 'jalan' && $p['selesai_ms'] === null && $out['mulai_dalam'] === 0 && (int)$p['pos'] < $total) {
+        'selesai_saya' => $p['selesai_ms'] !== null, 'mulai_saya' => $aku_mulai, 'mulai_dalam_saya' => $aku_mulai ? 0 : max(0, (int)$k['mulai_ms'] - kuis_ms()),
+        'poin' => null, 'benar' => null, 'rank' => null, 'jumlah' => (int)nilai('SELECT COUNT(*) FROM guru_kuis_peserta WHERE kuis_id = ?', [$kid])];
+    if ($k['status'] === 'jalan' && $p['selesai_ms'] === null && !$aku_mulai) {
+        $out['mulai_dalam_saya'] = max(0, (int)$k['mulai_ms'] - kuis_ms());
+    }
+    $ms_saya = $aku_mulai ? (int)$p['soal_ms'] + (int)$k['detik'] * 1000 - kuis_ms() : 0;
+    if ($k['status'] === 'jalan' && $aku_mulai && (int)$p['pos'] < $total) {
+        $out['sisa_ms_saya'] = max(0, $ms_saya);
         $ur = json_decode((string)$p['urutan'], true) ?: [];
         $i = $ur['s'][(int)$p['pos']] ?? 0;
         $x = $soal[$i];
         $out['soal'] = ['teks' => $x['teks'], 'g' => gambar_url($x['gambar'] ?? null),
             'opsi' => array_map(fn($h) => ['k' => $h, 't' => (string)$x['opsi'][$h]], $ur['o'][$i] ?? array_keys($x['opsi']))];
-        $out['sisa_ms'] = max(0, (int)$p['soal_ms'] + (int)$k['detik'] * 1000 - kuis_ms());
     }
     if ($p['selesai_ms'] !== null) $out['urut_selesai'] = 1 + (int)nilai('SELECT COUNT(*) FROM guru_kuis_peserta WHERE kuis_id = ? AND selesai_ms IS NOT NULL AND selesai_ms < ?', [$kid, $p['selesai_ms']]);
     if ($k['status'] === 'selesai') {
