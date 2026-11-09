@@ -9,19 +9,19 @@
 <title>Penilaian · SiGuru</title>
 <meta name="application-name" content="SiGuru">
 <meta name="apple-mobile-web-app-title" content="SiGuru">
-<link rel="x-manifest" href="manifest.webmanifest?v=1.1">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.2">
 <link rel="icon" href="aset/favicon.png">
 <link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="aset/gaya.css?v=1.1">
-<link rel="stylesheet" href="aset/guru.css?v=1.1">
+<link rel="stylesheet" href="aset/gaya.css?v=1.2">
+<link rel="stylesheet" href="aset/guru.css?v=1.2">
 </head>
 <body class="">
 <header class="atas">
   <a class="merek" href="beranda.html"><img src="aset/logo.png" alt="Logo"> <span><small>SMP Negeri 6 Keritang</small><b>SiGuru</b></span></a>
-    <form method="post"  class="keluar"><input type="hidden" name="_t" value="a6cb8629d13578ba4f3e753ce89be281"><button title="Keluar">Keluar</button></form>
+    <form method="post"  class="keluar"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><button title="Keluar">Keluar</button></form>
   </header>
 <nav class="menu">
     <a href="beranda.html" class=""><span class="ik">⌂</span>Beranda</a>
@@ -34,9 +34,9 @@
 <div class="judul-baris"><h1>Penilaian</h1><span><a class="tombol" href="nilai_rekap.html">Rekap nilai</a></span></div><details class="kartu" >
   <summary><b>＋ Penilaian baru</b></summary>
   <form method="post" class="formulir" style="margin-top:.8rem">
-    <input type="hidden" name="_t" value="a6cb8629d13578ba4f3e753ce89be281">    <label>Judul<input name="judul" required placeholder="mis. Ulangan Bab 2 Sistem Pencernaan"></label>
+    <input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482">    <label>Judul<input name="judul" required placeholder="mis. Ulangan Bab 2 Sistem Pencernaan"></label>
     <div class="baris2">
-      <label>Kelas<select name="kelas" required><option value="IX A">IX A</option><option value="VII A">VII A</option><option value="VIII A">VIII A</option></select></label>
+      <label>Kelas<select name="kelas" required><option value="VIII A">VIII A</option><option value="IX A">IX A</option><option value="VII A">VII A</option><option value="VII B">VII B</option><option value="VII C">VII C</option><option value="IX B">IX B</option></select></label>
       <label>Mapel<input name="mapel" list="dl-mapel" required value="Informatika"></label>
     </div>
     <div class="baris3">
@@ -50,9 +50,12 @@
 <datalist id="dl-mapel"><option value="Informatika"><option value="Prakarya"></datalist>
 
 <form class="cari" method="get"><input type="hidden" name="p" value="penilaian">
-  <select name="kelas" onchange="this.form.submit()"><option value="">Semua kelas</option><option value="IX A">IX A</option><option value="VII A">VII A</option><option value="VIII A">VIII A</option></select></form>
+  <select name="kelas" onchange="this.form.submit()"><option value="">Semua kelas</option><option value="VIII A">VIII A</option><option value="IX A">IX A</option><option value="VII A">VII A</option><option value="VII B">VII B</option><option value="VII C">VII C</option><option value="IX B">IX B</option></select></form>
 <ul class="daftar kartu">
-        <li><a href="nilai__id-2.html"><b>Tugas Proyek Algoritma</b>
+        <li><a href="nilai__id-4.html"><b>Ulangan Harian Informatika Bab 1 (online)</b>
+      <small>Ulangan Harian · Kelas VIII A · Informatika · 9 Nov 2026</small>
+      <small class="kode">10 nilai terisi · rata-rata 25.8</small></a></li>
+      <li><a href="nilai__id-2.html"><b>Tugas Proyek Algoritma</b>
       <small>Tugas · Kelas VIII A · Informatika · 28 Okt 2026</small>
       <small class="kode">10 nilai terisi · rata-rata 84.9</small></a></li>
       <li><a href="nilai__id-3.html"><b>Ulangan Bab 1: Informatika &amp; Kehidupan</b>
@@ -63,6 +66,6 @@
       <small class="kode">10 nilai terisi · rata-rata 75.4</small></a></li>
   </ul>
 </main>
-<footer class="bawah tak-cetak">SiGuru v1.1 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.1"></script>
+<footer class="bawah tak-cetak">SiGuru v1.2 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.2"></script>
 </body>
 </html>

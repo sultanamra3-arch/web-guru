@@ -16,7 +16,9 @@
   }
   var asliFetch = window.fetch;
   window.fetch = function (url, o) {
-    if (String(url).indexOf('api_ai') >= 0) {
+    var mp = String(url).match(/api_ujian&aksi=pantau&id=(\d+)/);
+    if (mp) return asliFetch.call(this, 'pantau-' + mp[1] + '.json');
+    if (String(url).indexOf('api_ai') >= 0 || String(url).indexOf('api_ujian') >= 0) {
       return new Promise(function (ok) { setTimeout(function () {
         ok(new Response(JSON.stringify({ ok: false, galat: 'Ini pratinjau: AI tidak aktif. Coba di Codespaces atau setelah SiGuru dipasang di hosting.' }), { headers: { 'Content-Type': 'application/json' } }));
       }, 600); });

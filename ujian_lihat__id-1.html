@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script src="aset/pratinjau.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2A2C84">
+<meta name="robots" content="noindex, nofollow">
+<title>Ulangan Harian Informatika Bab 1 · SiGuru</title>
+<meta name="application-name" content="SiGuru">
+<meta name="apple-mobile-web-app-title" content="SiGuru">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.2">
+<link rel="icon" href="aset/favicon.png">
+<link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="aset/gaya.css?v=1.2">
+<link rel="stylesheet" href="aset/guru.css?v=1.2">
+</head>
+<body class="">
+<header class="atas">
+  <a class="merek" href="beranda.html"><img src="aset/logo.png" alt="Logo"> <span><small>SMP Negeri 6 Keritang</small><b>SiGuru</b></span></a>
+    <form method="post"  class="keluar"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><button title="Keluar">Keluar</button></form>
+  </header>
+<nav class="menu">
+    <a href="beranda.html" class=""><span class="ik">⌂</span>Beranda</a>
+    <a href="kelas.html" class="aktif"><span class="ik">🧑‍🎓</span>Kelas</a>
+    <a href="soal.html" class=""><span class="ik">📝</span>Soal</a>
+    <a href="perangkat.html" class=""><span class="ik">📘</span>Perangkat</a>
+    <a href="lainnya.html" class=""><span class="ik">☰</span>Lainnya</a>
+  </nav>
+<main>
+<div class="judul-baris"><h1>Ulangan Harian Informatika Bab 1</h1><span><a class="tombol" href="ujian.html">‹ Ujian</a></span></div><div class="kartu">
+  <p style="margin-top:0">Kelas <b>VIII A</b> · 10 soal · 30 menit
+        </p>
+  <p><span class="lencana st-tutup">Ditutup</span></p>
+  <div class="dua-tombol">
+        <form method="post"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><input type="hidden" name="aksi" value="buka"><button class="utama lebar">▶ Buka ujian</button></form>
+        <a class="tombol" href="ujian_hasil__id-1.html">📊 Hasil & nilai</a>
+  </div>
+  <p class="kecil"><a href="ujian_form__id-1.html">⚙ Pengaturan</a></p>
+</div>
+
+<div class="kartu layar-token" id="layar-token" data-id="1" data-url="http://127.0.0.1:8092/u/?k=PZY7Y4">
+  <div class="token-kiri">
+    <div class="kecil redup">Buka di HP</div>
+    <div class="url-siswa">127.0.0.1:8092/u/?k=PZY7Y4</div>
+    <div class="kecil redup" style="margin-top:.4rem">Kode ujian</div>
+    <div class="kode-ujian">PZY7Y4</div>
+    <div class="kecil redup" style="margin-top:.4rem">Token</div>
+    <div class="token-besar" id="token">····</div>
+    <div class="kecil redup" id="token-sisa"></div>
+  </div>
+  <div class="token-qr" id="qr"></div>
+  <button type="button" class="kecil" id="tombol-layar-penuh">⛶ Tampilkan di proyektor</button>
+</div>
+
+<div class="kartu">
+  <h3 style="margin-top:0">Pantau siswa <small class="redup" id="pantau-waktu"></small></h3>
+  <div class="statistik" id="pantau-ringkas"></div>
+  <ul class="daftar pantau" id="pantau"></ul>
+</div>
+<template id="tpl-aksi">
+  <form method="post" class="aksi-pantau">
+    <input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><input type="hidden" name="kode">
+    <button name="aksi" value="buka_ulang" class="kecil" title="Izinkan masuk dari HP lain / lanjut lagi">Buka ulang</button>
+    <button name="aksi" value="tambah_waktu" class="kecil">+10 menit</button>
+    <button name="aksi" value="akhiri" class="kecil" onclick="return confirm('Kumpulkan sekarang?')">Kumpulkan</button>
+    <button name="aksi" value="reset" class="kecil bahaya" onclick="return confirm('Hapus semua jawaban siswa ini dan ulang dari awal?')">Ulang</button>
+  </form>
+</template>
+</main>
+<footer class="bawah tak-cetak">SiGuru v1.2 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.2"></script>
+<script src="aset/lib/qrcode.js?v=1.2"></script>
+<script src="aset/ujian_guru.js?v=1.2"></script>
+</body>
+</html>

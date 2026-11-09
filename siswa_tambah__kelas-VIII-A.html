@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script src="aset/pratinjau.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2A2C84">
+<meta name="robots" content="noindex, nofollow">
+<title>Tambah siswa · SiGuru</title>
+<meta name="application-name" content="SiGuru">
+<meta name="apple-mobile-web-app-title" content="SiGuru">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.2">
+<link rel="icon" href="aset/favicon.png">
+<link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="aset/gaya.css?v=1.2">
+<link rel="stylesheet" href="aset/guru.css?v=1.2">
+</head>
+<body class="">
+<header class="atas">
+  <a class="merek" href="beranda.html"><img src="aset/logo.png" alt="Logo"> <span><small>SMP Negeri 6 Keritang</small><b>SiGuru</b></span></a>
+    <form method="post"  class="keluar"><input type="hidden" name="_t" value="8ea2cb5bc7dd32a7133094dd313d2482"><button title="Keluar">Keluar</button></form>
+  </header>
+<nav class="menu">
+    <a href="beranda.html" class=""><span class="ik">⌂</span>Beranda</a>
+    <a href="kelas.html" class="aktif"><span class="ik">🧑‍🎓</span>Kelas</a>
+    <a href="soal.html" class=""><span class="ik">📝</span>Soal</a>
+    <a href="perangkat.html" class=""><span class="ik">📘</span>Perangkat</a>
+    <a href="lainnya.html" class=""><span class="ik">☰</span>Lainnya</a>
+  </nav>
+<main>
+<div class="judul-baris"><h1>Tambah siswa</h1><span><a class="tombol" href="siswa__kelas-VIII-A.html">‹ Kembali</a></span></div><form id="form-siswa" class="kartu formulir" data-token="8ea2cb5bc7dd32a7133094dd313d2482" onsubmit="return false">
+  <label>Masukkan ke kelas
+    <select id="kelas-tujuan">
+      <option value="VII A" >VII A</option><option value="VII B" >VII B</option><option value="VII C" >VII C</option><option value="VIII A" selected>VIII A</option><option value="IX A" >IX A</option><option value="IX B" >IX B</option>      <option value="__baru" >＋ Kelas baru…</option>
+    </select></label>
+  <label id="kotak-kelas-baru" hidden>Nama kelas baru<input id="kelas-baru" placeholder="mis. VII A"></label>
+
+  <div class="tab tab-isi" role="tablist">
+    <button type="button" class="aktif" data-tab="foto">📷 Foto daftar</button>
+    <button type="button" data-tab="tempel">📋 Tempel / ketik</button>
+    <button type="button" data-tab="berkas">📄 Excel / CSV</button>
+  </div>
+
+  <section data-isi="foto">
+    <p class="kecil redup">Foto daftar hadir, buku absen, atau daftar nama dari wali kelas. AI membaca nama (dan NISN/L-P bila ada). Maks 4 foto.</p>
+    <div class="dua-tombol">
+      <label class="tombol">📷 Kamera<input type="file" class="ambil-foto-siswa" accept="image/*" capture="environment" hidden></label>
+      <label class="tombol">🖼 Galeri<input type="file" class="ambil-foto-siswa" accept="image/*" multiple hidden></label>
+    </div>
+    <div class="pratinjau-foto kiri" id="foto-siswa"></div>
+    <button type="button" class="utama lebar" id="tombol-baca-foto">✨ Baca nama dari foto</button>
+  </section>
+
+  <section data-isi="tempel" hidden>
+    <label>Satu siswa per baris
+      <textarea id="teks-siswa" rows="10" placeholder="Ahmad Pratama&#10;Siti Rahma, P&#10;Budi Santoso; 0123456789; L"></textarea></label>
+    <p class="kecil redup">Boleh menempel dari Excel, Word, atau WhatsApp. Nomor urut di depan, NISN (10 angka), dan L/P dikenali otomatis.</p>
+    <button type="button" class="utama lebar" id="tombol-tempel">Lanjut</button>
+  </section>
+
+  <section data-isi="berkas" hidden>
+    <p class="kecil redup">Berkas .xlsx atau .csv dengan kolom <b>Nama</b> (wajib) dan bila ada <b>NISN</b>, <b>JK</b>, <b>Rombel/Kelas</b>, <b>No absen</b>. Ekspor peserta didik Dapodik bisa langsung dipakai.</p>
+    <label class="tombol lebar" style="text-align:center">📄 Pilih berkas<input type="file" id="berkas-siswa" accept=".xlsx,.csv,.txt" hidden></label>
+    <label class="centang"><input type="checkbox" id="pakai-kolom-kelas" checked> Pakai kolom Rombel/Kelas dari berkas bila ada</label>
+  </section>
+  <div id="status-siswa" class="status-ai"></div>
+</form>
+
+<div id="pratinjau-siswa" class="kartu" hidden>
+  <h3 style="margin-top:0">Periksa sebelum disimpan</h3>
+  <p class="kecil redup">Ubah nama yang salah langsung di kotaknya. Hapus centang untuk melewati. Baris kuning = AI kurang yakin.</p>
+  <label class="centang"><input type="checkbox" id="rapikan-kelas" checked> Rapikan nama kelas (7A → VII A)</label>
+  <table class="tabel-pratinjau-siswa"><thead><tr><th></th><th>No</th><th>Nama</th><th>L/P</th><th>NISN</th><th>Kelas</th></tr></thead><tbody></tbody></table>
+  <button type="button" class="utama lebar" id="tombol-simpan-siswa">💾 Simpan</button>
+  <div id="status-simpan-siswa" class="status-ai"></div>
+</div>
+</main>
+<footer class="bawah tak-cetak">SiGuru v1.2 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.2"></script>
+<script src="aset/siswa.js?v=1.2"></script>
+</body>
+</html>
