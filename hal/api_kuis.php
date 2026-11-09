@@ -73,11 +73,11 @@ if (kuis_mandiri($k)) {
     foreach ($urut as $i => $x) $ke[$x['kode']] = $i + 1;
     $akhir = $k['status'] === 'selesai';
     $daftar = $akhir ? $peringkat : $peringkat;
-    if (!$akhir) usort($daftar, fn($a, $b) => [(int)($a['selesai_ms'] === null), $ke[$a['kode']] ?? 0, -(int)$a['pos'], $a['nama']] <=> [(int)($b['selesai_ms'] === null), $ke[$b['kode']] ?? 0, -(int)$b['pos'], $b['nama']]);
+    if (!$akhir) usort($daftar, fn($a, $b) => [(int)($a['selesai_ms'] === null), $ke[$a['kode']] ?? 0, (int)($a['soal_ms'] === null && (int)$a['pos'] === 0), -(int)$a['pos'], $a['nama']] <=> [(int)($b['selesai_ms'] === null), $ke[$b['kode']] ?? 0, (int)($b['soal_ms'] === null && (int)$b['pos'] === 0), -(int)$b['pos'], $b['nama']]);
     echo json_encode([
         'ok' => true, 'mode' => 'mandiri', 'status' => $k['status'], 'total' => count($soal), 'detik' => (int)$k['detik'],
         'mulai_dalam' => max(0, (int)$k['mulai_ms'] - kuis_ms()), 'lewat_ms' => $k['status'] === 'jalan' ? max(0, kuis_ms() - (int)$k['mulai_ms']) : 0,
-        'peserta' => array_map(fn($x) => ['kode' => $x['kode'], 'nama' => $x['nama'], 'pos' => min((int)$x['pos'], count($soal)), 'selesai_ke' => $ke[$x['kode']] ?? null,
+        'peserta' => array_map(fn($x) => ['kode' => $x['kode'], 'nama' => $x['nama'], 'pos' => min((int)$x['pos'], count($soal)), 'mulai' => $x['soal_ms'] !== null || (int)$x['pos'] > 0 || $x['selesai_ms'] !== null, 'selesai_ke' => $ke[$x['kode']] ?? null,
             'poin' => $akhir ? (int)$x['poin'] : null, 'benar' => $akhir ? (int)$x['benar'] : null, 'rank' => $akhir ? $x['rank'] : null], $daftar),
         'rekap' => $akhir ? kuis_rekap($k, $peringkat) : null,
     ], JSON_UNESCAPED_UNICODE);

@@ -148,8 +148,8 @@ function kuis_mandiri_langkah(array $k, array $p): array
     $ubah = [];
     if (!$p['urutan']) { $p['urutan'] = json_encode(kuis_urutan_baru($k)); $ubah['urutan'] = $p['urutan']; }
     $pos = (int)$p['pos'];
+    // jam soal baru berjalan setelah siswa menekan "Mulai" di HP-nya (soal_ms terisi saat itu)
     $ms = $p['soal_ms'] !== null ? (int)$p['soal_ms'] : null;
-    if ($pos < $total && $ms === null) { $ms = $now; $ubah['soal_ms'] = $ms; }
     $batas = (int)$k['detik'] * 1000 + 800;
     while ($pos < $total && $ms !== null && $now > $ms + $batas) { $pos++; $ms += $batas; $ubah['pos'] = $pos; $ubah['soal_ms'] = $ms; }
     if ($pos >= $total && $p['selesai_ms'] === null) { $ubah['selesai_ms'] = min($now, $ms ?? $now); }
