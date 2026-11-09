@@ -17,6 +17,17 @@ function kepala(string $judul, string $aktif = '', bool $polos = false): void
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+/* Saat dibuka sebagai aplikasi terpasang (ikon di layar HP), matikan zoom; di browser biasa zoom tetap bisa. */
+(function () {
+  var apl = (window.matchMedia && matchMedia('(display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui)').matches) || navigator.standalone;
+  if (!apl) return;
+  document.querySelector('meta[name=viewport]').setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
+  document.documentElement.classList.add('apl');
+  // iPhone mengabaikan user-scalable=no: tahan gerakan cubit
+  document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+})();
+</script>
 <meta name="theme-color" content="#2A2C84">
 <meta name="robots" content="noindex, nofollow">
 <title><?= h($judul) ?> · SiGuru</title>
