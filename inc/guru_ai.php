@@ -39,25 +39,43 @@ const ATURAN_UMUM = "Tulis dalam Bahasa Indonesia baku yang jelas dan praktis un
 
 /* ---------- Soal ---------- */
 
-function ai_buat_soal(array $in, array $foto = []): array
+/** Jumlah soal per bentuk dari isian guru: ['pg' => 10, 'bs' => 0, 'isian' => 5, 'esai' => 2]. */
+function jumlah_per_bentuk(array $in): array
 {
-    $jumlah = max(1, min(30, (int)($in['jumlah'] ?? 10)));
-    $tipe = $in['tipe'] ?? 'pg';
-    $tipe_teks = $tipe === 'campur' ? 'campuran (sebagian besar pilihan ganda, beberapa isian dan uraian)' : (TIPE_SOAL[$tipe] ?? 'pilihan ganda');
+    $j = [];
+    foreach (['pg', 'bs', 'isian', 'esai'] as $t) $j[$t] = max(0, min(50, (int)($in['jml_' . $t] ?? 0)));
+    if (!array_sum($j)) {   // bentuk lama: jumlah + tipe
+        $n = max(1, min(30, (int)($in['jumlah'] ?? 10)));
+        $tipe = $in['tipe'] ?? 'pg';
+        if ($tipe === 'campur') $j = ['pg' => (int)ceil($n * .6), 'bs' => 0, 'isian' => (int)floor($n * .2), 'esai' => 0] + $j;
+        else $j[isset($j[$tipe]) ? $tipe : 'pg'] = $n;
+        if ($tipe === 'campur') $j['esai'] = $n - $j['pg'] - $j['isian'];
+    }
+    return $j;
+}
+
+/** Satu permintaan ke AI untuk sejumlah soal dengan komposisi tertentu. */
+function ai_buat_soal_satu(array $in, array $foto, array $komposisi, array $hindari): array
+{
+    $nama = ['pg' => 'pilihan ganda', 'bs' => 'benar/salah', 'isian' => 'isian singkat', 'esai' => 'uraian'];
+    $bagian = [];
+    foreach ($komposisi as $t => $n) if ($n > 0) $bagian[] = "$n soal {$nama[$t]} (tipe \"$t\")";
+    $total = array_sum($komposisi);
     $opsi = (int)($in['jumlah_opsi'] ?? 4) === 5 ? 'A–E' : 'A–D';
-    $perintah = "Buat $jumlah soal untuk asesmen.\n"
+    $perintah = "Buat TEPAT $total soal untuk asesmen dengan komposisi: " . implode(', ', $bagian) . ". Jumlah tiap bentuk harus persis seperti itu; urutkan per bentuk.\n"
         . "Mata pelajaran: {$in['mapel']}\nKelas: {$in['kelas']} — " . fase_dari_kelas((string)$in['kelas']) . "\n"
-        . "Materi/topik: {$in['topik']}\nBentuk soal: $tipe_teks\nTingkat kesulitan: " . ($in['tingkat'] ?? 'campuran (LOTS, MOTS, HOTS seimbang)') . "\n"
+        . "Materi/topik: {$in['topik']}\nTingkat kesulitan: " . ($in['tingkat'] ?? 'campuran (LOTS, MOTS, HOTS seimbang)') . "\n"
         . (trim((string)($in['catatan'] ?? '')) !== '' ? "Catatan guru: {$in['catatan']}\n" : '')
         . (trim((string)($in['bahan'] ?? '')) !== '' ? "Bahan/teks materi dari guru (soal harus berdasarkan ini):\n" . mb_substr((string)$in['bahan'], 0, 8000) . "\n" : '')
         . ($foto ? "Guru juga melampirkan foto materi/buku; gunakan isinya sebagai bahan.\n" : '')
-        . "\nKetentuan: pilihan ganda memakai opsi $opsi dengan satu jawaban benar dan pengecoh yang masuk akal; benar/salah memakai opsi A=Benar, B=Salah; "
+        . ($hindari ? "Jangan mengulang soal yang mirip dengan ini:\n- " . implode("\n- ", array_map(fn($x) => mb_substr($x, 0, 120), array_slice($hindari, -30))) . "\n" : '')
+        . "\nKetentuan: pilihan ganda memakai opsi $opsi dengan satu jawaban benar dan pengecoh yang masuk akal; benar/salah memakai opsi A=Benar, B=Salah dan kunci A atau B; "
         . "isian dan uraian tanpa opsi, kunci berisi jawaban/pedoman penskoran singkat. Variasikan level kognitif (C1–C6). Kontekstual dan sesuai usia. "
         . ATURAN_UMUM . "\n" . konteks_sekolah() . "\n\n"
         . "Balas HANYA dengan JSON tanpa teks lain, format:\n"
         . '{"soal":[{"tipe":"pg|bs|isian|esai","tingkat":"mudah|sedang|sulit","level":"C1".."C6","pertanyaan":"...","opsi":{"A":"...","B":"..."},"kunci":"A","pembahasan":"..."}]}';
     $isi = $foto ? array_merge([['type' => 'text', 'text' => $perintah]], ai_bagian_foto($foto)) : $perintah;
-    $r = ai_minta([['role' => 'user', 'content' => $isi]], ['gambar' => (bool)$foto, 'maks_token' => 8000, 'waktu' => 150, 'suhu' => 0.5]);
+    $r = ai_minta([['role' => 'user', 'content' => $isi]], ['gambar' => (bool)$foto, 'maks_token' => 9000, 'waktu' => 150, 'suhu' => 0.5]);
     if (!$r['ok']) return $r;
     $j = ai_ambil_json((string)$r['pesan']['content']);
     $daftar = $j['soal'] ?? (is_array($j) && array_is_list($j) ? $j : null);
@@ -72,6 +90,7 @@ function ai_buat_soal(array $in, array $foto = []): array
             if (preg_match('/^[A-E]$/', $kk) && trim((string)$vv) !== '') $o[$kk] = trim((string)$vv);
         }
         if ($t === 'bs' && !$o) $o = ['A' => 'Benar', 'B' => 'Salah'];
+        if (in_array($t, ['isian', 'esai'], true)) $o = [];
         $bersih[] = [
             'tipe' => $t,
             'tingkat' => in_array($s['tingkat'] ?? '', array_keys(TINGKAT_SOAL), true) ? $s['tingkat'] : 'sedang',
@@ -83,6 +102,51 @@ function ai_buat_soal(array $in, array $foto = []): array
         ];
     }
     return ['ok' => true, 'soal' => $bersih, 'oleh' => $r['oleh']];
+}
+
+/**
+ * Buat soal sesuai jumlah per bentuk. Sampai 15 soal sekali minta; lebih dari itu dibagi beberapa permintaan
+ * per bentuk (≤ 15 per permintaan) supaya jumlahnya tepat. Kekurangan per bentuk diminta ulang sekali.
+ */
+function ai_buat_soal(array $in, array $foto = []): array
+{
+    $mau = jumlah_per_bentuk($in);
+    $total = array_sum($mau);
+    if ($total < 1) return ['ok' => false, 'galat' => 'Isi jumlah soal minimal 1.'];
+    if ($total > 60) return ['ok' => false, 'galat' => 'Maksimal 60 soal sekali buat (agar tidak kehabisan waktu). Buat dua kali bila perlu lebih.'];
+    $tugas = [];
+    if ($total <= 15) $tugas[] = $mau;
+    else foreach ($mau as $t => $n) for ($i = 0; $i < $n; $i += 15) $tugas[] = [$t => min(15, $n - $i)];
+    $semua = [];
+    $oleh = [];
+    $galat = null;
+    foreach ($tugas as $k) {
+        $r = ai_buat_soal_satu($in, $foto, $k, array_column($semua, 'pertanyaan'));
+        if (!$r['ok']) { $galat = $r; continue; }
+        $semua = array_merge($semua, $r['soal']);
+        $oleh[] = $r['oleh'];
+    }
+    // potong kelebihan & minta ulang kekurangan (sekali)
+    $per = [];
+    foreach ($semua as $s) $per[$s['tipe']][] = $s;
+    $kurang = [];
+    foreach ($mau as $t => $n) {
+        $per[$t] = array_slice($per[$t] ?? [], 0, $n);
+        if (count($per[$t]) < $n) $kurang[$t] = $n - count($per[$t]);
+    }
+    if ($kurang && array_sum($kurang) <= 20) {
+        $r = ai_buat_soal_satu($in, $foto, $kurang, array_column($semua, 'pertanyaan'));
+        if ($r['ok']) {
+            $oleh[] = $r['oleh'];
+            foreach ($r['soal'] as $s) if (isset($kurang[$s['tipe']]) && count($per[$s['tipe']]) < $mau[$s['tipe']]) $per[$s['tipe']][] = $s;
+        }
+    }
+    $hasil = array_merge($per['pg'] ?? [], $per['bs'] ?? [], $per['isian'] ?? [], $per['esai'] ?? []);
+    if (!$hasil) return $galat ?? ['ok' => false, 'galat' => 'AI tidak menghasilkan soal. Coba lagi.'];
+    $catatan = [];
+    $nama = ['pg' => 'PG', 'bs' => 'benar/salah', 'isian' => 'isian', 'esai' => 'uraian'];
+    foreach ($mau as $t => $n) if ($n && count($per[$t] ?? []) < $n) $catatan[] = $nama[$t] . ' ' . count($per[$t] ?? []) . ' dari ' . $n;
+    return ['ok' => true, 'soal' => $hasil, 'oleh' => implode(' + ', array_unique($oleh)), 'kurang' => $catatan];
 }
 
 /* ---------- Modul ajar & LKPD ---------- */

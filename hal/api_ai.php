@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') balas(['ok' => false, 'galat' => 'Met
 $aksi = (string)post('aksi');
 $foto = array_values(array_filter((array)($_POST['foto'] ?? []), 'is_string'));
 $in = [];
-foreach (['mapel', 'kelas', 'topik', 'jumlah', 'tipe', 'tingkat', 'jumlah_opsi', 'catatan', 'bahan', 'alokasi', 'model', 'cp', 'kondisi'] as $k) {
+foreach (['mapel', 'kelas', 'topik', 'jumlah', 'tipe', 'jml_pg', 'jml_bs', 'jml_isian', 'jml_esai', 'tingkat', 'jumlah_opsi', 'catatan', 'bahan', 'alokasi', 'model', 'cp', 'kondisi'] as $k) {
     $in[$k] = mb_substr(trim((string)post($k)), 0, $k === 'bahan' ? 12000 : 3000);
 }
 // Lepas kunci sesi agar halaman lain tidak menunggu selama AI bekerja

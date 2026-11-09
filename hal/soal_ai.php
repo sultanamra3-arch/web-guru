@@ -6,6 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode((string)post('data'), true) ?: [];
     $pilih = array_map('intval', (array)($_POST['pilih'] ?? []));
     $n = 0;
+    $ids = [];
     foreach ($pilih as $i) {
         $s = $data[$i] ?? null;
         if (!$s || trim((string)($s['pertanyaan'] ?? '')) === '') continue;
@@ -15,9 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             in_array($s['level'] ?? '', LEVEL_KOGNITIF, true) ? $s['level'] : null, (string)$s['pertanyaan'],
             !empty($s['opsi']) ? json_encode($s['opsi'], JSON_UNESCAPED_UNICODE) : null, (string)($s['kunci'] ?? ''), (string)($s['pembahasan'] ?? ''),
             post('berbagi') ? 1 : 0, sekarang()]);
+        $ids[] = (int)db()->lastInsertId();
         $n++;
     }
     pesan($n . ' soal disimpan ke bank soal.');
+    if (post('jadikan_paket') && $ids) { $_SESSION['paket_pilih'] = $ids; ke('?p=paket'); }
     ke('?p=soal&mapel=' . rawurlencode((string)post('mapel')));
 }
 
@@ -31,11 +34,15 @@ judul_baris('✨ Buat soal dengan AI', '<a class="tombol" href="?p=soal">‹ Ban
       <label>Kelas<select name="kelas"><?= pilihan(['7' => 'Kelas 7', '8' => 'Kelas 8', '9' => 'Kelas 9'], '8') ?></select></label>
     </div>
     <label>Materi / topik<input name="topik" required placeholder="mis. Sistem pencernaan manusia"></label>
-    <div class="baris3">
-      <label>Jumlah<input type="number" name="jumlah" min="1" max="30" value="10"></label>
-      <label>Bentuk<select name="tipe"><?= pilihan(['pg' => 'Pilihan ganda', 'campur' => 'Campuran', 'esai' => 'Uraian', 'isian' => 'Isian singkat', 'bs' => 'Benar/Salah'], 'pg') ?></select></label>
-      <label>Opsi PG<select name="jumlah_opsi"><?= pilihan(['4' => 'A–D', '5' => 'A–E'], '4') ?></select></label>
+    <div class="jumlah-bentuk">
+      <span class="kecil redup">Jumlah soal per bentuk</span>
+      <label>Pilihan ganda<input type="number" name="jml_pg" min="0" max="50" value="10" inputmode="numeric"></label>
+      <label>Benar/Salah<input type="number" name="jml_bs" min="0" max="50" value="0" inputmode="numeric"></label>
+      <label>Isian singkat<input type="number" name="jml_isian" min="0" max="50" value="0" inputmode="numeric"></label>
+      <label>Uraian/esai<input type="number" name="jml_esai" min="0" max="50" value="0" inputmode="numeric"></label>
+      <b class="total-soal">Total: <span id="total-soal">10</span> soal</b>
     </div>
+    <label>Opsi pilihan ganda<select name="jumlah_opsi"><?= pilihan(['4' => 'A–D (4 pilihan)', '5' => 'A–E (5 pilihan)'], '4') ?></select></label>
     <label>Tingkat<select name="tingkat"><?= pilihan(['campuran (LOTS, MOTS, HOTS seimbang)' => 'Campuran (disarankan)', 'mudah (LOTS)' => 'Mudah', 'sedang (MOTS)' => 'Sedang', 'sulit (HOTS, berbasis kasus/stimulus)' => 'Sulit / HOTS'], 'campuran (LOTS, MOTS, HOTS seimbang)') ?></select></label>
     <details><summary class="kecil">Tambahan (opsional): bahan materi, foto buku, catatan</summary>
       <label>Tempel teks materi <small>(soal dibuat dari teks ini)</small><textarea name="bahan" rows="4"></textarea></label>
@@ -56,7 +63,9 @@ judul_baris('✨ Buat soal dengan AI', '<a class="tombol" href="?p=soal">‹ Ban
   <input type="hidden" name="data"><input type="hidden" name="mapel"><input type="hidden" name="kelas_angka"><input type="hidden" name="topik">
   <div class="kartu lengket aksi-bank">
     <label class="centang"><input type="checkbox" id="pilih-semua-hasil" checked> Pilih semua</label>
-    <span><label class="centang kecil"><input type="checkbox" name="berbagi" value="1"> Bagikan</label> <button class="utama kecil">💾 Simpan ke bank soal</button></span>
+    <span><label class="centang kecil"><input type="checkbox" name="berbagi" value="1"> Bagikan</label>
+      <label class="centang kecil"><input type="checkbox" name="jadikan_paket" value="1" checked> Langsung jadikan paket soal</label>
+      <button class="utama kecil">💾 Simpan</button></span>
   </div>
   <ol class="daftar kartu bank-soal" id="daftar-hasil"></ol>
 </form>

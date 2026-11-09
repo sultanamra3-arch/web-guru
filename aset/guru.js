@@ -82,17 +82,27 @@
   /* ---------- Generator soal ---------- */
   var fs = $('#form-soal-ai');
   if (fs) {
+    var hitungTotal = function () {
+      var n = 0; ['jml_pg', 'jml_bs', 'jml_isian', 'jml_esai'].forEach(function (k) { n += Math.max(0, +fs.elements[k].value || 0); });
+      var t = $('#total-soal'); if (t) t.textContent = n;
+      return n;
+    };
+    if (fs.elements.jml_pg) { fs.addEventListener('input', hitungTotal); hitungTotal(); }
     var ambilFotoSoal = pasangFoto(fs), hasil = $('#hasil-soal'), daftar = $('#daftar-hasil'), st = $('#status-ai'), btn = $('#tombol-buat-soal');
     var TIPE = { pg: 'Pilihan ganda', bs: 'Benar/Salah', isian: 'Isian', esai: 'Uraian' };
     fs.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (fs.elements.jml_pg && !hitungTotal()) { st.textContent = 'Isi jumlah soal minimal 1.'; return; }
+      if (fs.elements.jml_pg && hitungTotal() > 60) { st.textContent = 'Maksimal 60 soal sekali buat.'; return; }
       var d = dataForm(fs); d.aksi = 'buat_soal'; d.foto = ambilFotoSoal();
       btn.disabled = true;
       var t = jamTunggu(st, '⏳ AI sedang menyusun soal…');
       kirimAI(fs.dataset.token, d).then(function (r) {
         clearInterval(t); btn.disabled = false;
         if (!r.ok) { tampilGalat(st, r); return; }
-        st.textContent = '✅ ' + r.soal.length + ' soal dibuat oleh ' + r.oleh + '. Periksa, hapus centang yang tidak dipakai, lalu simpan.';
+        var hit = {}; r.soal.forEach(function (s) { hit[s.tipe] = (hit[s.tipe] || 0) + 1; });
+        st.textContent = '✅ ' + r.soal.length + ' soal (' + Object.keys(TIPE).filter(function (k) { return hit[k]; }).map(function (k) { return TIPE[k] + ' ' + hit[k]; }).join(', ') + ') dibuat oleh ' + r.oleh + '. Periksa, hapus centang yang tidak dipakai, lalu simpan.'
+          + (r.kurang && r.kurang.length ? ' ⚠ Kurang: ' + r.kurang.join(', ') + ' — buat lagi untuk menambah.' : '');
         hasil.hidden = false; daftar.innerHTML = '';
         hasil.elements.data.value = JSON.stringify(r.soal);
         hasil.elements.mapel.value = d.mapel; hasil.elements.kelas_angka.value = d.kelas; hasil.elements.topik.value = d.topik;
@@ -272,4 +282,23 @@
     if (d.length === 1 || d.length === 2) d = ('0' + d).slice(-2) + '00';
     if (d.length === 4 && +d.slice(0, 2) < 24 && +d.slice(2) < 60) i.value = d.slice(0, 2) + ':' + d.slice(2);
   }, true);
+})();
+
+/* Soal manual: pastikan setiap PG yang diisi punya kunci */
+(function () {
+  var f = document.getElementById('form-manual');
+  if (!f) return;
+  f.addEventListener('submit', function (e) {
+    var kurang = [];
+    Array.prototype.forEach.call(f.querySelectorAll('.soal-manual'), function (k) {
+      var t = k.querySelector('textarea[name$="[pertanyaan]"]'), r = k.querySelectorAll('input[type=radio]');
+      if (t && t.value.trim() && r.length && !k.querySelector('input[type=radio]:checked')) { kurang.push(k); k.classList.add('perlu-kunci'); }
+      else k.classList.remove('perlu-kunci');
+    });
+    if (kurang.length) {
+      e.preventDefault();
+      kurang[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      alert(kurang.length + ' soal pilihan ganda belum ditandai kuncinya (bulatan di depan pilihan).');
+    }
+  });
 })();

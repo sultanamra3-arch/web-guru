@@ -296,3 +296,15 @@ html.apl input,html.apl select,html.apl textarea{font-size:max(16px,1em)}
 .menu-lainnya li>a .ikon-kotak .ikon{width:22px;height:22px}
 .menu-lainnya li>a small{grid-column:2}
 .tombol .ikon,button .ikon{margin-right:.15rem}
+/* jumlah soal per bentuk */
+.jumlah-bentuk{display:grid;grid-template-columns:1fr 1fr;gap:.5rem .7rem;padding:.7rem;border:1px solid var(--garis);border-radius:12px;margin:.6rem 0;background:#fafbfe}
+.jumlah-bentuk>span,.jumlah-bentuk .total-soal{grid-column:1/-1}
+.jumlah-bentuk input{text-align:center;font-weight:700;font-size:1.05rem}
+.total-soal{color:var(--navy)}
+.judul-bagian{margin:1.2rem 0 .4rem;color:var(--navy)}
+.soal-manual{margin-bottom:.6rem}
+.soal-manual.perlu-kunci{border-color:#e0a19b;background:#fff7f6}
+.opsi-manual{display:grid;gap:.35rem;margin-top:.4rem}
+.opsi-baris{display:grid!important;grid-template-columns:1.6rem 1.4rem 1fr;align-items:center;gap:.3rem;margin:0!important}
+.opsi-baris input[type=radio]{width:20px;height:20px;accent-color:#2E9E48}
+.lengket-bawah{position:sticky;bottom:64px;z-index:4;box-shadow:0 -6px 18px rgba(0,0,0,.06)}

@@ -4,8 +4,8 @@ Aplikasi web (bisa dipasang di HP) untuk guru:
 
 | Fitur | Keterangan |
 |---|---|
-| ✨ Generator soal AI | PG, benar/salah, isian, uraian; level C1–C6; bisa dari teks/foto materi |
-| 📝 Bank soal | simpan, cari, bagikan ke guru lain, jadikan **paket soal** (cetak/Word, dengan kunci) |
+| ✨ Generator soal AI | pilih jumlah tiap bentuk (PG, benar/salah, isian, uraian; maks 60); level C1–C6; bisa dari teks/foto materi; langsung jadi paket soal |
+| 📝 Bank soal | tulis soal manual (pilih jumlah tiap bentuk, isi di lembar), simpan, cari, bagikan ke guru lain, jadikan **paket soal** (cetak/Word, dengan kunci) |
 | ✨ Modul ajar | struktur Perencanaan Pembelajaran Mendalam (Kurikulum Merdeka), cetak/Word, revisi dengan AI |
 | ✨ LKPD | siap cetak, dengan pedoman guru |
 | ✨ Presentasi | tayang layar penuh di browser + unduh PowerPoint (.pptx) |
