@@ -120,3 +120,24 @@
       });
   });
 })();
+
+/* Jam pelajaran saya: tambah/kurangi baris; jam baru melanjutkan dari jam terakhir (+40 menit) */
+(function () {
+  'use strict';
+  function tambahMenit(w, m) { var p = String(w || '07:30').split(':'), t = (+p[0]) * 60 + (+p[1]) + m; return ('0' + Math.floor(t / 60) % 24).slice(-2) + ':' + ('0' + t % 60).slice(-2); }
+  Array.prototype.forEach.call(document.querySelectorAll('.daftar-jam'), function (fs) {
+    var jenis = fs.dataset.jenis, tombol = fs.querySelector('.dua-tombol');
+    fs.querySelector('.tambah-jam').addEventListener('click', function () {
+      var baris = fs.querySelectorAll('.baris-waktu'), akhir = baris[baris.length - 1];
+      var mulai = akhir ? akhir.querySelector('[name^=selesai]').value : '07:30';
+      var d = document.createElement('div'); d.className = 'baris-waktu';
+      d.innerHTML = '<b>' + (baris.length + 1) + '</b><input type="time" name="mulai_' + jenis + '[]" required><span>–</span><input type="time" name="selesai_' + jenis + '[]" required>';
+      d.children[1].value = mulai; d.children[3].value = tambahMenit(mulai, 40);
+      fs.insertBefore(d, tombol);
+    });
+    fs.querySelector('.kurang-jam').addEventListener('click', function () {
+      var baris = fs.querySelectorAll('.baris-waktu');
+      if (baris.length > 1) baris[baris.length - 1].remove();
+    });
+  });
+})();
