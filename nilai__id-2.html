@@ -9,19 +9,19 @@
 <title>Tugas Proyek Algoritma · SiGuru</title>
 <meta name="application-name" content="SiGuru">
 <meta name="apple-mobile-web-app-title" content="SiGuru">
-<link rel="x-manifest" href="manifest.webmanifest?v=1.6">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.8">
 <link rel="icon" href="aset/favicon.png">
 <link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="aset/gaya.css?v=1.6">
-<link rel="stylesheet" href="aset/guru.css?v=1.6">
+<link rel="stylesheet" href="aset/gaya.css?v=1.8">
+<link rel="stylesheet" href="aset/guru.css?v=1.8">
 </head>
 <body class="">
 <header class="atas">
   <a class="merek" href="beranda.html"><img src="aset/logo.png" alt="Logo"> <span><small>SMP Negeri 6 Keritang</small><b>SiGuru</b></span></a>
-    <form method="post"  class="keluar"><input type="hidden" name="_t" value="41968df5a427a2bec99a012d84830452"><button title="Keluar">Keluar</button></form>
+    <form method="post"  class="keluar"><input type="hidden" name="_t" value="d263014b607131ae7c4514c5337d2304"><button title="Keluar">Keluar</button></form>
   </header>
 <nav class="menu">
     <a href="beranda.html" class=""><span class="ik">⌂</span>Beranda</a>
@@ -34,16 +34,33 @@
 <div class="judul-baris"><h1>Tugas Proyek Algoritma</h1><span><a class="tombol" href="penilaian.html">‹ Penilaian</a></span></div><div class="kartu">
   <p>Tugas · <b>Kelas VIII A</b> · Informatika · 28 Okt 2026 · KKTP 75</p>
   <div class="statistik">
-    <span><b>10/10</b>terisi</span>
+    <span><b>10/9</b>terisi</span>
     <span><b>84.9</b>rata-rata</span>
     <span><b>97 / 65</b>tertinggi/terendah</span>
     <span><b>9</b>tuntas</span>
   </div>
   <p class="kecil"><a href="nilai__id-2__unduh-1.csv">⬇ Unduh Excel</a></p>
+  <details class="ubah-penilaian">
+    <summary>✎ Ubah nama / keterangan</summary>
+    <form method="post" class="formulir" style="margin-top:.6rem">
+      <input type="hidden" name="_t" value="d263014b607131ae7c4514c5337d2304"><input type="hidden" name="aksi" value="ubah">
+      <label>Nama penilaian<input name="judul" value="Tugas Proyek Algoritma" required maxlength="200"></label>
+      <div class="baris2">
+        <label>Jenis<select name="jenis"><option value="Tugas" selected>Tugas</option><option value="Ulangan Harian">Ulangan Harian</option><option value="Asesmen Formatif">Asesmen Formatif</option><option value="Sumatif Lingkup Materi">Sumatif Lingkup Materi</option><option value="Sumatif Tengah Semester">Sumatif Tengah Semester</option><option value="Sumatif Akhir Semester">Sumatif Akhir Semester</option><option value="Praktik">Praktik</option><option value="Proyek">Proyek</option><option value="Lainnya">Lainnya</option></select></label>
+        <label>Mapel<input name="mapel" value="Informatika"></label>
+      </div>
+      <div class="baris2">
+        <label>Tanggal<input type="date" name="tanggal" value="2026-10-28"></label>
+        <label>KKTP<input name="kktp" value="75" inputmode="decimal"></label>
+      </div>
+      <button class="lebar">Simpan perubahan</button>
+      <p class="kecil redup">Kelas tidak bisa diganti karena nilai terikat pada siswa kelas ini.</p>
+    </form>
+  </details>
 </div>
 <a class="tombol utama tombol-foto-nilai" href="koreksi__id-2.html">📷 Nilai otomatis dari foto lembar jawaban</a>
 <form method="post" class="tabel-nilai" data-kktp="75.00">
-  <input type="hidden" name="_t" value="41968df5a427a2bec99a012d84830452">  <ul class="daftar kartu">
+  <input type="hidden" name="_t" value="d263014b607131ae7c4514c5337d2304">  <ul class="daftar kartu">
       <li class="baris-nilai">
       <span class="no">1</span>
       <b class="nm">Arif Wijaya</b>
@@ -88,18 +105,12 @@
     </li>
       <li class="baris-nilai">
       <span class="no">8</span>
-      <b class="nm">Taufik Anggraini</b>
-      <input class="isi-nilai" name="nilai[9000000011]" value="65" inputmode="decimal" placeholder="0–100" autocomplete="off">
-      <input class="ket" name="catatan[9000000011]" value="remedial" placeholder="catatan">
-    </li>
-      <li class="baris-nilai">
-      <span class="no">9</span>
       <b class="nm">Taufik Lestari</b>
       <input class="isi-nilai" name="nilai[9000000017]" value="97" inputmode="decimal" placeholder="0–100" autocomplete="off">
       <input class="ket" name="catatan[9000000017]" value="" placeholder="catatan">
     </li>
       <li class="baris-nilai">
-      <span class="no">10</span>
+      <span class="no">9</span>
       <b class="nm">Wulan Saputra</b>
       <input class="isi-nilai" name="nilai[9000000014]" value="75" inputmode="decimal" placeholder="0–100" autocomplete="off">
       <input class="ket" name="catatan[9000000014]" value="" placeholder="catatan">
@@ -108,9 +119,9 @@
   <button class="utama lebar">Simpan nilai</button>
 </form>
 <form method="post" style="margin-top:1rem" onsubmit="return confirm('Hapus penilaian ini beserta semua nilainya?')">
-  <input type="hidden" name="_t" value="41968df5a427a2bec99a012d84830452"><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus penilaian</button>
+  <input type="hidden" name="_t" value="d263014b607131ae7c4514c5337d2304"><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus penilaian</button>
 </form>
 </main>
-<footer class="bawah tak-cetak">SiGuru v1.6 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.6"></script>
+<footer class="bawah tak-cetak">SiGuru v1.8 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.8"></script>
 </body>
 </html>
