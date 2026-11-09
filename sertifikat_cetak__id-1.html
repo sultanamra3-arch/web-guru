@@ -9,19 +9,23 @@
 <title>Cetak sertifikat · SiGuru</title>
 <meta name="application-name" content="SiGuru">
 <meta name="apple-mobile-web-app-title" content="SiGuru">
-<link rel="x-manifest" href="manifest.webmanifest?v=1.8">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.11">
 <link rel="icon" href="aset/favicon.png">
 <link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="aset/gaya.css?v=1.8">
-<link rel="stylesheet" href="aset/guru.css?v=1.8">
+<link rel="stylesheet" href="aset/gaya.css?v=1.11">
+<link rel="stylesheet" href="aset/guru.css?v=1.11">
 </head>
 <body class="polos">
 <main>
 <style>
 @page { size: A4 landscape; margin: 0; }
+@media screen and (max-width: 1140px) { .lembar { zoom: 0.85; } }
+@media screen and (max-width: 900px) { .lembar { zoom: 0.65; } }
+@media screen and (max-width: 700px) { .lembar { zoom: 0.5; } }
+@media screen and (max-width: 520px) { .lembar { zoom: 0.33; } }
 body.polos { background: #e9ecf3; padding: 0; }
 .alat-cetak { position: sticky; top: 0; z-index: 5; display: flex; gap: .5rem; justify-content: center; padding: .6rem; background: #fff; border-bottom: 1px solid #ddd; }
 .lembar { width: 297mm; height: 210mm; margin: 12px auto; background: #fff; position: relative; overflow: hidden; page-break-after: always; box-shadow: 0 4px 20px rgba(0,0,0,.12);
@@ -100,6 +104,6 @@ body.polos { background: #e9ecf3; padding: 0; }
   </div>
 </section>
 </main>
-<script src="aset/guru.js?v=1.8"></script>
+<script src="aset/guru.js?v=1.11"></script>
 </body>
 </html>

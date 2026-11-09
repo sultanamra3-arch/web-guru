@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script src="aset/pratinjau.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2A2C84">
+<meta name="robots" content="noindex, nofollow">
+<title>Ubah siswa · SiGuru</title>
+<meta name="application-name" content="SiGuru">
+<meta name="apple-mobile-web-app-title" content="SiGuru">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.11">
+<link rel="icon" href="aset/favicon.png">
+<link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="aset/gaya.css?v=1.11">
+<link rel="stylesheet" href="aset/guru.css?v=1.11">
+</head>
+<body class="">
+<header class="atas">
+  <a class="merek" href="beranda.html"><img src="aset/logo.png" alt="Logo"> <span><small>SMP Negeri 6 Keritang</small><b>SiGuru</b></span></a>
+    <form method="post"  class="keluar"><input type="hidden" name="_t" value="b38f244d7ca4e09f0cc190f1bad560a8"><button title="Keluar">Keluar</button></form>
+  </header>
+<nav class="menu">
+    <a href="beranda.html" class=""><span class="ik">⌂</span>Beranda</a>
+    <a href="kelas.html" class="aktif"><span class="ik">🧑‍🎓</span>Kelas</a>
+    <a href="soal.html" class=""><span class="ik">📝</span>Soal</a>
+    <a href="perangkat.html" class=""><span class="ik">📘</span>Perangkat</a>
+    <a href="lainnya.html" class=""><span class="ik">☰</span>Lainnya</a>
+  </nav>
+<main>
+<div class="judul-baris"><h1>Ubah siswa</h1><span><a class="tombol" href="siswa__kelas-7-3.html">‹ Kembali</a></span></div><form method="post" class="kartu formulir">
+  <input type="hidden" name="_t" value="b38f244d7ca4e09f0cc190f1bad560a8">  <label>Nama lengkap<input name="nama" value="Alika Salsabila" required></label>
+  <div class="baris2">
+    <label>NISN<input name="nisn" value="" inputmode="numeric" maxlength="20"></label>
+    <label>Jenis kelamin<select name="jk"><option value="" selected>—</option><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></label>
+  </div>
+  <div class="baris2">
+    <label>Kelas (2026/2027)<select name="kelas"><option value="7.3" selected>7.3</option><option value="VII A">VII A</option><option value="VII B">VII B</option><option value="VII C">VII C</option><option value="VIII A">VIII A</option><option value="IX A">IX A</option><option value="IX B">IX B</option></select></label>
+    <label>No. absen<input name="absen" value="" inputmode="numeric"></label>
+  </div>
+  <label>Status<select name="status"><option value="aktif" selected>Aktif</option><option value="keluar">Keluar / pindah</option><option value="lulus">Lulus</option></select></label>
+  <button class="utama lebar">Simpan</button>
+</form>
+<form method="post" onsubmit="return confirm('Hapus siswa ini? Bila sudah punya nilai/absensi, siswa hanya ditandai keluar.')">
+  <input type="hidden" name="_t" value="b38f244d7ca4e09f0cc190f1bad560a8"><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus siswa</button>
+</form>
+</main>
+<footer class="bawah tak-cetak">SiGuru v1.11 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.11"></script>
+</body>
+</html>
