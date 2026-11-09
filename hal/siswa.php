@@ -11,36 +11,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // nomor absen urut nama (abjad) atau simpan nomor yang diketik
         if (post('urut') === 'nama') {
             $i = 0;
-            foreach (semua("SELECT ks.kode FROM guru_kelas_siswa ks JOIN guru_siswa s ON s.kode = ks.kode WHERE ks.tahun = ? AND ks.kelas = ? AND s.status = 'aktif' ORDER BY s.nama", [$tahun, $kelas]) as $r)
+            foreach (semua("SELECT ks.kode FROM guru_kelas_siswa ks JOIN guru_siswa s ON s.kode = ks.kode WHERE ks.tahun = ? AND ks.kelas = ? AND s.status = 'aktif' AND s.guru_id = ? ORDER BY s.nama", [$tahun, $kelas, uid()]) as $r)
                 q('UPDATE guru_kelas_siswa SET absen = ? WHERE tahun = ? AND kode = ?', [++$i, $tahun, $r['kode']]);
         } else {
             foreach ((array)($_POST['absen'] ?? []) as $kode => $v) {
                 $v = trim((string)$v);
+                if (!siswa_milik_saya((string)$kode)) continue;
                 q('UPDATE guru_kelas_siswa SET absen = ? WHERE tahun = ? AND kode = ? AND kelas = ?', [$v === '' ? null : max(1, min(999, (int)$v)), $tahun, (string)$kode, $kelas]);
             }
         }
         pesan('Nomor absen disimpan.');
-    } elseif ($aksi === 'wali' && adalah_admin()) {
-        $w = (int)post('wali_id');
-        q('UPDATE guru_kelas SET wali_id = ? WHERE tahun = ? AND nama = ?', [$w ?: null, $tahun, $kelas]);
-        pesan('Wali kelas disimpan.');
-    } elseif ($aksi === 'ganti_nama' && adalah_admin()) {
+    } elseif ($aksi === 'ganti_nama') {
         $baru = rapikan_kelas(mb_substr(trim((string)post('nama')), 0, 50));
         if ($baru !== '' && $baru !== $kelas && !kelas_valid($baru)) {
             db()->beginTransaction();
-            q('UPDATE guru_kelas SET nama = ? WHERE tahun = ? AND nama = ?', [$baru, $tahun, $kelas]);
-            q('UPDATE guru_kelas_siswa SET kelas = ? WHERE tahun = ? AND kelas = ?', [$baru, $tahun, $kelas]);
-            foreach (['guru_jadwal', 'guru_absensi', 'guru_penilaian'] as $t) q("UPDATE $t SET kelas = ? WHERE kelas = ?", [$baru, $kelas]);
-            q('UPDATE guru_ujian SET kelas = ? WHERE kelas = ? AND tahun = ?', [$baru, $kelas, $tahun]);
+            q('UPDATE guru_kelas SET nama = ? WHERE tahun = ? AND nama = ? AND guru_id = ?', [$baru, $tahun, $kelas, uid()]);
+            q('UPDATE guru_kelas_siswa ks JOIN guru_siswa s ON s.kode = ks.kode SET ks.kelas = ? WHERE ks.tahun = ? AND ks.kelas = ? AND s.guru_id = ?', [$baru, $tahun, $kelas, uid()]);
+            foreach (['guru_jadwal', 'guru_absensi', 'guru_penilaian'] as $t) q("UPDATE $t SET kelas = ? WHERE kelas = ? AND guru_id = ?", [$baru, $kelas, uid()]);
+            q('UPDATE guru_ujian SET kelas = ? WHERE kelas = ? AND tahun = ? AND guru_id = ?', [$baru, $kelas, $tahun, uid()]);
             db()->commit();
             pesan('Nama kelas diganti menjadi ' . h($baru) . '.');
             ke('?p=siswa&kelas=' . rawurlencode($baru));
         }
         pesan('Nama kelas tidak valid atau sudah dipakai.', 'galat');
-    } elseif ($aksi === 'hapus_kelas' && adalah_admin()) {
+    } elseif ($aksi === 'hapus_kelas') {
         if (!siswa_kelas($kelas)) {
-            q('DELETE FROM guru_kelas WHERE tahun = ? AND nama = ?', [$tahun, $kelas]);
-            q('DELETE FROM guru_kelas_siswa WHERE tahun = ? AND kelas = ?', [$tahun, $kelas]);
+            q('DELETE FROM guru_kelas WHERE tahun = ? AND nama = ? AND guru_id = ?', [$tahun, $kelas, uid()]);
+            q('DELETE ks FROM guru_kelas_siswa ks JOIN guru_siswa s ON s.kode = ks.kode WHERE ks.tahun = ? AND ks.kelas = ? AND s.guru_id = ?', [$tahun, $kelas, uid()]);
             pesan('Kelas dihapus.');
             ke('?p=kelas');
         }
@@ -51,9 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $siswa = siswa_kelas($kelas);
 $nonaktif = semua("SELECT s.kode, s.nama, s.status FROM guru_kelas_siswa ks JOIN guru_siswa s ON s.kode = ks.kode
-    WHERE ks.tahun = ? AND ks.kelas = ? AND s.status <> 'aktif' ORDER BY s.nama", [$tahun, $kelas]);
-$info = satu('SELECT * FROM guru_kelas WHERE tahun = ? AND nama = ?', [$tahun, $kelas]);
-$guru = semua('SELECT id, nama FROM guru_akun WHERE aktif = 1 ORDER BY nama');
+    WHERE ks.tahun = ? AND ks.kelas = ? AND s.status <> 'aktif' AND s.guru_id = ? ORDER BY s.nama", [$tahun, $kelas, uid()]);
 $l = count(array_filter($siswa, fn($s) => $s['jk'] === 'L'));
 $pr = count(array_filter($siswa, fn($s) => $s['jk'] === 'P'));
 
@@ -89,25 +84,18 @@ judul_baris('Kelas ' . h($kelas), '<a class="tombol" href="?p=kelas">‹ Kelas</
   <ul class="daftar"><?php foreach ($nonaktif as $s): ?><li><a href="?p=siswa_ubah&amp;kode=<?= h($s['kode']) ?>"><?= h($s['nama']) ?> <small><?= h($s['status']) ?></small></a></li><?php endforeach; ?></ul>
 </details>
 <?php endif; ?>
-<?php if (adalah_admin()): ?>
-<details class="kartu"><summary><b>Pengaturan kelas (admin)</b></summary>
+<details class="kartu"><summary><b>Ganti nama / hapus kelas</b></summary>
   <form method="post" class="formulir" style="margin-top:.6rem">
-    <?= input_token() ?><input type="hidden" name="aksi" value="wali">
-    <label>Wali kelas<select name="wali_id"><option value="">—</option><?= pilihan($guru, $info['wali_id'] ?? '', 'id', 'nama') ?></select></label>
-    <button>Simpan wali kelas</button>
-  </form>
-  <form method="post" class="formulir" style="margin-top:.8rem">
     <?= input_token() ?><input type="hidden" name="aksi" value="ganti_nama">
     <label>Ganti nama kelas<input name="nama" value="<?= h($kelas) ?>" required></label>
     <button>Ganti nama</button>
-    <p class="kecil redup">Jadwal, absensi, penilaian, dan ujian ikut diganti.</p>
+    <p class="kecil redup">Jadwal, absensi, penilaian, dan ujianmu untuk kelas ini ikut diganti.</p>
   </form>
   <?php if (!$siswa): ?>
   <form method="post" style="margin-top:.8rem" onsubmit="return confirm('Hapus kelas kosong ini?')">
     <?= input_token() ?><input type="hidden" name="aksi" value="hapus_kelas"><button class="kecil bahaya">Hapus kelas</button>
   </form>
-  <?php endif; ?>
+  <?php else: ?><p class="kecil redup" style="margin-top:.8rem">Kelas bisa dihapus bila sudah tidak berisi siswa aktif.</p><?php endif; ?>
 </details>
-<?php endif; ?>
 <?php
 kaki();

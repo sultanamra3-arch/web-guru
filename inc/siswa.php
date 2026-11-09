@@ -1,6 +1,7 @@
 <?php
 /*
- * Data siswa milik SiGuru (terpisah dari perpustakaan).
+ * Data siswa milik SiGuru (terpisah dari perpustakaan), diatur oleh MASING-MASING guru:
+ * tiap guru punya kelas & daftar siswanya sendiri (guru_id), guru lain tidak melihatnya.
  * guru_siswa = identitas; guru_kelas = daftar kelas per tahun ajaran; guru_kelas_siswa = siswa di kelas pada tahun itu.
  * Fungsi lama (siswa_kelas dst.) tetap mengembalikan kolom member_id/member_name/gender agar modul lain tidak berubah.
  */
@@ -19,10 +20,12 @@ function setelan_simpan(string $k, string $v): void
     q('INSERT INTO guru_setelan (k, v) VALUES (?, ?) ON DUPLICATE KEY UPDATE v = VALUES(v)', [$k, $v]);
 }
 
-/** Tahun ajaran aktif, mis. 2026/2027. */
-function tahun_aktif(): string
+/** Tahun ajaran aktif guru, mis. 2026/2027 (tiap guru bisa pindah tahun sendiri saat naik kelas). */
+function tahun_aktif(?int $guru = null): string
 {
-    return setelan('tahun_ajaran', (string)k('tahun_ajaran', date('n') >= 7 ? date('Y') . '/' . (date('Y') + 1) : (date('Y') - 1) . '/' . date('Y')));
+    $guru ??= uid();
+    $umum = setelan('tahun_ajaran', (string)k('tahun_ajaran', date('n') >= 7 ? date('Y') . '/' . (date('Y') + 1) : (date('Y') - 1) . '/' . date('Y')));
+    return $guru ? (string)setelan('tahun_ajaran:' . $guru, $umum) : (string)$umum;
 }
 
 function tahun_berikut(string $t): string
@@ -30,10 +33,11 @@ function tahun_berikut(string $t): string
     return preg_match('/^(\d{4})\/(\d{4})$/', $t, $m) ? ($m[1] + 1) . '/' . ($m[2] + 1) : $t;
 }
 
-function daftar_kelas(?string $tahun = null): array
+function daftar_kelas(?string $tahun = null, ?int $guru = null): array
 {
-    $tahun ??= tahun_aktif();
-    $k = q('SELECT nama FROM guru_kelas WHERE tahun = ?', [$tahun])->fetchAll(PDO::FETCH_COLUMN);
+    $guru ??= uid();
+    $tahun ??= tahun_aktif($guru);
+    $k = q('SELECT nama FROM guru_kelas WHERE tahun = ? AND guru_id = ?', [$tahun, $guru])->fetchAll(PDO::FETCH_COLUMN);
     usort($k, 'banding_kelas');
     return $k;
 }
@@ -64,13 +68,20 @@ function rapikan_kelas(string $k): string
     return $k;
 }
 
-function siswa_kelas(string $kelas, ?string $tahun = null): array
+function siswa_kelas(string $kelas, ?string $tahun = null, ?int $guru = null): array
 {
-    $tahun ??= tahun_aktif();
+    $guru ??= uid();
+    $tahun ??= tahun_aktif($guru);
     return semua("SELECT s.kode AS member_id, s.nama AS member_name, (s.jk = 'L') AS gender, s.nisn, s.jk, ks.absen
         FROM guru_kelas_siswa ks JOIN guru_siswa s ON s.kode = ks.kode
-        WHERE ks.tahun = ? AND ks.kelas = ? AND s.status = 'aktif'
-        ORDER BY ks.absen IS NULL, ks.absen, s.nama", [$tahun, $kelas]);
+        WHERE ks.tahun = ? AND ks.kelas = ? AND s.status = 'aktif' AND s.guru_id = ?
+        ORDER BY ks.absen IS NULL, ks.absen, s.nama", [$tahun, $kelas, $guru]);
+}
+
+/** Siswa milik guru yang sedang masuk? */
+function siswa_milik_saya(string $kode): ?array
+{
+    return satu('SELECT * FROM guru_siswa WHERE kode = ? AND guru_id = ?', [$kode, uid()]) ?: null;
 }
 
 function kelas_valid(string $kelas): bool
@@ -78,13 +89,12 @@ function kelas_valid(string $kelas): bool
     return $kelas !== '' && in_array($kelas, daftar_kelas(), true);
 }
 
-/** Kelas yang diajar guru menurut jadwalnya (+ kelas walinya), lalu semua kelas. */
+/** Kelas guru ini: yang ada di jadwalnya dulu, lalu kelas lainnya. */
 function kelas_saya(): array
 {
     $j = q('SELECT DISTINCT kelas FROM guru_jadwal WHERE guru_id = ? ORDER BY kelas', [uid()])->fetchAll(PDO::FETCH_COLUMN);
-    $w = q('SELECT nama FROM guru_kelas WHERE tahun = ? AND wali_id = ?', [tahun_aktif(), uid()])->fetchAll(PDO::FETCH_COLUMN);
     $semua = daftar_kelas();
-    return array_values(array_unique(array_merge($w, array_intersect($j, $semua), $semua)));
+    return array_values(array_unique(array_merge(array_intersect($j, $semua), $semua)));
 }
 
 function mapel_saya(): array
@@ -109,7 +119,7 @@ function kode_siswa_baru(): string
 
 function pastikan_kelas(string $kelas, ?string $tahun = null): void
 {
-    q('INSERT IGNORE INTO guru_kelas (tahun, nama) VALUES (?, ?)', [$tahun ?? tahun_aktif(), $kelas]);
+    q('INSERT IGNORE INTO guru_kelas (tahun, guru_id, nama) VALUES (?, ?, ?)', [$tahun ?? tahun_aktif(), uid(), $kelas]);
 }
 
 function rapikan_nama(string $n): string
@@ -138,10 +148,10 @@ function simpan_banyak_siswa(array $baris): array
         $jk = strtoupper(substr(trim((string)($r['jk'] ?? '')), 0, 1));
         $jk = in_array($jk, ['L', 'P'], true) ? $jk : null;
         pastikan_kelas($kelas, $tahun);
-        $kode = $nisn ? nilai('SELECT kode FROM guru_siswa WHERE nisn = ?', [$nisn]) : false;
+        $kode = $nisn ? nilai('SELECT kode FROM guru_siswa WHERE nisn = ? AND guru_id = ?', [$nisn, uid()]) : false;
         if (!$kode) {
             $kode = nilai('SELECT s.kode FROM guru_siswa s JOIN guru_kelas_siswa ks ON ks.kode = s.kode AND ks.tahun = ?
-                WHERE ks.kelas = ? AND LOWER(s.nama) = LOWER(?)', [$tahun, $kelas, $nama]);
+                WHERE ks.kelas = ? AND LOWER(s.nama) = LOWER(?) AND s.guru_id = ?', [$tahun, $kelas, $nama, uid()]);
             if ($kode) { $hasil['dilewati']++; continue; }
         }
         if ($kode) {
@@ -149,7 +159,7 @@ function simpan_banyak_siswa(array $baris): array
             $hasil['diperbarui']++;
         } else {
             $kode = kode_siswa_baru();
-            q('INSERT INTO guru_siswa (kode, nisn, nama, jk, status, dibuat, diubah) VALUES (?,?,?,?,?,?,?)', [$kode, $nisn, $nama, $jk, 'aktif', sekarang(), sekarang()]);
+            q('INSERT INTO guru_siswa (kode, guru_id, nisn, nama, jk, status, dibuat, diubah) VALUES (?,?,?,?,?,?,?,?)', [$kode, uid(), $nisn, $nama, $jk, 'aktif', sekarang(), sekarang()]);
             $hasil['baru']++;
         }
         $absen = isset($r['absen']) && ctype_digit((string)$r['absen']) ? (int)$r['absen'] : null;

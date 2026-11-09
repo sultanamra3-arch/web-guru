@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-wajib_admin();
 $lama = tahun_aktif();
 $baru = (string)(get('ke') ?: tahun_berikut($lama));
 $kelas = daftar_kelas($lama);
@@ -39,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     // kelas baru tingkat terendah (siswa baru) dibuat kosong bila diminta
     foreach (array_filter(array_map('trim', explode(',', (string)post('kelas_kosong')))) as $kk) pastikan_kelas(rapikan_kelas(mb_substr($kk, 0, 50)), $baru);
-    setelan_simpan('tahun_ajaran', $baru);
+    setelan_simpan('tahun_ajaran:' . uid(), $baru);
     db()->commit();
     pesan("Tahun ajaran $baru aktif. {$n['naik']} siswa naik kelas, {$n['lulus']} lulus. Data tahun $lama tetap tersimpan.");
     ke('?p=kelas');

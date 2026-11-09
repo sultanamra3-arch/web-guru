@@ -32,7 +32,7 @@ if ($u && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $siswa = (string)post('siswa');
     $_SESSION['coba_token'] = $_SESSION['coba_token'] ?? ['n' => 0, 't' => 0];
     $ct = &$_SESSION['coba_token'];
-    $kelas_siswa = array_column(siswa_kelas((string)$u['kelas'], (string)($u['tahun'] ?: tahun_aktif())), 'member_name', 'member_id');
+    $kelas_siswa = array_column(siswa_kelas((string)$u['kelas'], (string)($u['tahun'] ?: tahun_aktif((int)$u['guru_id'])), (int)$u['guru_id']), 'member_name', 'member_id');
     if (($m = ujian_bisa_masuk($u)) !== '') $galat = $m;
     elseif (!isset($kelas_siswa[$siswa])) $galat = 'Pilih namamu dari daftar.';
     elseif ($ct['n'] >= 5 && time() - $ct['t'] < 60) $galat = 'Terlalu sering salah token. Tunggu 1 menit.';
@@ -80,7 +80,7 @@ kepala($u ? $u['judul'] : 'Masuk ujian', '', true);
     <label>Kode ujian<input name="k" class="isian-kode" maxlength="10" autocomplete="off" autocapitalize="characters" required placeholder="mis. K7M2QX"></label>
     <button class="utama lebar">Lanjut</button>
   </form>
-  <?php else: $alasan = ujian_bisa_masuk($u); $siswa = siswa_kelas((string)$u['kelas'], (string)($u['tahun'] ?: tahun_aktif())); ?>
+  <?php else: $alasan = ujian_bisa_masuk($u); $siswa = siswa_kelas((string)$u['kelas'], (string)($u['tahun'] ?: tahun_aktif((int)$u['guru_id'])), (int)$u['guru_id']); ?>
   <div class="kartu">
     <h2 style="margin:0 0 .3rem"><?= h($u['judul']) ?></h2>
     <p class="redup" style="margin:0">Kelas <?= h($u['kelas']) ?><?= $u['mapel'] ? ' · ' . h($u['mapel']) : '' ?> · <?= count(ujian_soal($u)) ?> soal · <?= (int)$u['durasi'] ?> menit</p>

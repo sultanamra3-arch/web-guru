@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-/* Jam pelajaran sekolah (diatur admin, dipakai semua guru). Baris: "1 07:30-08:10". */
+/* Jam pelajaran diisi sendiri oleh tiap guru (bawaan: contoh di bawah). Disimpan sebagai baris "1 07:30-08:10". */
 const JAM_BAWAAN_UMUM = "1 07:30-08:10\n2 08:10-08:50\n3 08:50-09:30\n4 09:45-10:25\n5 10:25-11:05\n6 11:05-11:45\n7 12:15-12:55\n8 12:55-13:35";
 const JAM_BAWAAN_JUMAT = "1 07:30-08:05\n2 08:05-08:40\n3 08:40-09:15\n4 09:30-10:05\n5 10:05-10:40\n6 10:40-11:15";
 
@@ -18,14 +18,28 @@ function urai_jam(string $teks): array
 }
 function jam_hari(int $hari): array
 {
-    $t = $hari === 5 ? setelan('jam_jumat', JAM_BAWAAN_JUMAT) : setelan('jam_umum', JAM_BAWAAN_UMUM);
+    $t = $hari === 5 ? setelan('jam_jumat:' . uid(), JAM_BAWAAN_JUMAT) : setelan('jam_umum:' . uid(), JAM_BAWAAN_UMUM);
     return urai_jam((string)$t) ?: urai_jam($hari === 5 ? JAM_BAWAAN_JUMAT : JAM_BAWAAN_UMUM);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (post('aksi') === 'jam' && adalah_admin()) {
-        foreach (['jam_umum', 'jam_jumat'] as $k) if (urai_jam((string)post($k))) setelan_simpan($k, trim((string)post($k)));
-        pesan('Jam pelajaran sekolah disimpan.');
+    if (post('aksi') === 'jam') {
+        foreach (['umum', 'jumat'] as $k) {
+            $baris = [];
+            $mulai = (array)($_POST['mulai_' . $k] ?? []);
+            $selesai = (array)($_POST['selesai_' . $k] ?? []);
+            foreach (array_values($mulai) as $i => $m) {
+                $s = (string)(array_values($selesai)[$i] ?? '');
+                if (preg_match('/^\d{2}:\d{2}$/', (string)$m) && preg_match('/^\d{2}:\d{2}$/', $s)) $baris[] = (count($baris) + 1) . " $m-$s";
+            }
+            if ($baris) setelan_simpan('jam_' . $k . ':' . uid(), implode("\n", $baris));
+        }
+        // perbarui jam mulai–selesai jadwal yang sudah ada
+        foreach (semua('SELECT id, hari, jam_ke FROM guru_jadwal WHERE guru_id = ?', [uid()]) as $j) {
+            $jm = jam_hari((int)$j['hari'])[(int)$j['jam_ke']] ?? [null, null];
+            q('UPDATE guru_jadwal SET mulai = ?, selesai = ? WHERE id = ?', [$jm[0], $jm[1], $j['id']]);
+        }
+        pesan('Jam pelajaran disimpan.');
         ke('?p=jadwal');
     }
     // simpan seluruh jadwal mingguan guru ini sekaligus
@@ -66,7 +80,7 @@ judul_baris('Jadwal pelajaran', '<button type="button" class="tombol" onclick="w
 ?>
 <form method="post" class="kartu formulir tak-cetak" id="form-jadwal" data-token="<?= h(token()) ?>">
   <?= input_token() ?>
-  <p style="margin-top:0" class="kecil redup">Pilih <b>kelas</b> di jam yang kamu mengajar, kosongkan yang tidak. Jam mulai–selesai terisi otomatis. Simpan sekali di bawah.</p>
+  <p style="margin-top:0" class="kecil redup">Pilih <b>kelas</b> di jam yang kamu mengajar, kosongkan yang tidak. Jam mulai–selesai diambil dari <a href="#jam-saya">jam pelajaranmu</a>. Simpan sekali di bawah.</p>
   <label>Mapel yang diajar<input name="mapel_utama" value="<?= h($mapel_utama) ?>" placeholder="mis. Informatika" list="dl-mapel"></label>
   <?php if (!daftar_kelas()): ?><p class="pesan">Belum ada kelas di SiGuru. Kamu tetap bisa mengetik nama kelas (pilih "✎ ketik…"), atau tambahkan dulu di menu <a href="?p=kelas">Kelas</a>.</p><?php endif; ?>
   <details class="foto-jadwal">
@@ -122,20 +136,23 @@ judul_baris('Jadwal pelajaran', '<button type="button" class="tombol" onclick="w
   <?php endif; ?>
 </div>
 
-<?php if (adalah_admin()): ?>
-<details class="kartu tak-cetak">
-  <summary><b>⏰ Jam pelajaran sekolah (admin)</b></summary>
-  <form method="post" class="formulir" style="margin-top:.6rem">
+<?php $sudah_atur = setelan('jam_umum:' . uid()) !== null; ?>
+<details class="kartu tak-cetak" id="jam-saya" <?= $sudah_atur ? '' : 'open' ?>>
+  <summary><b>⏰ Jam pelajaran saya</b> <?= $sudah_atur ? '' : '<small class="redup">(masih contoh — sesuaikan dengan sekolahmu)</small>' ?></summary>
+  <form method="post" class="formulir" style="margin-top:.6rem" id="form-jam">
     <?= input_token() ?><input type="hidden" name="aksi" value="jam">
-    <p class="kecil redup">Satu baris per jam: <code>nomor mulai-selesai</code>. Istirahat cukup tidak ditulis. Berlaku untuk semua guru.</p>
-    <div class="baris2">
-      <label>Senin–Kamis & Sabtu<textarea name="jam_umum" rows="10"><?= h((string)setelan('jam_umum', JAM_BAWAAN_UMUM)) ?></textarea></label>
-      <label>Jumat<textarea name="jam_jumat" rows="10"><?= h((string)setelan('jam_jumat', JAM_BAWAAN_JUMAT)) ?></textarea></label>
-    </div>
-    <button class="lebar">Simpan jam pelajaran</button>
+    <p class="kecil redup">Isi jam mulai–selesai tiap jam pelajaran. Jam istirahat tidak perlu ditulis.</p>
+    <?php foreach (['umum' => 'Senin–Kamis & Sabtu', 'jumat' => 'Jumat'] as $k => $judul): ?>
+    <fieldset class="daftar-jam" data-jenis="<?= $k ?>"><legend><?= $judul ?></legend>
+      <?php foreach (jam_hari($k === 'jumat' ? 5 : 1) as $ke => [$m, $s]): ?>
+      <div class="baris-waktu"><b><?= $ke ?></b><input type="time" name="mulai_<?= $k ?>[]" value="<?= h($m) ?>" required><span>–</span><input type="time" name="selesai_<?= $k ?>[]" value="<?= h($s) ?>" required></div>
+      <?php endforeach; ?>
+      <div class="dua-tombol"><button type="button" class="kecil tambah-jam">＋ Jam</button><button type="button" class="kecil kurang-jam">－ Jam terakhir</button></div>
+    </fieldset>
+    <?php endforeach; ?>
+    <button class="utama lebar">Simpan jam pelajaran</button>
   </form>
 </details>
-<?php endif; ?>
 <datalist id="dl-mapel"><?php foreach (mapel_saya() as $m): ?><option value="<?= h($m) ?>"><?php endforeach; ?></datalist>
 <?php
 $GLOBALS['skrip_tambahan'][] = 'aset/jadwal.js';

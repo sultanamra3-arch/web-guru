@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 3;
+const SKEMA_VERSI = 4;
 
 function pastikan_skema(): void
 {
@@ -86,19 +86,21 @@ function pastikan_skema(): void
         ) DEFAULT CHARSET=utf8mb4",
         "CREATE TABLE IF NOT EXISTS guru_siswa (
             kode VARCHAR(20) NOT NULL PRIMARY KEY,
+            guru_id INT NOT NULL DEFAULT 0,
             nisn VARCHAR(20) NULL,
             nama VARCHAR(120) NOT NULL,
             jk CHAR(1) NULL,
             status VARCHAR(10) NOT NULL DEFAULT 'aktif',
             dibuat DATETIME NULL,
             diubah DATETIME NULL,
-            KEY (nisn), KEY (nama)
+            KEY (guru_id), KEY (nisn), KEY (nama)
         ) DEFAULT CHARSET=utf8mb4",
         "CREATE TABLE IF NOT EXISTS guru_kelas (
             tahun VARCHAR(9) NOT NULL,
+            guru_id INT NOT NULL DEFAULT 0,
             nama VARCHAR(50) NOT NULL,
             wali_id INT NULL,
-            PRIMARY KEY (tahun, nama)
+            PRIMARY KEY (tahun, guru_id, nama)
         ) DEFAULT CHARSET=utf8mb4",
         "CREATE TABLE IF NOT EXISTS guru_kelas_siswa (
             tahun VARCHAR(9) NOT NULL,
@@ -203,5 +205,27 @@ function pastikan_skema(): void
         ) DEFAULT CHARSET=utf8mb4",
     ];
     foreach ($sql as $q) db()->exec($q);
+    skema_migrasi_4();
     @file_put_contents($f, date('c'));
+}
+
+function kolom_ada(string $tabel, string $kolom): bool
+{
+    return (bool)nilai('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?', [$tabel, $kolom]);
+}
+
+/** v4: data siswa & kelas milik masing-masing guru (data lama diberikan ke admin pertama). */
+function skema_migrasi_4(): void
+{
+    $pemilik = (int)(nilai("SELECT MIN(id) FROM guru_akun WHERE peran = 'admin'") ?: 0);
+    if (!kolom_ada('guru_siswa', 'guru_id')) {
+        db()->exec('ALTER TABLE guru_siswa ADD COLUMN guru_id INT NOT NULL DEFAULT 0 AFTER kode, ADD KEY (guru_id)');
+    }
+    if (!kolom_ada('guru_kelas', 'guru_id')) {
+        db()->exec('ALTER TABLE guru_kelas ADD COLUMN guru_id INT NOT NULL DEFAULT 0 AFTER tahun, DROP PRIMARY KEY, ADD PRIMARY KEY (tahun, guru_id, nama)');
+    }
+    if ($pemilik) {
+        q('UPDATE guru_siswa SET guru_id = ? WHERE guru_id = 0', [$pemilik]);
+        q('UPDATE guru_kelas SET guru_id = ? WHERE guru_id = 0', [$pemilik]);
+    }
 }

@@ -6,7 +6,7 @@ if (!$u) ke('?p=ujian');
 $id = (int)$u['id'];
 ujian_akhiri_kedaluwarsa($u);
 $soal = ujian_soal($u);
-$siswa = siswa_kelas((string)$u['kelas'], (string)($u['tahun'] ?: tahun_aktif()));
+$siswa = siswa_kelas((string)$u['kelas'], (string)($u['tahun'] ?: tahun_aktif((int)$u['guru_id'])), (int)$u['guru_id']);
 $peserta = [];
 foreach (semua('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ?', [$id]) as $p) $peserta[$p['kode']] = $p;
 $nama = array_column($siswa, 'member_name', 'member_id');
