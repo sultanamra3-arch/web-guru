@@ -12,7 +12,7 @@ $dok = semua('SELECT id, jenis, judul, diubah FROM guru_dokumen WHERE guru_id = 
 
 kepala('Beranda', 'beranda');
 ?>
-<h1>Halo, <?= h(pengguna()['nama']) ?></h1>
+<h1>Selamat datang, <?= h(pengguna()['nama']) ?></h1>
 <p class="redup" style="margin-top:-.5rem"><?= HARI[$hari] ?? 'Minggu' ?>, <?= tgl_panjang(hari_ini()) ?></p>
 
 <div class="tombol-besar">
