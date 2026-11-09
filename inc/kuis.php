@@ -161,13 +161,16 @@ function kuis_mandiri_langkah(array $k, array $p): array
     return $p;
 }
 
-/** Mode mandiri: kuis berakhir bila waktu total habis atau semua peserta sudah selesai. */
+/**
+ * Mode mandiri: kuis berakhir bila semua peserta sudah selesai sampai soal terakhir, atau guru menekan "Akhiri kuis".
+ * Tidak ada batas waktu total: siswa yang lambat tetap boleh menjawab sampai pertanyaan habis.
+ */
 function kuis_mandiri_cek_akhir(array $k): array
 {
     if ($k['status'] !== 'jalan') return $k;
     $now = kuis_ms();
-    $selesai = $now > (int)$k['selesai_ms'];
-    if (!$selesai && $now > (int)$k['mulai_ms']) {
+    $selesai = false;
+    if ($now > (int)$k['mulai_ms']) {
         $r = satu('SELECT COUNT(*) n, SUM(selesai_ms IS NOT NULL) s FROM guru_kuis_peserta WHERE kuis_id = ?', [$k['id']]);
         $selesai = (int)$r['n'] > 0 && (int)$r['s'] >= (int)$r['n'];
     }

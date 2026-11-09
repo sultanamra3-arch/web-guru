@@ -14,10 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     switch ((string)post('aksi')) {
         case 'mulai':
             if (kuis_mandiri($k)) {
-                // semua siswa mulai bersamaan setelah hitung mundur 3 detik; waktu total = soal × waktu per soal + cadangan
+                // semua siswa mulai bersamaan setelah hitung mundur 3 detik; tanpa batas waktu total (selesai bila semua siswa sampai soal terakhir)
                 $mulai = kuis_ms() + 3000;
-                q("UPDATE guru_kuis SET status = 'jalan', nomor = 0, mulai_ms = ?, selesai_ms = ? WHERE id = ?",
-                    [$mulai, $mulai + count($soal) * ((int)$k['detik'] * 1000 + 800) + 30000, $kid]);
+                q("UPDATE guru_kuis SET status = 'jalan', nomor = 0, mulai_ms = ?, selesai_ms = NULL WHERE id = ?", [$mulai, $kid]);
                 q('UPDATE guru_kuis_peserta SET pos = 0, soal_ms = NULL, selesai_ms = NULL, urutan = NULL, poin = 0, benar = 0, jawaban = NULL WHERE kuis_id = ?', [$kid]);
                 break;
             }
@@ -77,7 +76,7 @@ if (kuis_mandiri($k)) {
     if (!$akhir) usort($daftar, fn($a, $b) => [(int)($a['selesai_ms'] === null), $ke[$a['kode']] ?? 0, -(int)$a['pos'], $a['nama']] <=> [(int)($b['selesai_ms'] === null), $ke[$b['kode']] ?? 0, -(int)$b['pos'], $b['nama']]);
     echo json_encode([
         'ok' => true, 'mode' => 'mandiri', 'status' => $k['status'], 'total' => count($soal), 'detik' => (int)$k['detik'],
-        'mulai_dalam' => max(0, (int)$k['mulai_ms'] - kuis_ms()), 'sisa_total_ms' => $k['status'] === 'jalan' ? max(0, (int)$k['selesai_ms'] - kuis_ms()) : 0,
+        'mulai_dalam' => max(0, (int)$k['mulai_ms'] - kuis_ms()), 'lewat_ms' => $k['status'] === 'jalan' ? max(0, kuis_ms() - (int)$k['mulai_ms']) : 0,
         'peserta' => array_map(fn($x) => ['kode' => $x['kode'], 'nama' => $x['nama'], 'pos' => min((int)$x['pos'], count($soal)), 'selesai_ke' => $ke[$x['kode']] ?? null,
             'poin' => $akhir ? (int)$x['poin'] : null, 'benar' => $akhir ? (int)$x['benar'] : null, 'rank' => $akhir ? $x['rank'] : null], $daftar),
         'rekap' => $akhir ? kuis_rekap($k, $peringkat) : null,

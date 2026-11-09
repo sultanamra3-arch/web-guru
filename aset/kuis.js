@@ -32,11 +32,11 @@
       peserta.forEach(function (p) { var li = el('li'); li.append(el('b', null, p.nama), el('span', null, p.poin + ' poin · ' + p.benar + ' benar')); ol.append(li); });
       return ol;
     }
-    var tTotal = 0;
+    var tKuis = 0;
     function mmss(ms) { var d = Math.max(0, Math.ceil(ms / 1000)); return Math.floor(d / 60) + ':' + ('0' + d % 60).slice(-2); }
     function gambarBalap(r) {
       info.textContent = r.peserta.length + ' peserta · ' + r.total + ' soal';
-      tMulai = Date.now() + r.mulai_dalam; tTotal = Date.now() + r.sisa_total_ms;
+      tMulai = Date.now() + r.mulai_dalam; tKuis = Date.now() - r.lewat_ms;
       if (r.mulai_dalam > 0) {
         if (kunciTampil === 'siap') return;
         kunciTampil = 'siap'; isi.innerHTML = ''; tombol.innerHTML = ''; G.className = 'panggung st-soal';
@@ -142,7 +142,7 @@
     setInterval(function () {
       if (S && S.mode === 'mandiri' && S.status === 'jalan') {
         var a2 = document.getElementById('pg-angka'); if (a2) a2.textContent = String(hitungMundur(tMulai - Date.now()));
-        var tt = document.getElementById('pg-total'); if (tt) tt.textContent = '⏱ ' + mmss(tTotal - Date.now());
+        var tt = document.getElementById('pg-total'); if (tt) tt.textContent = '⏱ ' + mmss(Date.now() - tKuis);
         return;
       }
       if (!S || S.status !== 'soal') return;
