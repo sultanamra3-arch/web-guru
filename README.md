@@ -9,6 +9,8 @@ Aplikasi web (bisa dipasang di HP) untuk guru:
 | ✨ Modul ajar | struktur Perencanaan Pembelajaran Mendalam (Kurikulum Merdeka), cetak/Word, revisi dengan AI |
 | ✨ LKPD | siap cetak, dengan pedoman guru |
 | ✨ Presentasi | tayang layar penuh di browser + unduh PowerPoint (.pptx) |
+| 👩‍🎓 Data siswa | milik SiGuru sendiri (terpisah dari perpustakaan), per tahun ajaran; isi lewat foto daftar hadir (AI), tempel nama, atau Excel/CSV (ekspor Dapodik bisa langsung); wali kelas, no. absen, naik kelas massal |
+| 💻 Ujian online | paket soal dikerjakan siswa di HP lewat link/QR + kode + token berganti; satu nama satu HP; simpan otomatis & tahan sinyal putus; acak soal/opsi; pantau langsung (keluar layar tercatat); nilai otomatis, uraian dinilai AI; analisis butir; kirim ke Penilaian |
 | ✅ Absensi | H/S/I/A per kelas & tanggal, rekap bulanan, unduh Excel |
 | 📊 Penilaian | input nilai, KKTP, rekap per mapel, unduh Excel, cetak |
 | 📷 Nilai dari foto | foto lembar jawaban → AI membaca, program menilai PG/benar-salah dari kunci, AI menilai isian/uraian; dibaca dua AI berbeda, nomor meragukan ditandai kuning; lembar jawaban siap cetak |
@@ -16,7 +18,8 @@ Aplikasi web (bisa dipasang di HP) untuk guru:
 | 🏅 Sertifikat | A4 mendatar, banyak penerima sekaligus (dari kelas atau ketik nama) |
 
 - Tiap guru punya akun sendiri (dibuat admin).
-- Data siswa & kelas diambil dari anggota perpustakaan SLiMS (`member.inst_name`); kelas diisi lewat SiPustaka.
+- Data siswa & kelas disimpan di SiGuru sendiri (tabel `guru_siswa`, `guru_kelas`, `guru_kelas_siswa`), tidak tersambung ke perpustakaan.
+- Siswa membuka ujian di `https://<alamat-siguru>/u/` (tanpa akun).
 - Tabel SiGuru berawalan `guru_` di database yang sama; dibuat otomatis saat pertama dibuka. Tabel SLiMS tidak diubah.
 - AI gratis (Gemini, Groq, OpenRouter) memakai kunci yang sama dengan SiPustaka; **kunci tidak disimpan di GitHub**.
 

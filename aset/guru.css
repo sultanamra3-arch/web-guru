@@ -163,3 +163,70 @@ body.polos main{max-width:none;padding:0}
 .tabel-koreksi.isi-k{table-layout:fixed}.isi-k th:nth-child(1){width:2rem}.isi-k th:nth-child(3){width:2.7rem;text-align:center}.isi-k th:nth-child(4){width:1.7rem}
 .baris-status{display:flex;justify-content:space-between;gap:.5rem}
 #hasil-koreksi label{display:block;margin-top:.8rem}
+/* ---------- Data siswa ---------- */
+.tab-isi{display:flex;gap:.3rem;margin:.8rem 0 .6rem;flex-wrap:wrap}
+.tab-isi button{flex:1;min-width:6.5rem;padding:.55rem .4rem;border:1.5px solid var(--garis);background:#fff;border-radius:12px;font-weight:700;color:var(--redup);cursor:pointer}
+.tab-isi button.aktif{background:var(--navy);border-color:var(--navy);color:#fff}
+.daftar-siswa li{display:flex;align-items:center;gap:.6rem;padding:.45rem 0}
+.daftar-siswa a{flex:1;display:block}.daftar-siswa small{display:block;color:var(--redup)}
+.no-absen{width:3rem!important;min-height:2.4rem;text-align:center;font-weight:700;padding:.2rem!important}
+.tabel-pratinjau-siswa{width:100%;border-collapse:collapse;font-size:.9rem;margin:.6rem 0}
+.tabel-pratinjau-siswa th{text-align:left;font-size:.75rem;color:var(--redup);padding:.2rem}
+.tabel-pratinjau-siswa td{padding:.2rem;border-bottom:1px solid var(--garis)}
+.tabel-pratinjau-siswa input,.tabel-pratinjau-siswa select{min-height:2.2rem;padding:.2rem .35rem;font-size:.9rem;width:100%}
+.tabel-pratinjau-siswa input[type=checkbox]{width:20px;height:20px;min-height:auto}
+.tabel-pratinjau-siswa tr.ragu td{background:#fff3c4}
+.tabel-pratinjau-siswa{display:block;overflow-x:auto}
+.tabel-naik{width:100%;border-collapse:collapse;margin:.6rem 0}.tabel-naik td,.tabel-naik th{padding:.35rem;border-bottom:1px solid var(--garis);text-align:left}
+/* ---------- Ujian online: guru ---------- */
+.lencana.st-buka{background:#dff3e4;color:#1d6b33}.lencana.st-tutup{background:#eee;color:#555}.lencana.st-draf{background:#fff3c4;color:#7a5200}
+.layar-token{display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center}
+.layar-token #tombol-layar-penuh{grid-column:1/-1}
+.url-siswa{font-weight:700;color:var(--navy);word-break:break-all}
+.kode-ujian{font-size:1.8rem;font-weight:700;letter-spacing:.12em;color:var(--navy)}
+.token-besar{font-size:2.6rem;font-weight:700;letter-spacing:.2em;color:var(--navy2);font-variant-numeric:tabular-nums}
+.token-qr{width:9rem}.token-qr svg{width:100%;height:auto;display:block}
+.layar-token.proyektor{position:fixed;inset:0;z-index:50;border-radius:0;margin:0;background:#fff;grid-template-columns:1fr 1fr;padding:4vmin;font-size:2.2vmin}
+.layar-token.proyektor .kode-ujian{font-size:9vmin}.layar-token.proyektor .token-besar{font-size:16vmin}.layar-token.proyektor .url-siswa{font-size:4vmin}
+.layar-token.proyektor .token-qr{width:min(42vw,80vh)}.layar-token.proyektor .kecil{font-size:2.6vmin}
+.pantau li{display:flex;flex-wrap:wrap;gap:.3rem .6rem;align-items:center;padding:.55rem 0}
+.pantau-atas{flex:1;min-width:0}.pantau-atas small{display:block;color:var(--redup)}
+.pantau-jalan .pantau-atas b{color:var(--navy)}.pantau-selesai .pantau-atas small{color:#1d6b33}.pantau-belum{opacity:.65}
+.titik{font-size:.7rem;margin-right:.35rem;vertical-align:middle}.titik.hidup{color:#2E9E48}.titik.mati{color:#c0392b}
+.peringatan-keluar{color:#b3261e!important;font-weight:700}
+.aksi-pantau{flex-basis:100%;display:flex;flex-wrap:wrap;gap:.3rem}
+.tombol-aksi{min-width:2.4rem}
+.tabel-butir{width:100%;border-collapse:collapse;font-size:.9rem}.tabel-butir td,.tabel-butir th{padding:.3rem;border-bottom:1px solid var(--garis);text-align:left}
+.tabel-butir tr.sulit td{background:#fde8e6}.tabel-butir tr.mudah td{background:#e6f5ea}.tabel-butir .benar{font-weight:700;color:#1d6b33}
+.jawaban-ujian li{padding:.6rem 0;border-bottom:1px solid var(--garis)}.jawaban-ujian .tanya{margin-bottom:.3rem}
+.jawaban-ujian li.salah{border-left:3px solid #e0a19b;padding-left:.5rem}.jawaban-ujian li.benar{border-left:3px solid #9fd4ad;padding-left:.5rem}
+/* ---------- Ujian online: siswa ---------- */
+.siswa-wadah{max-width:560px;margin:0 auto;padding:1rem}
+.siswa-kop{display:flex;gap:.7rem;align-items:center;margin-bottom:1rem}.siswa-kop img{width:46px}.siswa-kop small{display:block;color:var(--redup);font-size:.75rem}.siswa-kop b{color:var(--navy);font-size:1.25rem}
+.isian-kode{text-transform:uppercase;letter-spacing:.15em;font-size:1.4rem!important;text-align:center;font-weight:700}
+.isian-token{letter-spacing:.4em;font-size:1.6rem!important;text-align:center;font-weight:700}
+.aturan-ujian{padding-left:1.1rem;margin:.8rem 0 0}
+.selesai-ujian{text-align:center}.ikon-selesai{font-size:3rem}.nilai-siswa{font-size:3.5rem;font-weight:700;color:var(--navy)}
+.ujian-wadah{max-width:720px;margin:0 auto;padding-bottom:5.5rem;min-height:100vh}
+.ujian-kop{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:.6rem;padding:.6rem .9rem;background:var(--navy);color:#fff}
+.ujian-nama{min-width:0}.ujian-nama b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ujian-nama small{opacity:.8;font-size:.75rem;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ujian-waktu{font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;background:rgba(255,255,255,.12);padding:.2rem .6rem;border-radius:10px}
+.ujian-waktu.mepet{background:#c0392b;animation:kedip 1s infinite}@keyframes kedip{50%{opacity:.6}}
+.ujian-status{font-size:.8rem;padding:.25rem .9rem;color:var(--redup);min-height:1.4rem}.ujian-status.ok{color:#1d6b33}.ujian-status.galat{color:#b3261e;font-weight:700;background:#fde8e6}
+.ujian-nomor{display:flex;gap:.35rem;overflow-x:auto;padding:.4rem .9rem .6rem;scrollbar-width:thin}
+.ujian-nomor button{flex:none;width:2.4rem;height:2.4rem;border-radius:10px;border:1.5px solid var(--garis);background:#fff;font-weight:700;color:var(--redup)}
+.ujian-nomor button.dijawab{background:var(--navy);border-color:var(--navy);color:#fff}
+.ujian-nomor button.ragu{background:var(--emas);border-color:var(--emas);color:var(--navy2)}
+.ujian-nomor button.kini{outline:3px solid #2E9E48;outline-offset:1px}
+.ujian-soal{padding:0 .9rem}.ujian-no{font-weight:700;color:var(--navy);margin:.3rem 0 .5rem}
+.ujian-teks{font-size:1.08rem;line-height:1.55;margin-bottom:1rem}
+.ujian-opsi{display:grid;gap:.55rem}
+.ujian-opsi button{display:flex;gap:.7rem;align-items:flex-start;text-align:left;padding:.75rem .8rem;border:1.5px solid var(--garis);border-radius:14px;background:#fff;font:inherit;font-size:1rem;color:var(--teks);cursor:pointer}
+.ujian-opsi .huruf{flex:none;width:2rem;height:2rem;border-radius:50%;border:1.5px solid var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--navy)}
+.ujian-opsi button.pilih{border-color:var(--navy);background:#eef0fb}.ujian-opsi button.pilih .huruf{background:var(--navy);color:#fff}
+.ujian-isian{width:100%;font-size:1.05rem}
+.ujian-bawah{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr auto 1fr;gap:.45rem;padding:.6rem .7rem calc(.6rem + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--garis);max-width:720px;margin:0 auto}
+.ujian-bawah button{min-height:3rem;font-weight:700;padding:.3rem .5rem;white-space:nowrap}
+.tombol-ragu.aktif{background:var(--emas);border-color:var(--emas);color:var(--navy2)}
+.ujian-tirai{position:fixed;inset:0;z-index:20;background:rgba(20,22,60,.6);display:flex;align-items:center;justify-content:center;padding:1rem}
+.ujian-tirai .kartu{max-width:420px;width:100%}

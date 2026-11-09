@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 2;
+const SKEMA_VERSI = 3;
 
 function pastikan_skema(): void
 {
@@ -79,6 +79,76 @@ function pastikan_skema(): void
             oleh VARCHAR(200) NULL,
             dibuat DATETIME NULL,
             PRIMARY KEY (penilaian_id, member_id)
+        ) DEFAULT CHARSET=utf8mb4",
+        "CREATE TABLE IF NOT EXISTS guru_setelan (
+            k VARCHAR(50) NOT NULL PRIMARY KEY,
+            v TEXT NULL
+        ) DEFAULT CHARSET=utf8mb4",
+        "CREATE TABLE IF NOT EXISTS guru_siswa (
+            kode VARCHAR(20) NOT NULL PRIMARY KEY,
+            nisn VARCHAR(20) NULL,
+            nama VARCHAR(120) NOT NULL,
+            jk CHAR(1) NULL,
+            status VARCHAR(10) NOT NULL DEFAULT 'aktif',
+            dibuat DATETIME NULL,
+            diubah DATETIME NULL,
+            KEY (nisn), KEY (nama)
+        ) DEFAULT CHARSET=utf8mb4",
+        "CREATE TABLE IF NOT EXISTS guru_kelas (
+            tahun VARCHAR(9) NOT NULL,
+            nama VARCHAR(50) NOT NULL,
+            wali_id INT NULL,
+            PRIMARY KEY (tahun, nama)
+        ) DEFAULT CHARSET=utf8mb4",
+        "CREATE TABLE IF NOT EXISTS guru_kelas_siswa (
+            tahun VARCHAR(9) NOT NULL,
+            kode VARCHAR(20) NOT NULL,
+            kelas VARCHAR(50) NOT NULL,
+            absen SMALLINT NULL,
+            PRIMARY KEY (tahun, kode),
+            KEY (tahun, kelas)
+        ) DEFAULT CHARSET=utf8mb4",
+        "CREATE TABLE IF NOT EXISTS guru_ujian (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            guru_id INT NOT NULL,
+            paket_id INT NULL,
+            judul VARCHAR(200) NOT NULL,
+            mapel VARCHAR(120) NULL,
+            kelas VARCHAR(50) NOT NULL,
+            tahun VARCHAR(9) NULL,
+            kode VARCHAR(10) NOT NULL UNIQUE,
+            rahasia VARCHAR(40) NOT NULL,
+            token_menit SMALLINT NOT NULL DEFAULT 10,
+            mulai DATETIME NULL,
+            selesai DATETIME NULL,
+            durasi SMALLINT NOT NULL DEFAULT 60,
+            acak_soal TINYINT NOT NULL DEFAULT 1,
+            acak_opsi TINYINT NOT NULL DEFAULT 1,
+            tampil_nilai TINYINT NOT NULL DEFAULT 0,
+            status VARCHAR(10) NOT NULL DEFAULT 'draf',
+            soal LONGTEXT NULL,
+            penilaian_id INT NULL,
+            dibuat DATETIME NULL,
+            KEY (guru_id)
+        ) DEFAULT CHARSET=utf8mb4",
+        "CREATE TABLE IF NOT EXISTS guru_ujian_peserta (
+            ujian_id INT NOT NULL,
+            kode VARCHAR(20) NOT NULL,
+            perangkat VARCHAR(64) NULL,
+            mulai DATETIME NULL,
+            batas DATETIME NULL,
+            selesai DATETIME NULL,
+            urutan TEXT NULL,
+            jawaban MEDIUMTEXT NULL,
+            ragu TEXT NULL,
+            nomor SMALLINT NOT NULL DEFAULT 0,
+            keluar SMALLINT NOT NULL DEFAULT 0,
+            terakhir DATETIME NULL,
+            skor DECIMAL(7,2) NULL,
+            nilai DECIMAL(5,2) NULL,
+            nilai_uraian TEXT NULL,
+            perlu_koreksi TINYINT NOT NULL DEFAULT 0,
+            PRIMARY KEY (ujian_id, kode)
         ) DEFAULT CHARSET=utf8mb4",
         "CREATE TABLE IF NOT EXISTS guru_soal (
             id INT AUTO_INCREMENT PRIMARY KEY,

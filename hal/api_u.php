@@ -1,0 +1,70 @@
+<?php
+/* API siswa saat mengerjakan ujian. */
+declare(strict_types=1);
+
+header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store');
+
+function balas_u(array $d): never
+{
+    echo json_encode($d, JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') balas_u(['ok' => false]);
+$id = (int)post('id');
+$kode = $_SESSION['ujian'][$id] ?? null;
+session_write_close();
+$u = ujian_ambil($id, false);
+if (!$u || !$kode) balas_u(['ok' => false, 'keluar' => true, 'galat' => 'Sesi ujian berakhir. Masuk lagi.']);
+
+db()->beginTransaction();
+$p = satu('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ? AND kode = ? FOR UPDATE', [$id, $kode]);
+$alat = hash('sha256', (string)($_COOKIE['sgu_alat'] ?? ''));
+if (!$p || !$p['perangkat'] || !hash_equals((string)$p['perangkat'], $alat)) {
+    db()->rollBack();
+    balas_u(['ok' => false, 'keluar' => true, 'galat' => 'Nama ini dipakai di perangkat lain.']);
+}
+if ($p['selesai']) { db()->commit(); balas_u(['ok' => false, 'selesai' => true]); }
+$sisa = strtotime((string)$p['batas']) - time();
+if ($u['status'] !== 'buka' || $sisa < -20) {
+    q('UPDATE guru_ujian_peserta SET selesai = ? WHERE ujian_id = ? AND kode = ?', [$u['status'] === 'buka' ? $p['batas'] : sekarang(), $id, $kode]);
+    db()->commit();
+    ujian_simpan_hitung($u, $p);
+    balas_u(['ok' => false, 'selesai' => true]);
+}
+
+$n_soal = count(ujian_soal($u));
+$jw = json_decode((string)$p['jawaban'], true) ?: [];
+$rg = json_decode((string)$p['ragu'], true) ?: [];
+$set = ['terakhir' => sekarang()];
+$aksi = (string)post('aksi');
+
+// jawaban yang menumpuk saat sinyal putus dikirim sekaligus: {"3":"B","7":"teks"}
+foreach ((array)json_decode((string)post('jawab', '{}'), true) as $i => $v) {
+    $i = (int)$i;
+    if ($i < 0 || $i >= $n_soal) continue;
+    $v = mb_substr((string)$v, 0, 5000);
+    if ($v === '') unset($jw[$i]); else $jw[$i] = $v;
+}
+foreach ((array)json_decode((string)post('ragu', '{}'), true) as $i => $v) {
+    $i = (int)$i;
+    if ($i < 0 || $i >= $n_soal) continue;
+    if ($v) $rg[$i] = 1; else unset($rg[$i]);
+}
+$set['jawaban'] = json_encode((object)$jw, JSON_UNESCAPED_UNICODE);
+$set['ragu'] = json_encode((object)$rg);
+if (post('nomor') !== '') $set['nomor'] = max(0, min($n_soal - 1, (int)post('nomor')));
+if ($aksi === 'keluar') $set['keluar'] = (int)$p['keluar'] + 1;
+if ($aksi === 'selesai') $set['selesai'] = sekarang();
+
+$sql = implode(', ', array_map(fn($k) => "$k = ?", array_keys($set)));
+q("UPDATE guru_ujian_peserta SET $sql WHERE ujian_id = ? AND kode = ?", array_merge(array_values($set), [$id, $kode]));
+db()->commit();
+
+if ($aksi === 'selesai') {
+    $p = satu('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ? AND kode = ?', [$id, $kode]);
+    ujian_simpan_hitung($u, $p);
+    balas_u(['ok' => true, 'selesai' => true]);
+}
+balas_u(['ok' => true, 'sisa' => max(0, $sisa)]);

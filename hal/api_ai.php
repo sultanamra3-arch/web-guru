@@ -58,6 +58,31 @@ switch ($aksi) {
         if (!$r['ok']) balas($r);
         q('UPDATE guru_dokumen SET isi = ?, diubah = ? WHERE id = ?', [$r['isi'], sekarang(), $id]);
         balas(['ok' => true, 'oleh' => $r['oleh']]);
+    case 'baca_daftar':
+        if (!$foto) balas(['ok' => false, 'galat' => 'Ambil foto daftar siswa dulu.']);
+        session_write_close();
+        balas(ai_baca_daftar_siswa($foto));
+
+    case 'baca_berkas':
+        $f = $_FILES['berkas'] ?? null;
+        if (!$f || ($f['error'] ?? 1) !== UPLOAD_ERR_OK || $f['size'] > 8_000_000) balas(['ok' => false, 'galat' => 'Berkas gagal diunggah (maks 8 MB).']);
+        try {
+            $r = petakan_tabel_siswa(baca_tabel_berkas($f['tmp_name'], (string)$f['name']));
+        } catch (RuntimeException $e) {
+            balas(['ok' => false, 'galat' => $e->getMessage()]);
+        }
+        if (!$r['ok'] || !$r['siswa']) balas(['ok' => false, 'galat' => 'Kolom "Nama" tidak ditemukan di berkas.']);
+        balas(['ok' => true, 'siswa' => array_slice($r['siswa'], 0, 2000), 'kolom' => $r['kolom']]);
+
+    case 'simpan_siswa':
+        $data = json_decode((string)post('data'), true);
+        if (!is_array($data) || !$data) balas(['ok' => false, 'galat' => 'Tidak ada data.']);
+        if (count($data) > 2000) balas(['ok' => false, 'galat' => 'Maksimal 2000 siswa sekali simpan.']);
+        $h = simpan_banyak_siswa($data);
+        $kl = array_count_values(array_map(fn($r) => (string)($r['kelas'] ?? ''), $data));
+        arsort($kl);
+        balas(['ok' => true, 'kelas' => (string)array_key_first($kl)] + $h);
+
     case 'koreksi':
         $pid = (int)post('id');
         $pn = satu('SELECT * FROM guru_penilaian WHERE id = ? AND guru_id = ?', [$pid, uid()]);

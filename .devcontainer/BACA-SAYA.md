@@ -10,3 +10,6 @@ Untuk mencoba fitur AI: Lainnya → ⚙ Pengaturan AI → isi kunci API (tersimp
 
 Matikan Codespace bila selesai agar kuota gratis tidak habis:
 github.com/codespaces → ⋯ → Stop codespace.
+
+Coba sebagai siswa: buka tab baru (atau HP lain) ke alamat yang sama + `/u/`,
+masukkan kode ujian "Kuis Informatika" (lihat Kelas → Ujian online → buka ujian itu), pilih nama siswa kelas VII A, dan isi token yang tampil di layar guru.

@@ -8,6 +8,7 @@ require __DIR__ . '/inc/siswa.php';
 require __DIR__ . '/inc/tampilan.php';
 require __DIR__ . '/inc/guru_ai.php';
 require __DIR__ . '/inc/koreksi.php';
+require __DIR__ . '/inc/ujian.php';
 
 header('X-Frame-Options: SAMEORIGIN');
 header('X-Content-Type-Options: nosniff');
@@ -17,12 +18,14 @@ mulai_sesi();
 
 $halaman = [
     'masuk', 'keluar', 'beranda', 'lainnya', 'akun', 'profil', 'pengaturan_ai',
-    'kelas', 'jadwal', 'absensi', 'absensi_rekap', 'penilaian', 'nilai', 'nilai_rekap', 'koreksi', 'koreksi_lj', 'koreksi_lihat',
+    'kelas', 'siswa', 'siswa_tambah', 'siswa_ubah', 'siswa_naik', 'jadwal', 'absensi', 'absensi_rekap', 'penilaian', 'nilai', 'nilai_rekap', 'koreksi', 'koreksi_lj', 'koreksi_lihat',
     'soal', 'soal_form', 'soal_ai', 'paket', 'paket_cetak',
     'perangkat', 'dokumen', 'dokumen_buat', 'dokumen_lihat', 'presentasi',
     'sertifikat', 'sertifikat_form', 'sertifikat_cetak',
-    'api_ai',
+    'ujian', 'ujian_form', 'ujian_lihat', 'ujian_hasil', 'ujian_jawaban', 'u', 'u_kerja',
+    'api_ai', 'api_ujian', 'api_u',
 ];
+const HALAMAN_UMUM = ['masuk', 'u', 'u_kerja', 'api_u'];
 $p = (string)($_GET['p'] ?? '');
 if (!in_array($p, $halaman, true)) $p = pengguna() ? 'beranda' : 'masuk';
 
@@ -38,7 +41,7 @@ try {
     exit;
 }
 
-if ($p !== 'masuk') wajib_login();
+if (!in_array($p, HALAMAN_UMUM, true)) wajib_login();
 // Akun dinonaktifkan admin → keluar
 if (pengguna() && !nilai('SELECT aktif FROM guru_akun WHERE id = ?', [uid()])) {
     $_SESSION = [];
@@ -51,7 +54,7 @@ try {
 } catch (Throwable $e) {
     if (db()->inTransaction()) db()->rollBack();
     error_log('[siguru] ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
-    if ($p === 'api_ai') {
+    if (in_array($p, ['api_ai', 'api_ujian', 'api_u'], true)) {
         echo json_encode(['ok' => false, 'galat' => 'Kesalahan server: ' . $e->getMessage()]);
         exit;
     }

@@ -156,7 +156,7 @@ CREATE TABLE `guru_akun` (
 LOCK TABLES `guru_akun` WRITE;
 /*!40000 ALTER TABLE `guru_akun` DISABLE KEYS */;
 INSERT INTO `guru_akun` VALUES
-(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 10:23:53'),
+(1,'admin','Budi Santoso, S.Pd.','198501012010011001','Informatika','$2y$10$VXXiSTis5cKmmcm00ypfZuC6J7Di1EXsu3aVjmDyCBFH5H0DC1VpC','admin',1,'2026-11-08 07:19:47','2026-11-09 10:58:05'),
 (2,'guru','Rina Marlina, S.Pd.','','Bahasa Indonesia','$2y$10$Yw3mhbCfjooqB0Du1toAHOUjFDbN9QrzkiWwGmppHqYXAPc4C3aKS','guru',1,'2026-11-08 07:19:47','2026-11-09 10:23:52');
 /*!40000 ALTER TABLE `guru_akun` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -221,6 +221,93 @@ INSERT INTO `guru_jadwal` VALUES
 (10,1,1,2,'08:50:00','10:10:00','VII A','Informatika','Lab');
 /*!40000 ALTER TABLE `guru_jadwal` ENABLE KEYS */;
 UNLOCK TABLES;
+DROP TABLE IF EXISTS `guru_kelas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `guru_kelas` (
+  `tahun` varchar(9) NOT NULL,
+  `nama` varchar(50) NOT NULL,
+  `wali_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`tahun`,`nama`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `guru_kelas` WRITE;
+/*!40000 ALTER TABLE `guru_kelas` DISABLE KEYS */;
+INSERT INTO `guru_kelas` VALUES
+('2026/2027','IX A',NULL),
+('2026/2027','IX B',NULL),
+('2026/2027','VII A',NULL),
+('2026/2027','VII B',NULL),
+('2026/2027','VII C',NULL),
+('2026/2027','VIII A',1);
+/*!40000 ALTER TABLE `guru_kelas` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `guru_kelas_siswa`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `guru_kelas_siswa` (
+  `tahun` varchar(9) NOT NULL,
+  `kode` varchar(20) NOT NULL,
+  `kelas` varchar(50) NOT NULL,
+  `absen` smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`tahun`,`kode`),
+  KEY `tahun` (`tahun`,`kelas`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `guru_kelas_siswa` WRITE;
+/*!40000 ALTER TABLE `guru_kelas_siswa` DISABLE KEYS */;
+INSERT INTO `guru_kelas_siswa` VALUES
+('2026/2027','12840210','IX B',8),
+('2026/2027','21814233','IX B',1),
+('2026/2027','22293940','VII A',8),
+('2026/2027','36620051','IX B',4),
+('2026/2027','39104132','IX B',2),
+('2026/2027','39411128','IX B',5),
+('2026/2027','43181034','IX A',1),
+('2026/2027','52507342','IX B',3),
+('2026/2027','54825020','VII A',11),
+('2026/2027','68649413','IX A',2),
+('2026/2027','70607818','VII A',13),
+('2026/2027','72903171','VII C',4),
+('2026/2027','77878701','VII C',3),
+('2026/2027','78605414','VII B',2),
+('2026/2027','89868444','VII B',1),
+('2026/2027','9000000001','VII A',14),
+('2026/2027','9000000002','VII A',12),
+('2026/2027','9000000003','VII A',4),
+('2026/2027','9000000004','VII A',5),
+('2026/2027','9000000005','VII A',9),
+('2026/2027','9000000006','VII A',1),
+('2026/2027','9000000007','VII A',3),
+('2026/2027','9000000008','VII A',6),
+('2026/2027','9000000009','VII A',2),
+('2026/2027','9000000010','VII A',10),
+('2026/2027','9000000011','VIII A',NULL),
+('2026/2027','9000000012','VIII A',NULL),
+('2026/2027','9000000013','VIII A',NULL),
+('2026/2027','9000000014','VIII A',NULL),
+('2026/2027','9000000015','VIII A',NULL),
+('2026/2027','9000000016','VIII A',NULL),
+('2026/2027','9000000017','VIII A',NULL),
+('2026/2027','9000000018','VIII A',NULL),
+('2026/2027','9000000019','VIII A',NULL),
+('2026/2027','9000000020','VIII A',NULL),
+('2026/2027','9000000021','IX A',NULL),
+('2026/2027','9000000022','IX A',NULL),
+('2026/2027','9000000023','IX A',NULL),
+('2026/2027','9000000024','IX A',NULL),
+('2026/2027','9000000025','IX A',NULL),
+('2026/2027','9000000026','IX A',NULL),
+('2026/2027','9000000027','IX A',NULL),
+('2026/2027','9000000028','IX A',NULL),
+('2026/2027','9000000029','IX A',NULL),
+('2026/2027','9000000030','IX A',NULL),
+('2026/2027','94856327','IX B',7),
+('2026/2027','95881326','IX B',6);
+/*!40000 ALTER TABLE `guru_kelas_siswa` ENABLE KEYS */;
+UNLOCK TABLES;
 DROP TABLE IF EXISTS `guru_koreksi`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -256,8 +343,7 @@ CREATE TABLE `guru_koreksi_kunci` (
 LOCK TABLES `guru_koreksi_kunci` WRITE;
 /*!40000 ALTER TABLE `guru_koreksi_kunci` DISABLE KEYS */;
 INSERT INTO `guru_koreksi_kunci` VALUES
-(1,'lj','1. B\n2. D\n3. A\n4. C\n5. B\n6. A\n7. D\n8. C\n9. B\n10. A\n11. C\n12. D\n13. B\n14. A\n15. C\n16. (bs) B\n17. (bs) S\n18. (bs) S\n19. (isian) debugging\n20. (esai, 10 poin) Buatlah algoritma meminjam buku di perpustakaan (minimal 5 langkah). Poin kunci: urut, lengkap, logis, ada pencatatan & tanggal kembali.','2026-11-09 10:10:49'),
-(2,'lingkar','1. B\n2. C\n3. B\n4. C\n5. B\n6. C\n7. (bs) S\n8. (isian) debugging\n9. (esai, 10 poin) Soal: Buatlah algoritma (minimal 6 langkah) untuk meminjam buku di perpustakaan sekolah! Pedoman: Langkah logis: datang, cari buku di katalog, ambil buku, ke meja petugas, tunjukkan kartu, buku dicatat/discan, terima buku & tanggal kembali. Nilai penuh bila urut, lengkap, dan logis.\n10. B','2026-11-09 10:23:53');
+(1,'lj','1. B\n2. D\n3. A\n4. C\n5. B\n6. A\n7. D\n8. C\n9. B\n10. A\n11. C\n12. D\n13. B\n14. A\n15. C\n16. (bs) B\n17. (bs) S\n18. (bs) S\n19. (isian) debugging\n20. (esai, 10 poin) Buatlah algoritma meminjam buku di perpustakaan (minimal 5 langkah). Poin kunci: urut, lengkap, logis, ada pencatatan & tanggal kembali.','2026-11-09 10:10:49');
 /*!40000 ALTER TABLE `guru_koreksi_kunci` ENABLE KEYS */;
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `guru_nilai`;
@@ -304,7 +390,17 @@ INSERT INTO `guru_nilai` VALUES
 (3,'9000000007',88.00,''),
 (3,'9000000008',61.00,'remedial'),
 (3,'9000000009',62.00,'remedial'),
-(3,'9000000010',71.00,'remedial');
+(3,'9000000010',71.00,'remedial'),
+(4,'9000000011',26.00,'Ujian online'),
+(4,'9000000012',68.00,'Ujian online'),
+(4,'9000000013',5.00,'Ujian online'),
+(4,'9000000014',74.00,'Ujian online'),
+(4,'9000000015',11.00,'Ujian online'),
+(4,'9000000016',16.00,'Ujian online'),
+(4,'9000000017',21.00,'Ujian online'),
+(4,'9000000018',5.00,'Ujian online'),
+(4,'9000000019',11.00,'Ujian online'),
+(4,'9000000020',21.00,'Ujian online');
 /*!40000 ALTER TABLE `guru_nilai` ENABLE KEYS */;
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `guru_penilaian`;
@@ -322,7 +418,7 @@ CREATE TABLE `guru_penilaian` (
   `dibuat` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `guru_id` (`guru_id`,`kelas`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `guru_penilaian` WRITE;
@@ -330,7 +426,8 @@ LOCK TABLES `guru_penilaian` WRITE;
 INSERT INTO `guru_penilaian` VALUES
 (1,1,'VIII A','Informatika','Ulangan Bab 1: Berpikir Komputasional','Ulangan Harian','2026-10-14',75.00,'2026-11-08 07:19:47'),
 (2,1,'VIII A','Informatika','Tugas Proyek Algoritma','Tugas','2026-10-28',75.00,'2026-11-08 07:19:47'),
-(3,1,'VII A','Informatika','Ulangan Bab 1: Informatika & Kehidupan','Ulangan Harian','2026-10-21',75.00,'2026-11-08 07:19:47');
+(3,1,'VII A','Informatika','Ulangan Bab 1: Informatika & Kehidupan','Ulangan Harian','2026-10-21',75.00,'2026-11-08 07:19:47'),
+(4,1,'VIII A','Informatika','Ulangan Harian Informatika Bab 1 (online)','Ulangan Harian','2026-11-09',75.00,'2026-11-09 10:55:55');
 /*!40000 ALTER TABLE `guru_penilaian` ENABLE KEYS */;
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `guru_sertifikat`;
@@ -385,6 +482,91 @@ INSERT INTO `guru_sertifikat_penerima` VALUES
 (3,1,3,'Galih Pratama','Juara 3 - Kelas VII A');
 /*!40000 ALTER TABLE `guru_sertifikat_penerima` ENABLE KEYS */;
 UNLOCK TABLES;
+DROP TABLE IF EXISTS `guru_setelan`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `guru_setelan` (
+  `k` varchar(50) NOT NULL,
+  `v` text DEFAULT NULL,
+  PRIMARY KEY (`k`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `guru_setelan` WRITE;
+/*!40000 ALTER TABLE `guru_setelan` DISABLE KEYS */;
+INSERT INTO `guru_setelan` VALUES
+('tahun_ajaran','2026/2027');
+/*!40000 ALTER TABLE `guru_setelan` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `guru_siswa`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `guru_siswa` (
+  `kode` varchar(20) NOT NULL,
+  `nisn` varchar(20) DEFAULT NULL,
+  `nama` varchar(120) NOT NULL,
+  `jk` char(1) DEFAULT NULL,
+  `status` varchar(10) NOT NULL DEFAULT 'aktif',
+  `dibuat` datetime DEFAULT NULL,
+  `diubah` datetime DEFAULT NULL,
+  PRIMARY KEY (`kode`),
+  KEY `nisn` (`nisn`),
+  KEY `nama` (`nama`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `guru_siswa` WRITE;
+/*!40000 ALTER TABLE `guru_siswa` DISABLE KEYS */;
+INSERT INTO `guru_siswa` VALUES
+('12840210',NULL,'Indah Permatasari','P','aktif','2026-11-09 10:45:25','2026-11-09 10:45:25'),
+('21814233',NULL,'Ahmad Fauzi','L','aktif','2026-11-09 10:45:25','2026-11-09 10:45:25'),
+('22293940',NULL,'Rahmat Hidayat','L','aktif','2026-11-09 10:40:53','2026-11-09 10:40:53'),
+('36620051',NULL,'Eka Putri Ramadhani','P','aktif','2026-11-09 10:45:25','2026-11-09 10:45:25'),
+('39104132',NULL,'Bunga Citra Lestari','P','aktif','2026-11-09 10:45:25','2026-11-09 10:45:25'),
+('39411128',NULL,'Fikri Maulana','L','aktif','2026-11-09 10:45:25','2026-11-09 10:45:25'),
+('43181034',NULL,'Fajar Hidayat','L','aktif','2026-11-09 10:41:01','2026-11-09 10:41:01'),
+('52507342',NULL,'Dimas Arya Nugraha','L','aktif','2026-11-09 10:45:25','2026-11-09 10:45:25'),
+('54825020','0091234567','Siti Nurhaliza','P','aktif','2026-11-09 10:40:53','2026-11-09 10:40:53'),
+('68649413',NULL,'Wulan Permata','P','aktif','2026-11-09 10:41:01','2026-11-09 10:41:01'),
+('70607818',NULL,'Yoga Pratama','L','aktif','2026-11-09 10:40:53','2026-11-09 10:40:53'),
+('72903171','0098765404','Nur Aisyah','P','aktif','2026-11-09 10:40:56','2026-11-09 10:40:58'),
+('77878701','0098765403','Reza Pratama','L','aktif','2026-11-09 10:40:56','2026-11-09 10:40:58'),
+('78605414','0098765402','Dewi Lestari','P','aktif','2026-11-09 10:40:56','2026-11-09 10:40:58'),
+('89868444','0098765401','Andi Saputra','L','aktif','2026-11-09 10:40:56','2026-11-09 10:40:58'),
+('9000000001','0000000001','Yusuf Rahmawati','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000002','0000000002','Siti Pratama','P','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000003','0000000003','Hendra Wijaya','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000004','0000000004','Intan Safitri','P','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000005','0000000005','Rina Rahmawati','P','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000006','0000000006','Bayu Maharani','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000007','0000000007','Galih Setiawan','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000008','0000000008','Mega Kurniawan','P','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000009','0000000009','Dimas Wijaya','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000010','0000000010','Salsa Rahmawati','P','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000011','0000000011','Taufik Anggraini','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000012','0000000012','Putri Permata','P','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000013','0000000013','Intan Nugroho','P','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000014','0000000014','Wulan Saputra','P','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000015','0000000015','Galih Lestari','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000016','0000000016','Putri Pratama','P','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000017','0000000017','Taufik Lestari','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000018','0000000018','Indah Setiawan','P','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000019','0000000019','Arif Wijaya','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000020','0000000020','Hendra Permata','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000021','0000000021','Ilham Anggraini','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000022','0000000022','Rina Wijaya','P','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000023','0000000023','Rizki Kurniawan','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000024','0000000024','Rizki Wijaya','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000025','0000000025','Dewi Safitri','P','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000026','0000000026','Rafi Maharani','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000027','0000000027','Fajar Wijaya','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000028','0000000028','Taufik Setiawan','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000029','0000000029','Dimas Rahmawati','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('9000000030','0000000030','Ahmad Lestari','L','aktif','2026-11-09 10:40:21','2026-11-09 10:40:21'),
+('94856327',NULL,'Hendra Wijaya','L','aktif','2026-11-09 10:45:25','2026-11-09 10:45:25'),
+('95881326',NULL,'Gita Safitri','P','aktif','2026-11-09 10:45:25','2026-11-09 10:45:25');
+/*!40000 ALTER TABLE `guru_siswa` ENABLE KEYS */;
+UNLOCK TABLES;
 DROP TABLE IF EXISTS `guru_soal`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -424,84 +606,81 @@ INSERT INTO `guru_soal` VALUES
 (10,1,'Informatika','8','Etika Digital','pg','sedang','C3','Temanmu membagikan berita yang belum jelas sumbernya di grup kelas. Sikap yang tepat adalah ...','{\"A\": \"Ikut menyebarkan\", \"B\": \"Mengecek kebenaran dari sumber terpercaya\", \"C\": \"Mengabaikan dan menyebarkan ke grup lain\", \"D\": \"Menghapus grup\"}','B','Saring sebelum sharing.',0,'2026-11-08 07:19:47');
 /*!40000 ALTER TABLE `guru_soal` ENABLE KEYS */;
 UNLOCK TABLES;
-DROP TABLE IF EXISTS `member`;
+DROP TABLE IF EXISTS `guru_ujian`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `member` (
-  `member_id` varchar(20) NOT NULL,
-  `member_name` varchar(100) NOT NULL,
-  `gender` int(1) NOT NULL,
-  `member_type_id` int(6) DEFAULT NULL,
-  `inst_name` varchar(100) DEFAULT NULL,
-  `expire_date` date NOT NULL,
-  `input_date` date DEFAULT NULL,
-  PRIMARY KEY (`member_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `member` WRITE;
-/*!40000 ALTER TABLE `member` DISABLE KEYS */;
-INSERT INTO `member` VALUES
-('800000001','Budi Santoso, S.Pd.',0,2,'Guru','2027-09-27','2026-07-15'),
-('9000000001','Yusuf Rahmawati',0,1,'VII A','2027-09-27','2026-07-15'),
-('9000000002','Siti Pratama',1,1,'VII A','2027-09-27','2026-07-15'),
-('9000000003','Hendra Wijaya',0,1,'VII A','2027-09-27','2026-07-15'),
-('9000000004','Intan Safitri',1,1,'VII A','2027-09-27','2026-07-15'),
-('9000000005','Rina Rahmawati',1,1,'VII A','2027-09-27','2026-07-15'),
-('9000000006','Bayu Maharani',0,1,'VII A','2027-09-27','2026-07-15'),
-('9000000007','Galih Setiawan',0,1,'VII A','2027-09-27','2026-07-15'),
-('9000000008','Mega Kurniawan',1,1,'VII A','2027-09-27','2026-07-15'),
-('9000000009','Dimas Wijaya',0,1,'VII A','2027-09-27','2026-07-15'),
-('9000000010','Salsa Rahmawati',1,1,'VII A','2027-09-27','2026-07-15'),
-('9000000011','Taufik Anggraini',0,1,'VIII A','2027-09-27','2026-07-15'),
-('9000000012','Putri Permata',1,1,'VIII A','2027-09-27','2026-07-15'),
-('9000000013','Intan Nugroho',1,1,'VIII A','2027-09-27','2026-07-15'),
-('9000000014','Wulan Saputra',1,1,'VIII A','2027-09-27','2026-07-15'),
-('9000000015','Galih Lestari',0,1,'VIII A','2027-09-27','2026-07-15'),
-('9000000016','Putri Pratama',1,1,'VIII A','2027-09-27','2026-07-15'),
-('9000000017','Taufik Lestari',0,1,'VIII A','2027-09-27','2026-07-15'),
-('9000000018','Indah Setiawan',1,1,'VIII A','2027-09-27','2026-07-15'),
-('9000000019','Arif Wijaya',0,1,'VIII A','2027-09-27','2026-07-15'),
-('9000000020','Hendra Permata',0,1,'VIII A','2027-09-27','2026-07-15'),
-('9000000021','Ilham Anggraini',0,1,'IX A','2027-09-27','2026-07-15'),
-('9000000022','Rina Wijaya',1,1,'IX A','2027-09-27','2026-07-15'),
-('9000000023','Rizki Kurniawan',0,1,'IX A','2027-09-27','2026-07-15'),
-('9000000024','Rizki Wijaya',0,1,'IX A','2027-09-27','2026-07-15'),
-('9000000025','Dewi Safitri',1,1,'IX A','2027-09-27','2026-07-15'),
-('9000000026','Rafi Maharani',0,1,'IX A','2027-09-27','2026-07-15'),
-('9000000027','Fajar Wijaya',0,1,'IX A','2027-09-27','2026-07-15'),
-('9000000028','Taufik Setiawan',0,1,'IX A','2027-09-27','2026-07-15'),
-('9000000029','Dimas Rahmawati',0,1,'IX A','2027-09-27','2026-07-15'),
-('9000000030','Ahmad Lestari',0,1,'IX A','2027-09-27','2026-07-15');
-/*!40000 ALTER TABLE `member` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `mst_member_type`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mst_member_type` (
-  `member_type_id` int(11) NOT NULL AUTO_INCREMENT,
-  `member_type_name` varchar(50) NOT NULL,
-  `loan_limit` int(11) NOT NULL,
-  `loan_periode` int(11) NOT NULL,
-  `enable_reserve` int(1) NOT NULL DEFAULT 0,
-  `reserve_limit` int(11) NOT NULL DEFAULT 0,
-  `member_periode` int(11) NOT NULL,
-  `reborrow_limit` int(11) NOT NULL,
-  `fine_each_day` int(11) NOT NULL,
-  `grace_periode` int(2) DEFAULT 0,
-  `input_date` date NOT NULL,
-  `last_update` date DEFAULT NULL,
-  PRIMARY KEY (`member_type_id`),
-  UNIQUE KEY `member_type_name` (`member_type_name`)
+CREATE TABLE `guru_ujian` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `guru_id` int(11) NOT NULL,
+  `paket_id` int(11) DEFAULT NULL,
+  `judul` varchar(200) NOT NULL,
+  `mapel` varchar(120) DEFAULT NULL,
+  `kelas` varchar(50) NOT NULL,
+  `tahun` varchar(9) DEFAULT NULL,
+  `kode` varchar(10) NOT NULL,
+  `rahasia` varchar(40) NOT NULL,
+  `token_menit` smallint(6) NOT NULL DEFAULT 10,
+  `mulai` datetime DEFAULT NULL,
+  `selesai` datetime DEFAULT NULL,
+  `durasi` smallint(6) NOT NULL DEFAULT 60,
+  `acak_soal` tinyint(4) NOT NULL DEFAULT 1,
+  `acak_opsi` tinyint(4) NOT NULL DEFAULT 1,
+  `tampil_nilai` tinyint(4) NOT NULL DEFAULT 0,
+  `status` varchar(10) NOT NULL DEFAULT 'draf',
+  `soal` longtext DEFAULT NULL,
+  `penilaian_id` int(11) DEFAULT NULL,
+  `dibuat` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `kode` (`kode`),
+  KEY `guru_id` (`guru_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-LOCK TABLES `mst_member_type` WRITE;
-/*!40000 ALTER TABLE `mst_member_type` DISABLE KEYS */;
-INSERT INTO `mst_member_type` VALUES
-(1,'Siswa/i',2,3,0,0,365,0,1000,0,'2020-01-01',NULL),
-(2,'Guru',10,360,0,0,360,0,0,0,'2020-01-01',NULL);
-/*!40000 ALTER TABLE `mst_member_type` ENABLE KEYS */;
+LOCK TABLES `guru_ujian` WRITE;
+/*!40000 ALTER TABLE `guru_ujian` DISABLE KEYS */;
+INSERT INTO `guru_ujian` VALUES
+(1,1,1,'Ulangan Harian Informatika Bab 1','Informatika','VIII A','2026/2027','PZY7Y4','972206694dbb828ef63f0881dc720fbb',10,NULL,NULL,30,1,1,1,'tutup','[{\"tipe\":\"pg\",\"teks\":\"Urutan langkah logis untuk menyelesaikan suatu masalah disebut ...\",\"opsi\":{\"A\":\"Program\",\"B\":\"Algoritma\",\"C\":\"Data\",\"D\":\"Variabel\"},\"kunci\":\"B\",\"pembahasan\":\"Algoritma adalah langkah-langkah terurut dan logis untuk menyelesaikan masalah.\",\"maks\":1},{\"tipe\":\"pg\",\"teks\":\"Simbol flowchart berbentuk belah ketupat digunakan untuk ...\",\"opsi\":{\"A\":\"Mulai\\/selesai\",\"B\":\"Proses\",\"C\":\"Percabangan\\/keputusan\",\"D\":\"Input\\/output\"},\"kunci\":\"C\",\"pembahasan\":\"Belah ketupat menandakan keputusan dengan dua kemungkinan jawaban.\",\"maks\":1},{\"tipe\":\"pg\",\"teks\":\"Ibu menanak nasi: (1) cuci beras, (2) masukkan ke rice cooker, (3) tekan tombol masak, (4) takar beras. Urutan yang benar adalah ...\",\"opsi\":{\"A\":\"1-2-3-4\",\"B\":\"4-1-2-3\",\"C\":\"4-2-1-3\",\"D\":\"1-4-2-3\"},\"kunci\":\"B\",\"pembahasan\":\"Beras ditakar dulu, dicuci, dimasukkan, lalu dimasak.\",\"maks\":1},{\"tipe\":\"pg\",\"teks\":\"Memecah masalah besar menjadi bagian-bagian kecil disebut ...\",\"opsi\":{\"A\":\"Abstraksi\",\"B\":\"Pengenalan pola\",\"C\":\"Dekomposisi\",\"D\":\"Algoritma\"},\"kunci\":\"C\",\"pembahasan\":\"Dekomposisi = memecah masalah menjadi bagian kecil.\",\"maks\":1},{\"tipe\":\"pg\",\"teks\":\"Petani sawit di Keritang mencatat hasil panen tiap minggu dan melihat panen naik setiap musim hujan. Kegiatan ini termasuk ...\",\"opsi\":{\"A\":\"Dekomposisi\",\"B\":\"Pengenalan pola\",\"C\":\"Abstraksi\",\"D\":\"Debugging\"},\"kunci\":\"B\",\"pembahasan\":\"Menemukan keteraturan pada data adalah pengenalan pola.\",\"maks\":1},{\"tipe\":\"pg\",\"teks\":\"Perangkat yang berfungsi memasukkan data ke komputer adalah ...\",\"opsi\":{\"A\":\"Monitor\",\"B\":\"Printer\",\"C\":\"Keyboard\",\"D\":\"Speaker\"},\"kunci\":\"C\",\"pembahasan\":\"Keyboard adalah perangkat input.\",\"maks\":1},{\"tipe\":\"bs\",\"teks\":\"RAM menyimpan data secara permanen walaupun komputer dimatikan.\",\"opsi\":{\"A\":\"Benar\",\"B\":\"Salah\"},\"kunci\":\"B\",\"pembahasan\":\"RAM bersifat sementara (volatile).\",\"maks\":1},{\"tipe\":\"isian\",\"teks\":\"Kesalahan dalam program disebut bug, sedangkan proses mencari dan memperbaikinya disebut ...\",\"opsi\":[],\"kunci\":\"debugging\",\"pembahasan\":\"\",\"maks\":1},{\"tipe\":\"esai\",\"teks\":\"Buatlah algoritma (minimal 6 langkah) untuk meminjam buku di perpustakaan sekolah!\",\"opsi\":[],\"kunci\":\"Langkah logis: datang, cari buku di katalog, ambil buku, ke meja petugas, tunjukkan kartu, buku dicatat\\/discan, terima buku & tanggal kembali.\",\"pembahasan\":\"Nilai penuh bila urut, lengkap, dan logis.\",\"maks\":10},{\"tipe\":\"pg\",\"teks\":\"Temanmu membagikan berita yang belum jelas sumbernya di grup kelas. Sikap yang tepat adalah ...\",\"opsi\":{\"A\":\"Ikut menyebarkan\",\"B\":\"Mengecek kebenaran dari sumber terpercaya\",\"C\":\"Mengabaikan dan menyebarkan ke grup lain\",\"D\":\"Menghapus grup\"},\"kunci\":\"B\",\"pembahasan\":\"Saring sebelum sharing.\",\"maks\":1}]',4,'2026-11-09 10:52:00'),
+(2,1,1,'Kuis Informatika (coba sebagai siswa)','Informatika','VII A','2026/2027','A5QZTZ','5225f2f9e7b53b73abc5b3d250c33631',0,NULL,NULL,20,1,1,0,'buka','[{\"tipe\":\"pg\",\"teks\":\"Urutan langkah logis untuk menyelesaikan suatu masalah disebut ...\",\"opsi\":{\"A\":\"Program\",\"B\":\"Algoritma\",\"C\":\"Data\",\"D\":\"Variabel\"},\"kunci\":\"B\",\"pembahasan\":\"Algoritma adalah langkah-langkah terurut dan logis untuk menyelesaikan masalah.\",\"maks\":1},{\"tipe\":\"pg\",\"teks\":\"Simbol flowchart berbentuk belah ketupat digunakan untuk ...\",\"opsi\":{\"A\":\"Mulai\\/selesai\",\"B\":\"Proses\",\"C\":\"Percabangan\\/keputusan\",\"D\":\"Input\\/output\"},\"kunci\":\"C\",\"pembahasan\":\"Belah ketupat menandakan keputusan dengan dua kemungkinan jawaban.\",\"maks\":1},{\"tipe\":\"pg\",\"teks\":\"Ibu menanak nasi: (1) cuci beras, (2) masukkan ke rice cooker, (3) tekan tombol masak, (4) takar beras. Urutan yang benar adalah ...\",\"opsi\":{\"A\":\"1-2-3-4\",\"B\":\"4-1-2-3\",\"C\":\"4-2-1-3\",\"D\":\"1-4-2-3\"},\"kunci\":\"B\",\"pembahasan\":\"Beras ditakar dulu, dicuci, dimasukkan, lalu dimasak.\",\"maks\":1},{\"tipe\":\"pg\",\"teks\":\"Memecah masalah besar menjadi bagian-bagian kecil disebut ...\",\"opsi\":{\"A\":\"Abstraksi\",\"B\":\"Pengenalan pola\",\"C\":\"Dekomposisi\",\"D\":\"Algoritma\"},\"kunci\":\"C\",\"pembahasan\":\"Dekomposisi = memecah masalah menjadi bagian kecil.\",\"maks\":1},{\"tipe\":\"pg\",\"teks\":\"Petani sawit di Keritang mencatat hasil panen tiap minggu dan melihat panen naik setiap musim hujan. Kegiatan ini termasuk ...\",\"opsi\":{\"A\":\"Dekomposisi\",\"B\":\"Pengenalan pola\",\"C\":\"Abstraksi\",\"D\":\"Debugging\"},\"kunci\":\"B\",\"pembahasan\":\"Menemukan keteraturan pada data adalah pengenalan pola.\",\"maks\":1},{\"tipe\":\"pg\",\"teks\":\"Perangkat yang berfungsi memasukkan data ke komputer adalah ...\",\"opsi\":{\"A\":\"Monitor\",\"B\":\"Printer\",\"C\":\"Keyboard\",\"D\":\"Speaker\"},\"kunci\":\"C\",\"pembahasan\":\"Keyboard adalah perangkat input.\",\"maks\":1},{\"tipe\":\"bs\",\"teks\":\"RAM menyimpan data secara permanen walaupun komputer dimatikan.\",\"opsi\":{\"A\":\"Benar\",\"B\":\"Salah\"},\"kunci\":\"B\",\"pembahasan\":\"RAM bersifat sementara (volatile).\",\"maks\":1},{\"tipe\":\"isian\",\"teks\":\"Kesalahan dalam program disebut bug, sedangkan proses mencari dan memperbaikinya disebut ...\",\"opsi\":[],\"kunci\":\"debugging\",\"pembahasan\":\"\",\"maks\":1},{\"tipe\":\"esai\",\"teks\":\"Buatlah algoritma (minimal 6 langkah) untuk meminjam buku di perpustakaan sekolah!\",\"opsi\":[],\"kunci\":\"Langkah logis: datang, cari buku di katalog, ambil buku, ke meja petugas, tunjukkan kartu, buku dicatat\\/discan, terima buku & tanggal kembali.\",\"pembahasan\":\"Nilai penuh bila urut, lengkap, dan logis.\",\"maks\":5},{\"tipe\":\"pg\",\"teks\":\"Temanmu membagikan berita yang belum jelas sumbernya di grup kelas. Sikap yang tepat adalah ...\",\"opsi\":{\"A\":\"Ikut menyebarkan\",\"B\":\"Mengecek kebenaran dari sumber terpercaya\",\"C\":\"Mengabaikan dan menyebarkan ke grup lain\",\"D\":\"Menghapus grup\"},\"kunci\":\"B\",\"pembahasan\":\"Saring sebelum sharing.\",\"maks\":1}]',NULL,'2026-11-09 10:57:52');
+/*!40000 ALTER TABLE `guru_ujian` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `guru_ujian_peserta`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `guru_ujian_peserta` (
+  `ujian_id` int(11) NOT NULL,
+  `kode` varchar(20) NOT NULL,
+  `perangkat` varchar(64) DEFAULT NULL,
+  `mulai` datetime DEFAULT NULL,
+  `batas` datetime DEFAULT NULL,
+  `selesai` datetime DEFAULT NULL,
+  `urutan` text DEFAULT NULL,
+  `jawaban` mediumtext DEFAULT NULL,
+  `ragu` text DEFAULT NULL,
+  `nomor` smallint(6) NOT NULL DEFAULT 0,
+  `keluar` smallint(6) NOT NULL DEFAULT 0,
+  `terakhir` datetime DEFAULT NULL,
+  `skor` decimal(7,2) DEFAULT NULL,
+  `nilai` decimal(5,2) DEFAULT NULL,
+  `nilai_uraian` text DEFAULT NULL,
+  `perlu_koreksi` tinyint(4) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`ujian_id`,`kode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `guru_ujian_peserta` WRITE;
+/*!40000 ALTER TABLE `guru_ujian_peserta` DISABLE KEYS */;
+INSERT INTO `guru_ujian_peserta` VALUES
+(1,'9000000011','5f9e798d1c25b29ed9318ab1b824b042989201566ab6a1409b5161c8cd55ca21','2026-11-09 10:52:10','2026-11-09 11:22:10','2026-11-09 10:52:31','{\"s\":[6,9,3,5,8,1,7,4,2,0],\"o\":[[\"A\",\"C\",\"D\",\"B\"],[\"C\",\"B\",\"A\",\"D\"],[\"C\",\"D\",\"A\",\"B\"],[\"C\",\"B\",\"D\",\"A\"],[\"D\",\"A\",\"C\",\"B\"],[\"C\",\"A\",\"B\",\"D\"],[\"A\",\"B\"],[],[],[\"D\",\"C\",\"B\",\"A\"]]}','{\"0\":\"D\",\"2\":\"B\",\"3\":\"D\",\"5\":\"C\",\"6\":\"B\",\"7\":\"debugging\",\"8\":\"debugging\",\"9\":\"B\"}','{}',9,0,'2026-11-09 10:52:31',5.00,26.00,'{\"8\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Jawaban tidak sesuai dengan pertanyaan tentang algoritma meminjam buku.\",\"oleh\":\"ai\",\"ragu\":false}}',0),
+(1,'9000000012','a07e6a17b0972255f15aa56bb71f2a9cac01925d6ccb77e36fca0b03189b4563','2026-11-09 10:52:07','2026-11-09 11:22:07','2026-11-09 10:52:31','{\"s\":[9,1,3,4,2,5,6,0,7,8],\"o\":[[\"C\",\"D\",\"B\",\"A\"],[\"A\",\"C\",\"D\",\"B\"],[\"C\",\"D\",\"B\",\"A\"],[\"C\",\"B\",\"D\",\"A\"],[\"D\",\"A\",\"B\",\"C\"],[\"A\",\"D\",\"B\",\"C\"],[\"A\",\"B\"],[],[],[\"B\",\"A\",\"C\",\"D\"]]}','{\"2\":\"C\",\"4\":\"B\",\"6\":\"B\",\"7\":\"1. datang ke perpustakaan 2. cari buku di katalog 3. bawa ke petugas 4. tunjukkan kartu anggota 5. petugas mencatat 6. terima buku dan tanggal kembali\",\"8\":\"1. datang ke perpustakaan\\n2. cari buku di katalog\\n3. bawa ke petugas\\n4. tunjukkan kartu anggota\\n5. petugas mencatat\\n6. terima buku dan tanggal kembali\",\"9\":\"B\"}','{}',9,0,'2026-11-09 10:52:31',13.00,68.00,'{\"7\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Siswa menjawab soal nomor 8 dengan jawaban untuk nomor 9.\",\"oleh\":\"ai\",\"ragu\":false},\"8\":{\"skor\":10,\"skor_ai\":10,\"catatan\":\"Langkah-langkah algoritma lengkap, urut, dan sangat logis.\",\"oleh\":\"ai\",\"ragu\":false}}',0),
+(1,'9000000013','3bb45fe319371fda70c004b14e30be2a51da1c875e0ae9e2757352517c543fc1','2026-11-09 10:52:06','2026-11-09 11:22:06','2026-11-09 10:52:30','{\"s\":[6,2,4,0,5,3,8,1,7,9],\"o\":[[\"D\",\"A\",\"B\",\"C\"],[\"C\",\"D\",\"B\",\"A\"],[\"B\",\"C\",\"D\",\"A\"],[\"D\",\"C\",\"A\",\"B\"],[\"D\",\"B\",\"A\",\"C\"],[\"D\",\"C\",\"B\",\"A\"],[\"A\",\"B\"],[],[],[\"C\",\"B\",\"A\",\"D\"]]}','{\"0\":\"D\",\"1\":\"C\",\"2\":\"C\",\"3\":\"A\",\"4\":\"C\",\"5\":\"D\",\"6\":\"A\",\"7\":\"mencari kesalahan program\",\"8\":\"mencari kesalahan program\",\"9\":\"C\"}','{}',9,1,'2026-11-09 10:52:30',1.00,5.00,'{\"7\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Jawaban siswa salah karena menyebutkan definisinya, bukan istilah prosesnya (debugging).\",\"oleh\":\"ai\",\"ragu\":false},\"8\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Jawaban siswa salah\\/salah salin karena menjawab soal nomor 8, bukan membuat algoritma peminjaman buku.\",\"oleh\":\"ai\",\"ragu\":false}}',0),
+(1,'9000000014','cbf9027ff41dcf6a40207138beec7cfbca8bb00ea8e8ed2399f645d96d52ed7a','2026-11-09 10:52:12','2026-11-09 11:22:12','2026-11-09 10:52:52','{\"s\":[2,0,3,7,5,8,4,1,9,6],\"o\":[[\"B\",\"C\",\"A\",\"D\"],[\"B\",\"C\",\"D\",\"A\"],[\"B\",\"D\",\"C\",\"A\"],[\"B\",\"D\",\"A\",\"C\"],[\"A\",\"B\",\"C\",\"D\"],[\"C\",\"B\",\"A\",\"D\"],[\"A\",\"B\"],[],[],[\"C\",\"A\",\"D\",\"B\"]]}','{\"0\":\"B\",\"1\":\"C\",\"2\":\"D\",\"3\":\"A\",\"4\":\"B\",\"5\":\"B\",\"6\":\"A\",\"7\":\"mencari kesalahan program\",\"8\":\"1. datang ke perpustakaan\\n2. cari buku di katalog\\n3. bawa ke petugas\\n4. tunjukkan kartu anggota\\n5. petugas mencatat\\n6. terima buku dan tanggal kembali\",\"9\":\"B\"}','{\"7\":1}',9,0,'2026-11-09 10:52:21',14.00,74.00,'{\"7\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Siswa mendefinisikan prosesnya, bukan istilah (debugging) yang diminta.\",\"oleh\":\"ai\",\"ragu\":false},\"8\":{\"skor\":10,\"skor_ai\":10,\"catatan\":\"Langkah lengkap, logis, dan sesuai dengan minimal 6 langkah yang diminta.\",\"oleh\":\"ai\",\"ragu\":false}}',0),
+(1,'9000000015','f2b4f8f4d24937a1d8a379923fe927b108dbc4771766c9782dc68869c40e87b7','2026-11-09 10:52:03','2026-11-09 11:22:03','2026-11-09 10:52:30','{\"s\":[2,1,4,3,5,7,9,0,6,8],\"o\":[[\"A\",\"C\",\"B\",\"D\"],[\"B\",\"D\",\"A\",\"C\"],[\"A\",\"D\",\"B\",\"C\"],[\"D\",\"C\",\"A\",\"B\"],[\"B\",\"D\",\"C\",\"A\"],[\"D\",\"C\",\"B\",\"A\"],[\"A\",\"B\"],[],[],[\"C\",\"D\",\"B\",\"A\"]]}','{\"0\":\"D\",\"1\":\"B\",\"2\":\"C\",\"3\":\"D\",\"4\":\"B\",\"5\":\"B\",\"6\":\"B\",\"7\":\"1. datang ke perpustakaan 2. cari buku di katalog 3. bawa ke petugas 4. tunjukkan kartu anggota 5. petugas mencatat 6. terima buku dan tanggal kembali\",\"8\":\"Debugging\",\"9\":\"A\"}','{}',9,0,'2026-11-09 10:52:30',2.00,11.00,'{\"7\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Tertukar dengan jawaban soal nomor 9.\",\"oleh\":\"ai\",\"ragu\":false},\"8\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Tertukar dengan jawaban soal nomor 8, bukan algoritma meminjam buku.\",\"oleh\":\"ai\",\"ragu\":false}}',0),
+(1,'9000000016','08edd2d63ac4c66aad8de9c66b4ce112687f28108147b55ec75afc022ad5a40c','2026-11-09 10:52:09','2026-11-09 11:22:09','2026-11-09 10:52:31','{\"s\":[4,6,8,3,0,5,9,2,7,1],\"o\":[[\"A\",\"D\",\"C\",\"B\"],[\"D\",\"C\",\"A\",\"B\"],[\"A\",\"B\",\"C\",\"D\"],[\"C\",\"A\",\"D\",\"B\"],[\"A\",\"D\",\"C\",\"B\"],[\"B\",\"D\",\"C\",\"A\"],[\"A\",\"B\"],[],[],[\"B\",\"A\",\"D\",\"C\"]]}','{\"1\":\"C\",\"2\":\"D\",\"3\":\"A\",\"4\":\"B\",\"5\":\"C\",\"6\":\"A\",\"7\":\"mencari kesalahan program\",\"8\":\"mencari kesalahan program\",\"9\":\"D\"}','{\"3\":1}',9,0,'2026-11-09 10:52:31',3.00,16.00,'{\"7\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Jawaban siswa salah karena menyebutkan prosesnya, bukan istilah yang ditanyakan (debugging).\",\"oleh\":\"ai\",\"ragu\":false},\"8\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Siswa salah menjawab, isi jawaban sama dengan soal nomor 8 dan tidak sesuai dengan perintah membuat algoritma meminjam buku.\",\"oleh\":\"ai\",\"ragu\":false}}',0),
+(1,'9000000017','f6ced24189c89d742a8c38202f5d75d73fd07717db39e9b7cd022c8aa4e1cea5','2026-11-09 10:52:11','2026-11-09 11:22:11','2026-11-09 10:52:52','{\"s\":[7,0,9,6,8,3,2,4,5,1],\"o\":[[\"D\",\"B\",\"C\",\"A\"],[\"A\",\"D\",\"C\",\"B\"],[\"C\",\"D\",\"B\",\"A\"],[\"A\",\"D\",\"B\",\"C\"],[\"C\",\"B\",\"D\",\"A\"],[\"C\",\"B\",\"A\",\"D\"],[\"A\",\"B\"],[],[],[\"C\",\"B\",\"D\",\"A\"]]}','{\"0\":\"C\",\"1\":\"C\",\"3\":\"A\",\"4\":\"B\",\"5\":\"B\",\"6\":\"B\",\"7\":\"Debugging\",\"8\":\"debugging\",\"9\":\"D\"}','{}',9,0,'2026-11-09 10:52:20',4.00,21.00,'{\"8\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Jawaban \'debugging\' tidak sesuai dengan konteks peminjaman buku di perpustakaan.\",\"oleh\":\"ai\",\"ragu\":false}}',0),
+(1,'9000000018','a865160d0a2082ee7d6ae5eb6b415ea7eaa9a2372508c6f9cd5fdef7f45f187b','2026-11-09 10:52:05','2026-11-09 11:22:05','2026-11-09 10:52:30','{\"s\":[9,2,0,4,3,8,1,7,6,5],\"o\":[[\"A\",\"D\",\"C\",\"B\"],[\"C\",\"B\",\"D\",\"A\"],[\"A\",\"D\",\"C\",\"B\"],[\"C\",\"B\",\"A\",\"D\"],[\"B\",\"D\",\"C\",\"A\"],[\"B\",\"D\",\"A\",\"C\"],[\"A\",\"B\"],[],[],[\"A\",\"B\",\"D\",\"C\"]]}','{\"0\":\"C\",\"1\":\"B\",\"2\":\"D\",\"5\":\"C\",\"6\":\"A\",\"7\":\"mencari kesalahan program\",\"8\":\"debugging\"}','{\"4\":1}',9,0,'2026-11-09 10:52:30',1.00,5.00,'{\"7\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Siswa menjawab definisi prosesnya, bukan istilah spesifik yang diminta (debugging).\",\"oleh\":\"ai\",\"ragu\":false},\"8\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Jawaban tertukar dengan soal nomor 8.\",\"oleh\":\"ai\",\"ragu\":false}}',0),
+(1,'9000000019','72fd2c112e6a4401e64ed2172c50d6524f2ab18d8c67e80f31d2618a9130c5f1','2026-11-09 10:52:02','2026-11-09 11:22:02','2026-11-09 10:52:29','{\"s\":[7,3,1,2,6,0,9,4,5,8],\"o\":[[\"D\",\"C\",\"A\",\"B\"],[\"D\",\"C\",\"A\",\"B\"],[\"C\",\"B\",\"A\",\"D\"],[\"A\",\"B\",\"C\",\"D\"],[\"D\",\"B\",\"C\",\"A\"],[\"D\",\"A\",\"B\",\"C\"],[\"A\",\"B\"],[],[],[\"A\",\"D\",\"B\",\"C\"]]}','{\"0\":\"C\",\"1\":\"B\",\"2\":\"C\",\"3\":\"B\",\"4\":\"A\",\"5\":\"A\",\"6\":\"B\",\"7\":\"Debugging\",\"8\":\"Debugging\",\"9\":\"C\"}','{\"2\":1}',9,0,'2026-11-09 10:52:29',2.00,11.00,'{\"8\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Jawaban tidak sesuai karena berisi istilah pemrograman \'Debugging\' bukan algoritma meminjam buku.\",\"oleh\":\"ai\",\"ragu\":false}}',0),
+(1,'9000000020','e33f3e6129512eeaae7d00e8e245374c6aadab581b3fc2b2dae85f18a6146e8b','2026-11-09 10:52:04','2026-11-09 11:22:04','2026-11-09 10:52:30','{\"s\":[5,0,4,2,7,6,9,1,3,8],\"o\":[[\"D\",\"C\",\"B\",\"A\"],[\"A\",\"D\",\"C\",\"B\"],[\"B\",\"C\",\"A\",\"D\"],[\"C\",\"A\",\"B\",\"D\"],[\"C\",\"A\",\"B\",\"D\"],[\"C\",\"D\",\"A\",\"B\"],[\"A\",\"B\"],[],[],[\"B\",\"A\",\"C\",\"D\"]]}','{\"0\":\"A\",\"1\":\"C\",\"2\":\"A\",\"3\":\"C\",\"4\":\"D\",\"5\":\"C\",\"6\":\"B\",\"7\":\"1. datang ke perpustakaan 2. cari buku di katalog 3. bawa ke petugas 4. tunjukkan kartu anggota 5. petugas mencatat 6. terima buku dan tanggal kembali\",\"8\":\"mencari kesalahan program\",\"9\":\"D\"}','{}',9,0,'2026-11-09 10:52:30',4.00,21.00,'{\"7\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Siswa salah menempatkan jawaban; jawaban untuk soal nomor 8 tertulis pada nomor 9.\",\"oleh\":\"ai\",\"ragu\":false},\"8\":{\"skor\":0,\"skor_ai\":0,\"catatan\":\"Siswa salah menempatkan jawaban; jawaban untuk soal nomor 9 tertulis pada nomor 8.\",\"oleh\":\"ai\",\"ragu\":false}}',0);
+/*!40000 ALTER TABLE `guru_ujian_peserta` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

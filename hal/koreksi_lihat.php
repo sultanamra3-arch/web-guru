@@ -6,7 +6,7 @@ $mid = (string)get('m');
 $p = satu('SELECT * FROM guru_penilaian WHERE id = ? AND guru_id = ?', [$id, uid()]);
 $r = $p ? satu('SELECT * FROM guru_koreksi WHERE penilaian_id = ? AND member_id = ?', [$id, $mid]) : null;
 if (!$r) ke('?p=koreksi&id=' . $id);
-$s = satu('SELECT member_name FROM member WHERE member_id = ?', [$mid]);
+$s = ['member_name' => nama_siswa($mid)];
 $d = json_decode((string)$r['detail'], true) ?: [];
 
 kepala('Hasil koreksi', 'kelas');
