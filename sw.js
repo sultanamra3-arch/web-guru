@@ -1,6 +1,6 @@
 /* SiGuru: simpan berkas tampilan; halaman selalu diambil dari server. */
-const CACHE = 'siguru-v1.8';
-const ASET = ['aset/gaya.css?v=1.8', 'aset/guru.css?v=1.8', 'aset/guru.js?v=1.8', 'aset/logo.png', 'aset/favicon.png', 'offline.html'];
+const CACHE = 'siguru-v1.9';
+const ASET = ['aset/gaya.css?v=1.9', 'aset/guru.css?v=1.9', 'aset/guru.js?v=1.9', 'aset/logo.png', 'aset/favicon.png', 'offline.html'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASET)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => Promise.all(k.filter(n => n !== CACHE).map(n => caches.delete(n)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', e => {

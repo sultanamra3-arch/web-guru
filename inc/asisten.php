@@ -20,6 +20,7 @@ function asisten_prompt(): string
         . "ATURAN:\n"
         . "- Selalu cari/lihat data dulu dengan alat baca (cari_siswa, daftar_penilaian, dst.) untuk mendapatkan id/kode yang benar. Jangan menebak id.\n"
         . "- Setiap perubahan HANYA lewat alat tulis; alat tulis membuat kartu usulan dan data baru tersimpan setelah pengguna menekan Simpan. "
+        . "Bila alat tulis membalas DITOLAK, JANGAN bilang kartu sudah dibuat: jelaskan alasannya atau perbaiki argumennya lalu panggil lagi.\n"
         . "Kamu TIDAK PERNAH bisa menyimpan sendiri. Jawaban pengguna seperti \"ya\"/\"oke\"/\"simpan\" BUKAN penyimpanan: ingatkan untuk menekan tombol Simpan di kartu. "
         . "Jangan pernah menulis \"[Catatan sistem]\" atau mengaku data sudah tersimpan; hanya sistem yang menulis catatan DISIMPAN.\n"
         . "- Bila nama ambigu (beberapa siswa/penilaian cocok), tanyakan dulu yang mana.\n"
@@ -58,13 +59,13 @@ function asisten_alat(): array
         $f('ganti_nama_kelas', 'Usulkan mengganti nama kelas (jadwal, absensi, penilaian ikut).', ['lama' => $s, 'baru' => $s], ['lama', 'baru']),
         $f('hapus_kelas', 'Usulkan menghapus kelas yang sudah kosong.', ['nama' => $s], ['nama']),
         $f('buat_penilaian', 'Usulkan membuat penilaian baru.', ['judul' => $s, 'kelas' => $s, 'mapel' => $s,
-            'jenis' => ['type' => 'string', 'enum' => JENIS_PENILAIAN], 'tanggal' => $s, 'kktp' => $n], ['judul', 'kelas']),
+            'jenis' => ['type' => 'string', 'enum' => JENIS_PENILAIAN], 'tanggal' => ['type' => 'string', 'description' => 'YYYY-MM-DD'], 'kktp' => $n], ['judul', 'kelas']),
         $f('ubah_penilaian', 'Usulkan mengubah nama/jenis/mapel/tanggal/KKTP penilaian.', ['penilaian_id' => $i, 'judul' => $s, 'mapel' => $s,
             'jenis' => ['type' => 'string', 'enum' => JENIS_PENILAIAN], 'tanggal' => $s, 'kktp' => $n], ['penilaian_id']),
         $f('hapus_penilaian', 'Usulkan menghapus penilaian beserta nilainya.', ['penilaian_id' => $i], ['penilaian_id']),
         $f('isi_nilai', 'Usulkan mengisi/mengubah nilai siswa pada satu penilaian.', ['penilaian_id' => $i, 'nilai' => ['type' => 'array', 'items' => ['type' => 'object',
             'properties' => ['siswa' => $siswa_ref, 'nilai' => ['type' => ['number', 'null'], 'description' => '0–100, null untuk mengosongkan'], 'catatan' => $s], 'required' => ['siswa']]]], ['penilaian_id', 'nilai']),
-        $f('isi_absensi', 'Usulkan mengisi absensi satu kelas pada satu tanggal & mapel.', ['kelas' => $s, 'tanggal' => $s, 'mapel' => $s,
+        $f('isi_absensi', 'Usulkan mengisi absensi satu kelas pada SATU tanggal & mapel (beberapa tanggal = panggil berkali-kali).', ['kelas' => $s, 'tanggal' => ['type' => 'string', 'description' => 'YYYY-MM-DD'], 'mapel' => $s,
             'siswa' => ['type' => 'array', 'items' => ['type' => 'object', 'properties' => ['siswa' => $siswa_ref, 'status' => ['type' => 'string', 'enum' => ['H', 'S', 'I', 'A']], 'ket' => $s], 'required' => ['siswa', 'status']]],
             'sisanya_hadir' => ['type' => 'boolean', 'description' => 'true = siswa lain yang tidak disebut ditandai Hadir']], ['kelas', 'tanggal', 'mapel']),
         $f('ubah_jadwal', 'Usulkan menambah/mengganti/menghapus jam di jadwal mengajar.', [
@@ -123,10 +124,15 @@ function asisten_mapel(string $kelas = ''): string
     return $m ? (string)$m : '-';
 }
 
+/** Terima 2026-10-09, 09/10/2026, 9-10-2026, "hari ini", "kemarin". */
 function asisten_tgl(?string $t): ?string
 {
-    $t = trim((string)$t);
-    return preg_match('/^\d{4}-\d{2}-\d{2}$/', $t) ? $t : null;
+    $t = mb_strtolower(trim((string)$t));
+    if ($t === 'hari ini' || $t === 'sekarang') return date('Y-m-d');
+    if ($t === 'kemarin') return date('Y-m-d', strtotime('-1 day'));
+    if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $t, $m) && checkdate((int)$m[2], (int)$m[3], (int)$m[1])) return sprintf('%04d-%02d-%02d', $m[1], $m[2], $m[3]);
+    if (preg_match('/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/', $t, $m) && checkdate((int)$m[2], (int)$m[1], (int)$m[3])) return sprintf('%04d-%02d-%02d', $m[3], $m[2], $m[1]);
+    return null;
 }
 
 /* ---------- alat baca ---------- */
@@ -295,7 +301,10 @@ function asisten_periksa(string $nama, array $a): array
             $kelas = (string)($a['kelas'] ?? '');
             $tgl = asisten_tgl($a['tanggal'] ?? null);
             $mapel = mb_substr(trim((string)($a['mapel'] ?? '')), 0, 120);
-            if (!kelas_valid($kelas) || !$tgl || $mapel === '') return $g('Kelas, tanggal (YYYY-MM-DD), dan mapel wajib benar.');
+            if (!kelas_valid($kelas)) return $g("Kelas \"$kelas\" tidak ada. Kelas yang ada: " . implode(', ', daftar_kelas()) . '.');
+            if (!$tgl) return $g('Tanggal tidak dikenali: "' . ($a['tanggal'] ?? '') . '". Pakai YYYY-MM-DD.');
+            if ($mapel === '') $mapel = asisten_mapel($kelas);
+            if ($mapel === '-') return $g('Mapel belum disebutkan.');
             $isi = [];
             $salah = [];
             foreach ((array)($a['siswa'] ?? []) as $x) {
@@ -527,60 +536,69 @@ function asisten_giliran(string $teks, array $foto): array
 {
     // "ya / oke / simpan" bukan penyimpanan: tampilkan lagi kartu yang menunggu, tanpa bertanya ke AI
     $menunggu = asisten_usulan_menunggu();
-    if (!$foto && $menunggu && preg_match('/^\s*(ya+|iya|y|ok(e|ey)?|sip|simpan( saja| aja)?|lanjut(kan)?|boleh|setuju|betul|benar)\s*[.!]*\s*$/iu', $teks)) {
+    $ya = (bool)preg_match('/^\s*(ya+|iya|y|ok(e|ey)?|sip|simpan( saja| aja)?|lanjut(kan)?|boleh|setuju|betul|benar)\s*[.!]*\s*$/iu', $teks);
+    if (!$foto && $ya && $menunggu) {
         return ['ok' => true, 'teks' => 'Untuk menyimpan, tekan tombol **💾 Simpan** pada kartu. Ini kartunya lagi:', 'oleh' => '',
             'usulan' => array_map(fn($u) => ['id' => $u['id'], 'judul' => $u['judul'], 'baris' => $u['baris']], array_slice($menunggu, -5)), 'rincian' => []];
     }
     $bagian_foto = ai_bagian_foto($foto, 3);
     $isi = $teks !== '' ? $teks : 'Lihat foto ini.';
+    if (!$foto && $ya) $isi .= ' (Belum ada kartu usulan yang menunggu. Bila tadi saya meminta perubahan, buat kartunya sekarang dengan alat tulis.)';
     $pesan_pengguna = $bagian_foto ? ['role' => 'user', 'content' => array_merge([['type' => 'text', 'text' => $isi]], $bagian_foto)] : ['role' => 'user', 'content' => $isi];
     $pesan = array_merge([['role' => 'system', 'content' => asisten_prompt()]], asisten_riwayat(), [$pesan_pengguna]);
     $alat = asisten_alat();
     $usulan = [];
+    $ditolak = [];
     $rincian = [];
     $oleh = '';
     $jawab = '';
-    for ($putaran = 0; $putaran < 8; $putaran++) {
-        $r = ai_minta($pesan, ['alat' => $alat, 'gambar' => (bool)$bagian_foto, 'maks_token' => 4000]);
-        $rincian = array_values(array_unique(array_merge($rincian, $r['rincian'] ?? [])));
-        if (!$r['ok']) return ['ok' => false, 'teks' => $r['galat'], 'usulan' => $usulan, 'rincian' => $rincian];
-        $oleh = $r['oleh'];
-        $m = $r['pesan'];
-        if (empty($m['tool_calls'])) { $jawab = (string)$m['content']; break; }
-        $pesan[] = ['role' => 'assistant', 'content' => ($m['content'] ?? '') !== '' ? $m['content'] : null, 'tool_calls' => $m['tool_calls']];
-        foreach ($m['tool_calls'] as $tc) {
-            $nama = (string)$tc['function']['name'];
-            $arg = json_decode($tc['function']['arguments'] ?: '{}', true);
-            if (!is_array($arg)) $arg = [];
-            try {
-                if (in_array($nama, ALAT_TULIS_GURU, true)) {
-                    [$hasil, $u] = asisten_buat_usulan($nama, $arg);
-                    if ($u) $usulan[] = $u;
-                } else {
-                    $hasil = asisten_baca($nama, $arg);
+    $klaim = '/(kartu|usulan)[^.\n]{0,80}(simpan|dibuat|muncul|tampil|layar)|tekan\W+(tombol\W+)?\W*simpan/iu';
+    for ($coba = 0; $coba < 2; $coba++) {
+        for ($putaran = 0; $putaran < 8; $putaran++) {
+            $r = ai_minta($pesan, ['alat' => $alat, 'gambar' => (bool)$bagian_foto, 'maks_token' => 4000]);
+            $rincian = array_values(array_unique(array_merge($rincian, $r['rincian'] ?? [])));
+            if (!$r['ok']) return ['ok' => false, 'teks' => $r['galat'], 'usulan' => $usulan, 'rincian' => $rincian];
+            $oleh = $r['oleh'];
+            $m = $r['pesan'];
+            if (empty($m['tool_calls'])) { $jawab = (string)$m['content']; break; }
+            $pesan[] = ['role' => 'assistant', 'content' => ($m['content'] ?? '') !== '' ? $m['content'] : null, 'tool_calls' => $m['tool_calls']];
+            foreach ($m['tool_calls'] as $tc) {
+                $nama = (string)$tc['function']['name'];
+                $arg = json_decode($tc['function']['arguments'] ?: '{}', true);
+                if (!is_array($arg)) $arg = [];
+                try {
+                    if (in_array($nama, ALAT_TULIS_GURU, true)) {
+                        [$hasil, $u] = asisten_buat_usulan($nama, $arg);
+                        if ($u) $usulan[] = $u; else $ditolak[] = $hasil['galat'] ?? 'ditolak';
+                    } else {
+                        $hasil = asisten_baca($nama, $arg);
+                    }
+                } catch (Throwable $e) {
+                    $hasil = ['galat' => 'Kesalahan server: ' . $e->getMessage()];
+                    $ditolak[] = $hasil['galat'];
                 }
-            } catch (Throwable $e) {
-                $hasil = ['galat' => 'Kesalahan server: ' . $e->getMessage()];
+                $pesan[] = ['role' => 'tool', 'tool_call_id' => $tc['id'], 'content' => json_encode($hasil, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE)];
             }
-            $pesan[] = ['role' => 'tool', 'tool_call_id' => $tc['id'], 'content' => json_encode($hasil, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE)];
         }
+        // AI bilang ada kartu padahal tidak ada → minta sekali lagi memanggil alat dengan benar
+        if ($usulan || !preg_match($klaim, $jawab) || $coba === 1) break;
+        $pesan[] = ['role' => 'assistant', 'content' => $jawab];
+        $pesan[] = ['role' => 'user', 'content' => '[Pemeriksaan sistem] Tidak ada kartu usulan yang terbuat'
+            . ($ditolak ? ' — alat tulis DITOLAK: ' . implode(' | ', $ditolak) : ' karena kamu belum memanggil alat tulis')
+            . '. Panggil alat tulis yang benar sekarang (perbaiki argumennya), atau bila tidak bisa, jelaskan masalahnya kepada pengguna tanpa menyebut kartu.'];
     }
-    // buang catatan internal yang kadang ikut ditiru AI
-    $jawab = trim(preg_replace('/\[Usulan [0-9a-f]{8}[^\]]*\]?/u', '', $jawab));
-    // AI tidak boleh berpura-pura sudah menyimpan
-    if (str_contains($jawab, '[Catatan sistem]') || (!$usulan && preg_match('/\b(sudah|telah|berhasil)\s+(di)?(simpan|ubah|perbarui|pindah|hapus|tambah)|tersimpan\b/iu', $jawab) && !preg_match('/tekan|kartu/iu', $jawab))) {
-        $jawab = trim(preg_replace('/\[Catatan sistem\][^\n]*/u', '', $jawab));
-        $jawab .= ($jawab !== '' ? "\n\n" : '') . '⚠ Belum ada perubahan yang tersimpan. Data baru berubah setelah kamu menekan tombol **💾 Simpan** pada kartu usulan.';
-        if (!$usulan && ($menunggu = asisten_usulan_menunggu())) $usulan = array_slice($menunggu, -3);
+    $jawab = trim(preg_replace('/\[Usulan [0-9a-f]{8}[^\]]*\]?|\[(Catatan|Pemeriksaan) sistem\][^\n]*/u', '', $jawab));
+    if (!$usulan && preg_match($klaim, $jawab)) {
+        $jawab = 'Maaf, kartu usulan **belum terbuat**' . ($ditolak ? ' karena: ' . implode(' ', array_unique($ditolak)) : '.') . "\nCoba tulis ulang perintahnya dengan lebih rinci (nama kelas, tanggal, nama siswa).";
+    } elseif (!$usulan && preg_match('/\b(sudah|telah|berhasil)\s+(di)?(simpan|ubah|perbarui|pindah|hapus|tambah)|tersimpan\b/iu', $jawab)) {
+        $jawab .= "\n\n⚠ Belum ada perubahan yang tersimpan. Data baru berubah setelah kamu menekan tombol **💾 Simpan** pada kartu usulan.";
     }
-    if (!$usulan && preg_match('/tekan (tombol )?\**simpan/i', $jawab)) {
-        if ($menunggu = asisten_usulan_menunggu()) $usulan = array_slice($menunggu, -3);   // tampilkan lagi kartu yang menunggu
-        else $jawab .= "\n\n(Catatan: kartu usulan belum dibuat. Ulangi, misalnya: \"buat usulannya\".)";
-    }
+    if (!$usulan && $ditolak && !str_contains($jawab, $ditolak[0])) $jawab .= "\n\n⚠ Ditolak sistem: " . implode(' ', array_unique($ditolak));
     if (trim($jawab) === '') $jawab = $usulan ? 'Silakan periksa usulan di bawah, lalu tekan Simpan.' : 'Maaf, saya belum bisa menyelesaikannya. Coba jelaskan dengan cara lain.';
-    asisten_riwayat_tambah('user', $isi . ($bagian_foto ? ' [melampirkan ' . count($bagian_foto) . ' foto]' : ''));
+    asisten_riwayat_tambah('user', $teks !== '' ? $teks : 'Lihat foto ini.' . ($bagian_foto ? ' [melampirkan ' . count($bagian_foto) . ' foto]' : ''));
     $catat = '';
     foreach ($usulan as $u) $catat .= "\n[Usulan " . $u['id'] . ' ' . $u['alat'] . ' menunggu tombol Simpan: ' . json_encode($u['data'], JSON_UNESCAPED_UNICODE) . ']';
+    if (!$usulan && $ditolak) $catat .= "\n[Catatan sistem] Tidak ada kartu dibuat; ditolak: " . implode(' | ', $ditolak);
     asisten_riwayat_tambah('assistant', $jawab . $catat);
     return ['ok' => true, 'teks' => $jawab, 'usulan' => array_map(fn($u) => ['id' => $u['id'], 'judul' => $u['judul'], 'baris' => $u['baris']], $usulan), 'oleh' => $oleh, 'rincian' => $rincian];
 }
