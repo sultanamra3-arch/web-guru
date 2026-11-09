@@ -121,23 +121,45 @@
   });
 })();
 
-/* Jam pelajaran saya: tambah/kurangi baris; jam baru melanjutkan dari jam terakhir (+40 menit) */
+/* Jam pelajaran saya: per hari, tambah/kurangi baris, salin dari hari sebelumnya */
 (function () {
   'use strict';
+  var form = document.getElementById('form-jam');
+  if (!form) return;
   function tambahMenit(w, m) { var p = String(w || '07:30').split(':'), t = (+p[0]) * 60 + (+p[1]) + m; return ('0' + Math.floor(t / 60) % 24).slice(-2) + ':' + ('0' + t % 60).slice(-2); }
-  Array.prototype.forEach.call(document.querySelectorAll('.daftar-jam'), function (fs) {
-    var jenis = fs.dataset.jenis, tombol = fs.querySelector('.dua-tombol');
-    fs.querySelector('.tambah-jam').addEventListener('click', function () {
-      var baris = fs.querySelectorAll('.baris-waktu'), akhir = baris[baris.length - 1];
-      var mulai = akhir ? akhir.querySelector('[name^=selesai]').value : '07:30';
-      var d = document.createElement('div'); d.className = 'baris-waktu';
-      d.innerHTML = '<b>' + (baris.length + 1) + '</b><input type="time" name="mulai_' + jenis + '[]" required><span>–</span><input type="time" name="selesai_' + jenis + '[]" required>';
-      d.children[1].value = mulai; d.children[3].value = tambahMenit(mulai, 40);
-      fs.insertBefore(d, tombol);
-    });
-    fs.querySelector('.kurang-jam').addEventListener('click', function () {
-      var baris = fs.querySelectorAll('.baris-waktu');
-      if (baris.length > 1) baris[baris.length - 1].remove();
+  function bagian(h) { return form.querySelector('.daftar-jam[data-hari="' + h + '"]'); }
+  function baris(fs) { return fs.querySelectorAll('.baris-waktu'); }
+  function hitung() {
+    Array.prototype.forEach.call(form.querySelectorAll('.tab-jam button'), function (b) { b.querySelector('.jml-jam').textContent = baris(bagian(b.dataset.hari)).length || 'libur'; });
+  }
+  function barisBaru(fs, mulai, selesai) {
+    var h = fs.dataset.hari, n = baris(fs).length + 1, d = document.createElement('div');
+    d.className = 'baris-waktu';
+    d.innerHTML = '<b>' + n + '</b><input type="time" name="mulai[' + h + '][]" required><span>–</span><input type="time" name="selesai[' + h + '][]" required>';
+    d.children[1].value = mulai; d.children[3].value = selesai;
+    fs.insertBefore(d, fs.querySelector('.dua-tombol'));
+  }
+  Array.prototype.forEach.call(form.querySelectorAll('.tab-jam button'), function (b) {
+    b.addEventListener('click', function () {
+      Array.prototype.forEach.call(form.querySelectorAll('.tab-jam button'), function (x) { x.classList.toggle('aktif', x === b); });
+      Array.prototype.forEach.call(form.querySelectorAll('.daftar-jam'), function (f) { f.hidden = f.dataset.hari !== b.dataset.hari; });
     });
   });
+  Array.prototype.forEach.call(form.querySelectorAll('.daftar-jam'), function (fs) {
+    fs.querySelector('.tambah-jam').addEventListener('click', function () {
+      var r = baris(fs), akhir = r[r.length - 1], mulai = akhir ? akhir.querySelector('[name^=selesai]').value : '07:30';
+      barisBaru(fs, mulai, tambahMenit(mulai, 40)); hitung();
+    });
+    fs.querySelector('.kurang-jam').addEventListener('click', function () {
+      var r = baris(fs); if (r.length) r[r.length - 1].remove(); hitung();
+    });
+    var salin = fs.querySelector('.salin-jam');
+    if (salin) salin.addEventListener('click', function () {
+      var asal = bagian(+fs.dataset.hari - 1);
+      Array.prototype.forEach.call(baris(fs), function (r) { r.remove(); });
+      Array.prototype.forEach.call(baris(asal), function (r) { barisBaru(fs, r.children[1].value, r.children[3].value); });
+      hitung();
+    });
+  });
+  hitung();
 })();

@@ -248,3 +248,4 @@ body.polos main{max-width:none;padding:0}
 .daftar-jam{border:1px solid var(--garis);border-radius:12px;padding:.5rem .7rem;margin:.5rem 0}
 .baris-waktu{display:grid;grid-template-columns:1.8rem 1fr auto 1fr;gap:.4rem;align-items:center;margin:.3rem 0}
 .baris-waktu b{color:var(--navy);text-align:center}.baris-waktu input{min-height:2.4rem}
+.tab-jam button{min-width:0;flex:1}.tab-jam small{display:block;font-size:.7rem;min-height:.9rem;font-weight:600}
