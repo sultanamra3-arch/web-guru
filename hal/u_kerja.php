@@ -36,8 +36,8 @@ if ($p['selesai']):
     $nu = json_decode((string)$p['nilai_uraian'], true) ?: [];
 ?>
 <div class="siswa-wadah">
-  <header class="siswa-kop"><img src="aset/logo.png" alt=""><div><small><?= h((string)k('sekolah', '')) ?></small><b><?= ujian_latihan($u) ? 'Latihan Soal' : 'Ujian Online' ?></b></div></header>
-  <div class="kartu selesai-ujian">
+  <header class="siswa-kop tak-cetak"><img src="aset/logo.png" alt=""><div><small><?= h((string)k('sekolah', '')) ?></small><b><?= ujian_latihan($u) ? 'Latihan Soal' : 'Ujian Online' ?></b></div></header>
+  <div class="kartu selesai-ujian tak-cetak">
     <div class="ikon-selesai"><?= $p['alasan'] === 'pengaman' ? '🔒' : '✅' ?></div>
     <h2><?= $p['alasan'] === 'pengaman' ? 'Jawaban dikumpulkan otomatis' : 'Jawaban terkumpul' ?></h2>
     <p><b><?= h($nama) ?></b><br><?= h($u['judul']) ?></p>
@@ -55,6 +55,15 @@ if ($p['selesai']):
     <?php if (!$terbuka): ?><p class="kecil redup">Halaman ini boleh ditutup.</p><?php endif; ?>
   </div>
   <?php if ($terbuka): ?>
+  <div class="kartu tak-cetak simpan-pdf">
+    <button type="button" class="utama lebar" onclick="document.title=<?= h(json_encode('Pembahasan - ' . $u['judul'] . ' - ' . $nama, JSON_UNESCAPED_UNICODE)) ?>;window.print()">📄 Simpan sebagai PDF</button>
+    <p class="kecil redup" style="margin:.4rem 0 0">Di jendela yang muncul, pilih <b>Simpan sebagai PDF</b> (atau <b>Simpan PDF</b>), lalu tekan Simpan/Unduh. Simpan untuk belajar lagi nanti.</p>
+  </div>
+  <div class="hanya-cetak kop-pdf">
+    <b><?= h((string)k('sekolah', '')) ?></b> · Pembahasan <?= ujian_latihan($u) ? 'latihan' : 'ujian' ?><br>
+    <?= h($u['judul']) ?> · Kelas <?= h($u['kelas']) ?><?= $u['mapel'] ? ' · ' . h($u['mapel']) : '' ?><br>
+    Nama: <b><?= h($nama) ?></b><?= $lihat_nilai && !$h['perlu'] ? ' · Nilai: <b>' . h((string)$h['nilai']) . '</b>' : '' ?> · <?= h(tgl_panjang(substr((string)$p['selesai'], 0, 10))) ?>
+  </div>
   <h3 style="margin:1.2rem 0 .5rem">Pembahasan</h3>
   <ol class="ulasan-siswa">
   <?php foreach ($soal_semua as $i => $x): $a = (string)($jw[$i] ?? ''); $r = $h['rinci'][$i]; $pg = in_array($x['tipe'], ['pg', 'bs'], true);
