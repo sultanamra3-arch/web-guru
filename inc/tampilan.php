@@ -100,6 +100,10 @@ function judul_baris(string $judul, string $kanan = ''): void
 function panel_bagikan(array $d): void
 {
     $jenis = (string)$d['jenis'];
+    // nama guru & mata pelajaran ikut di tulisan dan gambar (mapel kosong → mapel di Profil guru)
+    $saya = pengguna() ?? [];
+    $d['guru'] = (string)($saya['nama'] ?? '');
+    if (trim((string)($d['mapel'] ?? '')) === '') $d['mapel'] = trim((string)($saya['mapel'] ?? ''));
     $attr = '';
     foreach ($d as $k => $v) $attr .= ' data-' . $k . '="' . h((string)$v) . '"';
     $attr .= ' data-sekolah="' . h((string)k('sekolah', '')) . '"';

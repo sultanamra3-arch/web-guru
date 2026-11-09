@@ -567,3 +567,14 @@ b.merah{color:var(--merah)}
 .ks-gambar{max-width:100%;max-height:28vh;border-radius:10px;background:#fff;align-self:center}
 @media (max-width:560px){.pg-baris{grid-template-columns:6.5rem 1fr auto}}
 .ks-mulai{font-size:1.15rem;min-height:3.4rem;margin-top:.6rem}
+/* Beranda: kartu "Sedang berjalan" */
+.berjalan h2 .lencana{font-size:.8rem;vertical-align:middle}
+.berjalan .daftar{margin:0}
+.berjalan .daftar li{display:flex;align-items:center;gap:.7rem;padding:.65rem 0}
+.berjalan-ikon{flex:none;width:2.2rem;height:2.2rem;border-radius:.6rem;background:#EAF6FD;color:#2A2C84;display:grid;place-items:center}
+.berjalan-ikon .ikon{width:1.2rem;height:1.2rem}
+.berjalan-isi{flex:1;min-width:0}
+.berjalan-isi>b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.berjalan-isi small{display:block;color:var(--redup,#5B6382);line-height:1.35}
+.berjalan .tombol{flex:none}
+.teks-merah{color:var(--merah);font-weight:700}

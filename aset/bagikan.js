@@ -20,7 +20,10 @@
     return ('0' + t.getHours()).slice(-2) + '.' + ('0' + t.getMinutes()).slice(-2);
   }
   function teks() {
-    var b = [(kuis ? '⚡ *Kuis: ' : '📝 *' + (tugas ? 'Tugas: ' : '')) + d.judul + '*', 'Kelas ' + d.kelas + (d.mapel ? ' · ' + d.mapel : '') + (tugas ? '' : ' · ' + d.soal + ' soal · ' + (kuis ? d.durasi + ' detik per soal' : d.durasi + ' menit'))];
+    var b = [(kuis ? '⚡ *Kuis: ' : '📝 *' + (tugas ? 'Tugas: ' : '')) + d.judul + '*'];
+    b.push('📚 ' + (d.mapel ? d.mapel + ' · ' : '') + 'Kelas ' + d.kelas);
+    if (d.guru) b.push('👤 Guru: ' + d.guru);
+    if (!tugas) b.push('🧮 ' + d.soal + ' soal · ' + (kuis ? d.durasi + ' detik per soal' : d.durasi + ' menit'));
     if (d.mulai) b.push('🗓 Mulai: ' + d.mulai);
     if (d.batas) b.push('⏰ Batas: ' + d.batas);
     b.push('', 'Buka: ' + d.url, labelKode.charAt(0) + labelKode.slice(1).toLowerCase() + ': *' + d.kode + '*');
@@ -43,7 +46,12 @@
     var qrSrc = '';
     try { var q = qrcode(0, 'M'); q.addData(d.url); q.make(); qrSrc = q.createDataURL(12, 1); } catch (e) { /* abaikan */ }
     return Promise.all([muatGambar('aset/logo.png'), muatGambar(qrSrc), document.fonts ? document.fonts.ready : null]).then(function (g) {
-      var c = cv.getContext('2d'), W = 1080, H = 1200;
+      var c = cv.getContext('2d'), W = 1080;
+      c.font = '700 64px ' + huruf;
+      var nJudul = Math.min(2, bungkus(c, d.judul, W - 144).length);
+      var nInfo = 1 + (d.guru ? 1 : 0) + (d.mulai ? 1 : 0);
+      var H = 290 + nJudul * 76 + nInfo * 46 + 20 + 470 + 70 + 96 + 60;
+      cv.height = H; c = cv.getContext('2d');
       var gr = c.createLinearGradient(0, 0, W * .4, H); gr.addColorStop(0, '#26317d'); gr.addColorStop(1, '#1a1f5e');
       c.fillStyle = gr; c.fillRect(0, 0, W, H);
       c.fillStyle = '#F2C230'; c.fillRect(0, H - 20, W * .6, 20); c.fillStyle = '#2E9E48'; c.fillRect(W * .6, H - 20, W * .4, 20);
@@ -54,7 +62,8 @@
       c.font = '700 64px ' + huruf;
       var y = 290; bungkus(c, d.judul, W - 144).slice(0, 2).forEach(function (b) { c.fillText(b, 72, y); y += 76; });
       c.fillStyle = 'rgba(255,255,255,.85)'; c.font = '500 32px ' + huruf;
-      c.fillText('Kelas ' + d.kelas + (d.mapel ? ' · ' + d.mapel : '') + (tugas ? '' : (kuis ? ' · ' + d.soal + ' soal' : ' · ' + d.durasi + ' menit')), 72, y); y += 46;
+      c.fillText((d.mapel ? d.mapel + ' · ' : '') + 'Kelas ' + d.kelas + (tugas ? '' : (kuis ? ' · ' + d.soal + ' soal' : ' · ' + d.durasi + ' menit')), 72, y); y += 46;
+      if (d.guru) { c.fillText('Guru: ' + d.guru, 72, y); y += 46; }
       if (d.mulai) { c.fillText('Mulai ' + d.mulai, 72, y); y += 46; }
       y += 20;
       var bh = 470; c.fillStyle = '#fff'; kotakBulat(c, 72, y, W - 144, bh, 40); c.fill();
