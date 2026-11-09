@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script src="aset/pratinjau.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2A2C84">
+<meta name="robots" content="noindex, nofollow">
+<title>Absensi · SiGuru</title>
+<meta name="application-name" content="SiGuru">
+<meta name="apple-mobile-web-app-title" content="SiGuru">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.1">
+<link rel="icon" href="aset/favicon.png">
+<link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="aset/gaya.css?v=1.1">
+<link rel="stylesheet" href="aset/guru.css?v=1.1">
+</head>
+<body class="">
+<header class="atas">
+  <a class="merek" href="beranda.html"><img src="aset/logo.png" alt="Logo"> <span><small>SMP Negeri 6 Keritang</small><b>SiGuru</b></span></a>
+    <form method="post"  class="keluar"><input type="hidden" name="_t" value="a6cb8629d13578ba4f3e753ce89be281"><button title="Keluar">Keluar</button></form>
+  </header>
+<nav class="menu">
+    <a href="beranda.html" class=""><span class="ik">⌂</span>Beranda</a>
+    <a href="kelas.html" class="aktif"><span class="ik">🧑‍🎓</span>Kelas</a>
+    <a href="soal.html" class=""><span class="ik">📝</span>Soal</a>
+    <a href="perangkat.html" class=""><span class="ik">📘</span>Perangkat</a>
+    <a href="lainnya.html" class=""><span class="ik">☰</span>Lainnya</a>
+  </nav>
+<main>
+<div class="judul-baris"><h1>Absensi siswa</h1><span><a class="tombol" href="absensi_rekap__kelas-VIII-A.html">Rekap</a></span></div><form class="cari" method="get">
+  <input type="hidden" name="p" value="absensi">
+  <select name="kelas" onchange="this.form.submit()"><option value="IX A">Kelas IX A</option><option value="VII A">Kelas VII A</option><option value="VIII A" selected>Kelas VIII A</option></select>
+  <input type="date" name="tanggal" value="2026-11-09" onchange="this.form.submit()">
+  <input name="mapel" list="dl-mapel" value="Informatika" placeholder="Mapel" style="flex:1 1 140px">
+  <button>Buka</button>
+</form>
+<datalist id="dl-mapel"><option value="Informatika"><option value="Prakarya"></datalist>
+
+<form method="post" id="form-absen">
+  <input type="hidden" name="_t" value="a6cb8629d13578ba4f3e753ce89be281">  <input type="hidden" name="kelas" value="VIII A"><input type="hidden" name="tanggal" value="2026-11-09"><input type="hidden" name="mapel" value="Informatika">
+  <div class="kartu lengket ringkas-absen">
+    <span><b>VIII A</b> · 9 Nov 2026</span>
+    <span id="hitung-absen" class="kecil">H 10 · S 0 · I 0 · A 0</span>
+    <button type="button" class="kecil" id="semua-hadir">Semua hadir</button>
+  </div>
+  <ul class="daftar kartu absen">
+      <li>
+      <div class="absen-nama"><span class="no">1</span> <b>Arif Wijaya</b> <small>P</small></div>
+      <div class="absen-pilih">
+                  <label class="pil pil-H" title="Hadir"><input type="radio" name="status[9000000019]" value="H" checked><span>H</span></label>
+                  <label class="pil pil-S" title="Sakit"><input type="radio" name="status[9000000019]" value="S" ><span>S</span></label>
+                  <label class="pil pil-I" title="Izin"><input type="radio" name="status[9000000019]" value="I" ><span>I</span></label>
+                  <label class="pil pil-A" title="Alpa"><input type="radio" name="status[9000000019]" value="A" ><span>A</span></label>
+                <input class="ket" name="ket[9000000019]" value="" placeholder="ket.">
+      </div>
+    </li>
+      <li>
+      <div class="absen-nama"><span class="no">2</span> <b>Galih Lestari</b> <small>P</small></div>
+      <div class="absen-pilih">
+                  <label class="pil pil-H" title="Hadir"><input type="radio" name="status[9000000015]" value="H" checked><span>H</span></label>
+                  <label class="pil pil-S" title="Sakit"><input type="radio" name="status[9000000015]" value="S" ><span>S</span></label>
+                  <label class="pil pil-I" title="Izin"><input type="radio" name="status[9000000015]" value="I" ><span>I</span></label>
+                  <label class="pil pil-A" title="Alpa"><input type="radio" name="status[9000000015]" value="A" ><span>A</span></label>
+                <input class="ket" name="ket[9000000015]" value="" placeholder="ket.">
+      </div>
+    </li>
+      <li>
+      <div class="absen-nama"><span class="no">3</span> <b>Hendra Permata</b> <small>P</small></div>
+      <div class="absen-pilih">
+                  <label class="pil pil-H" title="Hadir"><input type="radio" name="status[9000000020]" value="H" checked><span>H</span></label>
+                  <label class="pil pil-S" title="Sakit"><input type="radio" name="status[9000000020]" value="S" ><span>S</span></label>
+                  <label class="pil pil-I" title="Izin"><input type="radio" name="status[9000000020]" value="I" ><span>I</span></label>
+                  <label class="pil pil-A" title="Alpa"><input type="radio" name="status[9000000020]" value="A" ><span>A</span></label>
+                <input class="ket" name="ket[9000000020]" value="" placeholder="ket.">
+      </div>
+    </li>
+      <li>
+      <div class="absen-nama"><span class="no">4</span> <b>Indah Setiawan</b> <small>L</small></div>
+      <div class="absen-pilih">
+                  <label class="pil pil-H" title="Hadir"><input type="radio" name="status[9000000018]" value="H" checked><span>H</span></label>
+                  <label class="pil pil-S" title="Sakit"><input type="radio" name="status[9000000018]" value="S" ><span>S</span></label>
+                  <label class="pil pil-I" title="Izin"><input type="radio" name="status[9000000018]" value="I" ><span>I</span></label>
+                  <label class="pil pil-A" title="Alpa"><input type="radio" name="status[9000000018]" value="A" ><span>A</span></label>
+                <input class="ket" name="ket[9000000018]" value="" placeholder="ket.">
+      </div>
+    </li>
+      <li>
+      <div class="absen-nama"><span class="no">5</span> <b>Intan Nugroho</b> <small>L</small></div>
+      <div class="absen-pilih">
+                  <label class="pil pil-H" title="Hadir"><input type="radio" name="status[9000000013]" value="H" checked><span>H</span></label>
+                  <label class="pil pil-S" title="Sakit"><input type="radio" name="status[9000000013]" value="S" ><span>S</span></label>
+                  <label class="pil pil-I" title="Izin"><input type="radio" name="status[9000000013]" value="I" ><span>I</span></label>
+                  <label class="pil pil-A" title="Alpa"><input type="radio" name="status[9000000013]" value="A" ><span>A</span></label>
+                <input class="ket" name="ket[9000000013]" value="" placeholder="ket.">
+      </div>
+    </li>
+      <li>
+      <div class="absen-nama"><span class="no">6</span> <b>Putri Permata</b> <small>L</small></div>
+      <div class="absen-pilih">
+                  <label class="pil pil-H" title="Hadir"><input type="radio" name="status[9000000012]" value="H" checked><span>H</span></label>
+                  <label class="pil pil-S" title="Sakit"><input type="radio" name="status[9000000012]" value="S" ><span>S</span></label>
+                  <label class="pil pil-I" title="Izin"><input type="radio" name="status[9000000012]" value="I" ><span>I</span></label>
+                  <label class="pil pil-A" title="Alpa"><input type="radio" name="status[9000000012]" value="A" ><span>A</span></label>
+                <input class="ket" name="ket[9000000012]" value="" placeholder="ket.">
+      </div>
+    </li>
+      <li>
+      <div class="absen-nama"><span class="no">7</span> <b>Putri Pratama</b> <small>L</small></div>
+      <div class="absen-pilih">
+                  <label class="pil pil-H" title="Hadir"><input type="radio" name="status[9000000016]" value="H" checked><span>H</span></label>
+                  <label class="pil pil-S" title="Sakit"><input type="radio" name="status[9000000016]" value="S" ><span>S</span></label>
+                  <label class="pil pil-I" title="Izin"><input type="radio" name="status[9000000016]" value="I" ><span>I</span></label>
+                  <label class="pil pil-A" title="Alpa"><input type="radio" name="status[9000000016]" value="A" ><span>A</span></label>
+                <input class="ket" name="ket[9000000016]" value="" placeholder="ket.">
+      </div>
+    </li>
+      <li>
+      <div class="absen-nama"><span class="no">8</span> <b>Taufik Anggraini</b> <small>P</small></div>
+      <div class="absen-pilih">
+                  <label class="pil pil-H" title="Hadir"><input type="radio" name="status[9000000011]" value="H" checked><span>H</span></label>
+                  <label class="pil pil-S" title="Sakit"><input type="radio" name="status[9000000011]" value="S" ><span>S</span></label>
+                  <label class="pil pil-I" title="Izin"><input type="radio" name="status[9000000011]" value="I" ><span>I</span></label>
+                  <label class="pil pil-A" title="Alpa"><input type="radio" name="status[9000000011]" value="A" ><span>A</span></label>
+                <input class="ket" name="ket[9000000011]" value="" placeholder="ket.">
+      </div>
+    </li>
+      <li>
+      <div class="absen-nama"><span class="no">9</span> <b>Taufik Lestari</b> <small>P</small></div>
+      <div class="absen-pilih">
+                  <label class="pil pil-H" title="Hadir"><input type="radio" name="status[9000000017]" value="H" checked><span>H</span></label>
+                  <label class="pil pil-S" title="Sakit"><input type="radio" name="status[9000000017]" value="S" ><span>S</span></label>
+                  <label class="pil pil-I" title="Izin"><input type="radio" name="status[9000000017]" value="I" ><span>I</span></label>
+                  <label class="pil pil-A" title="Alpa"><input type="radio" name="status[9000000017]" value="A" ><span>A</span></label>
+                <input class="ket" name="ket[9000000017]" value="" placeholder="ket.">
+      </div>
+    </li>
+      <li>
+      <div class="absen-nama"><span class="no">10</span> <b>Wulan Saputra</b> <small>L</small></div>
+      <div class="absen-pilih">
+                  <label class="pil pil-H" title="Hadir"><input type="radio" name="status[9000000014]" value="H" checked><span>H</span></label>
+                  <label class="pil pil-S" title="Sakit"><input type="radio" name="status[9000000014]" value="S" ><span>S</span></label>
+                  <label class="pil pil-I" title="Izin"><input type="radio" name="status[9000000014]" value="I" ><span>I</span></label>
+                  <label class="pil pil-A" title="Alpa"><input type="radio" name="status[9000000014]" value="A" ><span>A</span></label>
+                <input class="ket" name="ket[9000000014]" value="" placeholder="ket.">
+      </div>
+    </li>
+    </ul>
+  <button class="utama lebar">Simpan absensi (10 siswa)</button>
+</form>
+</main>
+<footer class="bawah tak-cetak">SiGuru v1.1 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.1"></script>
+</body>
+</html>

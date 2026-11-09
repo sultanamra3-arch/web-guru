@@ -23,7 +23,7 @@
     }
     return asliFetch.apply(this, arguments);
   };
-  var AI = ['form-soal-ai', 'form-dokumen-ai', 'form-revisi'];
+  var AI = ['form-soal-ai', 'form-dokumen-ai', 'form-revisi', 'form-koreksi'];
   document.addEventListener('submit', function (e) {
     var f = e.target;
     if (AI.indexOf(f.id) >= 0) return;

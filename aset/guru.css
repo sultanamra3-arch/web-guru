@@ -134,3 +134,32 @@ body.polos main{max-width:none;padding:0}
   .deck .slide{page-break-after:always;border:1px solid #ccc}
   .alat-dokumen,#form-revisi,#sunting{display:none!important}
 }
+/* ---------- Nilai dari foto ---------- */
+.status-ai{margin-top:.6rem;font-weight:600;color:var(--navy)}
+.tombol-foto-nilai{display:block;text-align:center;margin:.2rem 0 1rem}
+.kepala-k h3{margin:0 0 .2rem}.kepala-k small{display:block}
+.ringkas-k{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0;padding:.6rem .8rem;background:var(--biru);border-radius:12px}
+.ringkas-k>div:nth-child(2){flex:1}
+.total-k{display:flex;align-items:baseline;gap:.4rem}.nilai-besar{font-size:2rem;color:var(--navy)}
+.ragu-info{font-weight:700;color:#8a5a00}.ragu-info.beres{color:#1d6b33}
+.tabel-koreksi{width:100%;border-collapse:collapse;font-size:.95rem}
+.tabel-koreksi th{text-align:left;font-size:.8rem;color:var(--redup);padding:.3rem .4rem;border-bottom:1px solid var(--garis)}
+.tabel-koreksi td{padding:.45rem .25rem;border-bottom:1px solid var(--garis);vertical-align:top}
+.tabel-koreksi td.no{font-weight:700;width:2.2rem;text-align:right}
+.tabel-koreksi tr.ragu td{background:#fff3c4}
+.tabel-koreksi tr.diperiksa td.no{color:#1d6b33}
+.tabel-koreksi tr.benar .tanda-k{color:#1d6b33;font-weight:700}
+.tabel-koreksi tr.salah .tanda-k{color:#b3261e;font-weight:700}
+.tabel-koreksi tr.sebagian td:last-child{color:#8a5a00}
+.kunci-k{font-weight:700;color:#1d6b33;width:2.5rem;text-align:center}.tanda-k{width:1.6rem;text-align:center;font-size:1.1rem}
+.pilih-huruf{display:flex;flex-wrap:wrap;gap:.2rem}
+.pilih-huruf button{min-width:2.1rem;min-height:2.3rem;padding:0 .3rem;border:1.5px solid var(--garis);background:#fff;border-radius:10px;font-weight:700;color:var(--redup);cursor:pointer}
+.pilih-huruf button.aktif{background:var(--navy);border-color:var(--navy);color:#fff}
+.pilih-huruf .ganda{align-self:center;color:#b3261e;font-weight:700}
+.catatan-k{display:block;color:#7a5200;margin-top:.25rem;font-size:.82rem}
+.ok-k{margin-top:.3rem}
+.jawaban-uraian{white-space:pre-wrap;background:#fafbfe;border:1px solid var(--garis);border-radius:8px;padding:.4rem .5rem;margin:.2rem 0;font-size:.9rem;max-height:9rem;overflow:auto}
+.skor-k{margin-top:.35rem;white-space:nowrap;font-weight:600}.skor-k input{width:4.2rem;text-align:center;font-weight:700;display:inline-block}
+.tabel-koreksi.isi-k{table-layout:fixed}.isi-k th:nth-child(1){width:2rem}.isi-k th:nth-child(3){width:2.7rem;text-align:center}.isi-k th:nth-child(4){width:1.7rem}
+.baris-status{display:flex;justify-content:space-between;gap:.5rem}
+#hasil-koreksi label{display:block;margin-top:.8rem}

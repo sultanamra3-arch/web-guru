@@ -9,19 +9,19 @@
 <title>Absensi · SiGuru</title>
 <meta name="application-name" content="SiGuru">
 <meta name="apple-mobile-web-app-title" content="SiGuru">
-<link rel="x-manifest" href="manifest.webmanifest?v=1.0">
+<link rel="x-manifest" href="manifest.webmanifest?v=1.1">
 <link rel="icon" href="aset/favicon.png">
 <link rel="apple-touch-icon" href="aset/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="aset/gaya.css?v=1.0">
-<link rel="stylesheet" href="aset/guru.css?v=1.0">
+<link rel="stylesheet" href="aset/gaya.css?v=1.1">
+<link rel="stylesheet" href="aset/guru.css?v=1.1">
 </head>
 <body class="">
 <header class="atas">
   <a class="merek" href="beranda.html"><img src="aset/logo.png" alt="Logo"> <span><small>SMP Negeri 6 Keritang</small><b>SiGuru</b></span></a>
-    <form method="post"  class="keluar"><input type="hidden" name="_t" value="133f947193b7e7a2db62b84097154561"><button title="Keluar">Keluar</button></form>
+    <form method="post"  class="keluar"><input type="hidden" name="_t" value="a6cb8629d13578ba4f3e753ce89be281"><button title="Keluar">Keluar</button></form>
   </header>
 <nav class="menu">
     <a href="beranda.html" class=""><span class="ik">⌂</span>Beranda</a>
@@ -34,16 +34,16 @@
 <div class="judul-baris"><h1>Absensi siswa</h1><span><a class="tombol" href="absensi_rekap__kelas-VIII-A.html">Rekap</a></span></div><form class="cari" method="get">
   <input type="hidden" name="p" value="absensi">
   <select name="kelas" onchange="this.form.submit()"><option value="IX A">Kelas IX A</option><option value="VII A">Kelas VII A</option><option value="VIII A" selected>Kelas VIII A</option></select>
-  <input type="date" name="tanggal" value="2026-11-08" onchange="this.form.submit()">
+  <input type="date" name="tanggal" value="2026-11-09" onchange="this.form.submit()">
   <input name="mapel" list="dl-mapel" value="Informatika" placeholder="Mapel" style="flex:1 1 140px">
   <button>Buka</button>
 </form>
 <datalist id="dl-mapel"><option value="Informatika"><option value="Prakarya"></datalist>
 
 <form method="post" id="form-absen">
-  <input type="hidden" name="_t" value="133f947193b7e7a2db62b84097154561">  <input type="hidden" name="kelas" value="VIII A"><input type="hidden" name="tanggal" value="2026-11-08"><input type="hidden" name="mapel" value="Informatika">
+  <input type="hidden" name="_t" value="a6cb8629d13578ba4f3e753ce89be281">  <input type="hidden" name="kelas" value="VIII A"><input type="hidden" name="tanggal" value="2026-11-09"><input type="hidden" name="mapel" value="Informatika">
   <div class="kartu lengket ringkas-absen">
-    <span><b>VIII A</b> · 8 Nov 2026</span>
+    <span><b>VIII A</b> · 9 Nov 2026</span>
     <span id="hitung-absen" class="kecil">H 10 · S 0 · I 0 · A 0</span>
     <button type="button" class="kecil" id="semua-hadir">Semua hadir</button>
   </div>
@@ -152,6 +152,6 @@
   <button class="utama lebar">Simpan absensi (10 siswa)</button>
 </form>
 </main>
-<footer class="bawah tak-cetak">SiGuru v1.0 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.0"></script>
+<footer class="bawah tak-cetak">SiGuru v1.1 · SMP Negeri 6 Keritang</footer><script src="aset/guru.js?v=1.1"></script>
 </body>
 </html>
