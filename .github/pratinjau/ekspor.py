@@ -27,6 +27,12 @@ while antri:
     ext_of[n]='.html'
     for m in re.findall(r'href="\?([^"]*)"', r.text): antri.append(m)
     open(os.path.join(OUT,n+'.html'),'w').write(r.text)
+# data pantau ujian (agar halaman pantau tampil di pratinjau)
+for f in list(ext_of):
+    m=re.match(r'ujian_lihat__id-(\d+)$', f)
+    if m:
+        r=s.get(U+'?p=api_ujian&aksi=pantau&id='+m.group(1))
+        if r.ok: open(os.path.join(OUT,'pantau-'+m.group(1)+'.json'),'w').write(r.text)
 # tulis ulang tautan
 for f in os.listdir(OUT):
     if not f.endswith('.html'): continue
