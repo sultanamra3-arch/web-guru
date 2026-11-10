@@ -52,6 +52,11 @@ function ujian_baris_pantau(string $kode, string $nama, ?array $p, int $n_soal, 
     ];
 }
 
+if ($aksi === 'status') {
+    session_write_close();
+    jawab_json(['ok' => true, 'per' => ujian_waktu_teks(sekarang()), 'tutup' => $u['status'] !== 'buka'] + ujian_status_kumpul($u));
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') jawab_json(['ok' => false, 'galat' => 'Metode tidak didukung']);
 
 if ($aksi === 'token_tetap') {

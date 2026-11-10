@@ -134,3 +134,31 @@ function panel_bagikan(array $d): void
 </div>
 <?php
 }
+
+/**
+ * Panel "Status ke WA": daftar nama yang sudah / belum mengumpulkan (tanpa nilai).
+ * $d: jenis (ujian|latihan|tugas), id, judul, kelas, mapel, url, kode, batas
+ */
+function panel_status(array $d): void
+{
+    $saya = pengguna() ?? [];
+    $d['guru'] = (string)($saya['nama'] ?? '');
+    if (trim((string)($d['mapel'] ?? '')) === '') $d['mapel'] = trim((string)($saya['mapel'] ?? ''));
+    $d['api'] = $d['jenis'] === 'tugas' ? '?p=api_tugas' : '?p=api_ujian';
+    $attr = '';
+    foreach ($d as $k => $v) $attr .= ' data-' . $k . '="' . h((string)$v) . '"';
+    ?>
+<div class="kartu panel-bagikan" id="panel-status" hidden<?= $attr ?>>
+  <div class="judul-panel"><h3 style="margin:0">📋 Status pengumpulan</h3><button type="button" class="kecil" id="tutup-status" aria-label="Tutup">✕</button></div>
+  <label class="centang"><input type="checkbox" id="status-sudah" checked> <b>Sertakan daftar yang sudah</b> <small class="redup">(matikan agar pesan pendek)</small></label>
+  <small class="redup">Pesan untuk grup WA kelas (nilai tidak ikut):</small>
+  <div class="pratinjau-pesan" id="status-pesan">Memuat…</div>
+  <div class="tombol-bagikan-lain">
+    <a class="tombol kecil utama" id="status-wa" target="_blank" rel="noopener">Kirim ke WA</a>
+    <button type="button" class="kecil" id="status-salin">Salin teks</button>
+    <button type="button" class="kecil" id="status-segar">↻ Perbarui</button>
+  </div>
+  <p class="kecil redup" id="status-info"></p>
+</div>
+<?php
+}

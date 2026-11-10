@@ -149,3 +149,23 @@ function ai_nilai_tugas(array $t, array $k): array
     return ['ok' => true, 'nilai' => max(0, min(100, (float)$j['nilai'])), 'catatan' => mb_substr(trim((string)($j['catatan'] ?? '')), 0, 400),
         'ragu' => !empty($j['ragu']), 'oleh' => $r['oleh']];
 }
+
+/** Nama siswa per status kiriman untuk dibagikan ke grup WA (tanpa nilai). */
+function tugas_status_kumpul(array $t): array
+{
+    $kirim = [];
+    foreach (semua('SELECT kode, dikirim, status FROM guru_tugas_kirim WHERE tugas_id = ?', [$t['id']]) as $k) $kirim[$k['kode']] = $k;
+    $daftar = [];
+    foreach (siswa_kelas((string)$t['kelas'], (string)($t['tahun'] ?: tahun_aktif())) as $s) {
+        $daftar[] = [$s['member_name'], $kirim[$s['member_id']] ?? null];
+        unset($kirim[$s['member_id']]);
+    }
+    foreach ($kirim as $kd => $k) $daftar[] = [nama_siswa((string)$kd), $k];
+    $o = ['sudah' => [], 'jalan' => [], 'belum' => [], 'perbaiki' => []];
+    foreach ($daftar as [$nama, $k]) {
+        if ($k && $k['status'] === 'perbaiki') $o['perbaiki'][] = $nama;
+        elseif ($k && $k['dikirim']) $o['sudah'][] = $nama;
+        else $o['belum'][] = $nama;
+    }
+    return $o;
+}

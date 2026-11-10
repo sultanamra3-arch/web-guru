@@ -95,6 +95,7 @@ judul_baris(h($u['judul']), '<a class="tombol" href="?p=ujian">‹ Ujian</a>');
   <div class="token-qr" id="qr"></div>
   <div class="token-tombol">
     <button type="button" class="utama kecil" id="tombol-bagikan">📤 Bagikan</button>
+    <button type="button" class="kecil" id="tombol-status">📋 Status ke WA</button>
     <button type="button" class="kecil" id="tombol-layar-penuh">⛶ Tampilkan di proyektor</button>
   </div>
 </div>
@@ -103,7 +104,9 @@ judul_baris(h($u['judul']), '<a class="tombol" href="?p=ujian">‹ Ujian</a>');
     'id' => $id, 'jenis' => ujian_latihan($u) ? 'latihan' : 'ujian', 'judul' => $u['judul'], 'kelas' => $u['kelas'], 'mapel' => (string)$u['mapel'],
     'soal' => $jumlah_soal, 'durasi' => (int)$u['durasi'], 'kode' => $u['kode'], 'url' => $url,
     'mulai' => ujian_waktu_teks($u['mulai']), 'batas' => ujian_waktu_teks($u['selesai']), 'tertib' => (int)$u['tampil_tertib'], 'token-menit' => (int)$u['token_menit'],
-]); ?>
+]);
+panel_status(['jenis' => ujian_latihan($u) ? 'latihan' : 'ujian', 'id' => $id, 'judul' => $u['judul'], 'kelas' => $u['kelas'], 'mapel' => (string)$u['mapel'],
+    'url' => $url, 'kode' => $u['kode'], 'batas' => ujian_waktu_teks($u['selesai'])]); ?>
 
 <div class="kartu">
   <h3 style="margin-top:0">Pantau siswa <small class="redup" id="pantau-waktu"></small></h3>

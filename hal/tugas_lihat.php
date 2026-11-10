@@ -76,12 +76,15 @@ judul_baris('Tugas: ' . h($t['judul']), '<a class="tombol" href="?p=tugas">‹ T
   </div>
   <div class="token-tombol">
     <button type="button" class="utama kecil" id="tombol-bagikan">📤 Bagikan</button>
+    <button type="button" class="kecil" id="tombol-status">📋 Status ke WA</button>
     <a class="tombol kecil" href="?p=tugas_form&amp;id=<?= $id ?>">⚙ Ubah tugas</a>
     <form method="post" class="sebaris"><?= input_token() ?><?php if ($t['status'] === 'buka'): ?><button name="aksi" value="tutup" class="kecil">■ Tutup</button><?php else: ?><button name="aksi" value="buka" class="kecil">▶ Buka lagi</button><?php endif; ?></form>
   </div>
 </div>
 <?php panel_bagikan(['id' => $id, 'jenis' => 'tugas', 'judul' => $t['judul'], 'kelas' => $t['kelas'], 'mapel' => (string)$t['mapel'],
-    'kode' => $t['kode'], 'url' => $url, 'batas' => ujian_waktu_teks($t['batas']), 'tertib' => (int)$t['tampil_tertib']]); ?>
+    'kode' => $t['kode'], 'url' => $url, 'batas' => ujian_waktu_teks($t['batas']), 'tertib' => (int)$t['tampil_tertib']]);
+panel_status(['jenis' => 'tugas', 'id' => $id, 'judul' => $t['judul'], 'kelas' => $t['kelas'], 'mapel' => (string)$t['mapel'],
+    'url' => $url, 'kode' => $t['kode'], 'batas' => ujian_waktu_teks($t['batas'])]); ?>
 
 <div class="kartu">
   <div class="statistik">
@@ -91,8 +94,7 @@ judul_baris('Tugas: ' . h($t['judul']), '<a class="tombol" href="?p=tugas">‹ T
     <span><b><?= $n['nilai'] ?></b>dinilai</span>
   </div>
   <?php if ($belum_nama): ?>
-  <button type="button" class="kecil" id="salin-belum" data-teks="<?= h("Yang belum mengumpulkan tugas *" . $t['judul'] . "*:\n" . implode("\n", array_map(fn($i, $x) => ($i + 1) . '. ' . $x, array_keys($belum_nama), $belum_nama)) . ($t['batas'] ? "\n\nBatas: " . ujian_waktu_teks($t['batas']) : '') . "\nLink: " . $url) ?>">📋 Salin nama yang belum (<?= count($belum_nama) ?>)</button>
-  <span class="kecil redup" id="salin-belum-st"></span>
+  <button type="button" class="kecil buka-status">📋 Bagikan yang belum (<?= count($belum_nama) ?>) ke grup WA</button>
   <?php endif; ?>
   <ul class="daftar daftar-tugas">
   <?php foreach ($baris as [$kd, $nm, $k]): $sudah = $k && $k['dikirim']; ?>
@@ -124,12 +126,6 @@ judul_baris('Tugas: ' . h($t['judul']), '<a class="tombol" href="?p=tugas">‹ T
 window.addEventListener('load', function () {
   var q = document.getElementById('qr');
   try { var x = qrcode(0, 'M'); x.addData(q.dataset.url); x.make(); q.innerHTML = x.createSvgTag({ cellSize: 6, margin: 2, scalable: true }); } catch (e) {}
-  var b = document.getElementById('salin-belum');
-  if (b) b.onclick = function () {
-    var t = b.dataset.teks, st = document.getElementById('salin-belum-st');
-    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { st.textContent = '✓ disalin, tempel di grup WA'; })
-      .catch(function () { var a = document.createElement('textarea'); a.value = t; document.body.append(a); a.select(); document.execCommand('copy'); a.remove(); st.textContent = '✓ disalin'; });
-  };
 });
 </script>
 <?php

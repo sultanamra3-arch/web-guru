@@ -323,3 +323,24 @@ function ujian_url_siswa(array $u): string
     $dir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/');
     return $s . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $dir . '/u/?k=' . $u['kode'];
 }
+
+/** Nama siswa per status untuk dibagikan ke grup WA (tanpa nilai). */
+function ujian_status_kumpul(array $u): array
+{
+    ujian_akhiri_kedaluwarsa($u);
+    $peserta = [];
+    foreach (semua('SELECT kode, mulai, selesai FROM guru_ujian_peserta WHERE ujian_id = ?', [$u['id']]) as $p) $peserta[$p['kode']] = $p;
+    $daftar = [];
+    foreach (siswa_kelas((string)$u['kelas'], (string)($u['tahun'] ?: tahun_aktif((int)$u['guru_id'])), (int)$u['guru_id']) as $s) {
+        $daftar[] = [$s['member_name'], $peserta[$s['member_id']] ?? null];
+        unset($peserta[$s['member_id']]);
+    }
+    foreach ($peserta as $k => $p) $daftar[] = [nama_siswa((string)$k), $p];
+    $o = ['sudah' => [], 'jalan' => [], 'belum' => [], 'perbaiki' => []];
+    foreach ($daftar as [$nama, $p]) {
+        if (!$p || !$p['mulai']) $o['belum'][] = $nama;
+        elseif ($p['selesai']) $o['sudah'][] = $nama;
+        else $o['jalan'][] = $nama;
+    }
+    return $o;
+}

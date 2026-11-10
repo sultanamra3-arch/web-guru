@@ -136,3 +136,58 @@
     }).catch(function (e) { if (e && e.name !== 'AbortError') pesan('Gagal membagikan: ' + e.message); });
   });
 })();
+
+/* ===== Status pengumpulan → grup WA (nama saja, tanpa nilai) ===== */
+(function () {
+  var P = document.getElementById('panel-status');
+  if (!P) return;
+  var d = P.dataset, data = null, cb = document.getElementById('status-sudah');
+  var kotak = document.getElementById('status-pesan'), wa = document.getElementById('status-wa'), info = document.getElementById('status-info');
+  var tugas = d.jenis === 'tugas', nama = tugas ? 'Tugas' : (d.jenis === 'latihan' ? 'Latihan' : 'Ujian');
+  function daftar(arr) { return arr.map(function (n, i) { return (i + 1) + '. ' + n; }).join('\n'); }
+  function teks() {
+    if (!data) return '';
+    var total = data.sudah.length + data.jalan.length + data.belum.length + data.perbaiki.length;
+    var b = ['📋 *Status ' + nama + ': ' + d.judul + '*', '📚 ' + (d.mapel ? d.mapel + ' · ' : '') + 'Kelas ' + d.kelas];
+    if (d.guru) b.push('👤 Guru: ' + d.guru);
+    b.push('🕒 Per ' + data.per);
+    var sudahJudul = '✅ ' + (tugas ? 'Sudah mengumpulkan' : 'Sudah selesai') + ' (' + data.sudah.length + '/' + total + ')';
+    if (cb.checked) { b.push('', sudahJudul); if (data.sudah.length) b.push(daftar(data.sudah)); else b.push('–'); }
+    else b.push('', sudahJudul.replace(/ \(/, ': ').replace(/\)$/, ''));
+    if (data.jalan.length) b.push('', '✍️ Sedang mengerjakan (' + data.jalan.length + ')', daftar(data.jalan));
+    if (data.perbaiki.length) b.push('', '🔁 Perlu diperbaiki (' + data.perbaiki.length + ')', daftar(data.perbaiki));
+    b.push('', '⏳ ' + (tugas ? 'Belum mengumpulkan' : 'Belum mengerjakan') + ' (' + data.belum.length + ')');
+    b.push(data.belum.length ? daftar(data.belum) : 'Tidak ada — semua sudah 🎉');
+    if (data.tutup) b.push('', '🔒 ' + nama + ' sudah ditutup.');
+    else if (data.belum.length || data.perbaiki.length) {
+      b.push('');
+      if (d.batas) b.push('⏰ Batas: ' + d.batas);
+      b.push((tugas ? 'Kirim lewat: ' : 'Kerjakan di: ') + d.url, 'Kode ' + nama.toLowerCase() + ': *' + d.kode + '*');
+    }
+    return b.join('\n');
+  }
+  function tampil() {
+    var t = teks(); kotak.textContent = t || 'Memuat…';
+    wa.href = 'https://wa.me/?text=' + encodeURIComponent(t);
+  }
+  function muat() {
+    kotak.textContent = 'Memuat…'; info.textContent = '';
+    var f = new FormData(); f.append('aksi', 'status'); f.append('id', d.id);
+    var tk = document.querySelector('input[name=_t]'); if (tk) f.append('_t', tk.value);
+    return fetch(d.api, { method: 'POST', body: f, credentials: 'same-origin' }).then(function (r) { return r.json(); })
+      .then(function (r) { if (!r.ok) throw new Error(r.galat || 'gagal'); data = r; tampil(); })
+      .catch(function (e) { kotak.textContent = 'Gagal memuat status: ' + e.message; });
+  }
+  function buka() { P.hidden = false; muat(); P.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  Array.prototype.forEach.call(document.querySelectorAll('#tombol-status, .buka-status'), function (b) {
+    b.addEventListener('click', function () { if (b.classList.contains('buka-status')) cb.checked = false; buka(); });
+  });
+  document.getElementById('tutup-status').addEventListener('click', function () { P.hidden = true; });
+  document.getElementById('status-segar').addEventListener('click', muat);
+  cb.addEventListener('change', tampil);
+  document.getElementById('status-salin').addEventListener('click', function () {
+    var t = teks();
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { info.textContent = '✓ Teks disalin. Tempel di grup WA kelas.'; })
+      .catch(function () { var a = document.createElement('textarea'); a.value = t; document.body.append(a); a.select(); document.execCommand('copy'); a.remove(); info.textContent = '✓ Teks disalin.'; });
+  });
+})();
