@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 8;
+const SKEMA_VERSI = 9;
 
 function pastikan_skema(): void
 {
@@ -274,6 +274,7 @@ function pastikan_skema(): void
     skema_migrasi_4();
     skema_migrasi_5();
     skema_migrasi_8();
+    skema_migrasi_9();
     @file_put_contents($f, date('c'));
 }
 
@@ -323,6 +324,18 @@ function skema_migrasi_8(): void
     $kolom = [
         'guru_kuis' => ['mode' => "VARCHAR(10) NOT NULL DEFAULT 'bersama'", 'selesai_ms' => 'BIGINT NULL'],
         'guru_kuis_peserta' => ['urutan' => 'TEXT NULL', 'pos' => 'SMALLINT NOT NULL DEFAULT 0', 'soal_ms' => 'BIGINT NULL', 'selesai_ms' => 'BIGINT NULL'],
+    ];
+    foreach ($kolom as $t => $daftar) {
+        foreach ($daftar as $k => $def) if (!kolom_ada($t, $k)) db()->exec("ALTER TABLE $t ADD COLUMN $k $def");
+    }
+}
+
+/** v9: latihan remedial & pengayaan (khusus siswa tertentu, terhubung ke ujian asal). */
+function skema_migrasi_9(): void
+{
+    $kolom = [
+        'guru_ujian' => ['khusus' => 'TEXT NULL', 'induk_id' => 'INT NULL', 'tindak' => 'VARCHAR(10) NULL',
+            'kktp' => 'DECIMAL(5,2) NULL', 'batasi_kktp' => 'TINYINT NOT NULL DEFAULT 1'],
     ];
     foreach ($kolom as $t => $daftar) {
         foreach ($daftar as $k => $def) if (!kolom_ada($t, $k)) db()->exec("ALTER TABLE $t ADD COLUMN $k $def");

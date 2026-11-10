@@ -42,7 +42,7 @@ judul_baris('Buat paket soal', '<a class="tombol" href="?p=soal">‹ Bank soal</
       <option value="Asesmen Sumatif Tengah Semester Genap"><option value="Asesmen Sumatif Akhir Tahun"><option value="Asesmen Formatif"><option value="Ulangan Harian">
     </datalist>
     <div class="baris3">
-      <label>Mapel<input name="mapel" value="<?= h((string)($lama['mapel'] ?? $mapel)) ?>"></label>
+      <label>Mapel<?= pilih_mapel((string)($lama['mapel'] ?? $mapel)) ?></label>
       <label>Kelas<input name="kelas" value="<?= h((string)($lama['kelas'] ?? $kelas)) ?>"></label>
       <label>Waktu<input name="waktu" value="<?= h((string)($lama['waktu'] ?? '60 menit')) ?>"></label>
     </div>

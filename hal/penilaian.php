@@ -37,7 +37,7 @@ judul_baris('Penilaian', '<a class="tombol" href="?p=nilai_rekap' . ($f ? '&amp;
     <label>Judul<input name="judul" required placeholder="mis. Ulangan Bab 2 Sistem Pencernaan"></label>
     <div class="baris2">
       <label>Kelas<select name="kelas" required><?= pilihan(array_combine($kelas_list, $kelas_list) ?: [], $f) ?></select></label>
-      <label>Mapel<input name="mapel" list="dl-mapel" required value="<?= h(mapel_saya()[0] ?? '') ?>"></label>
+      <label>Mapel<?= pilih_mapel('') ?></label>
     </div>
     <div class="baris3">
       <label>Jenis<select name="jenis"><?= pilihan(array_combine(JENIS_PENILAIAN, JENIS_PENILAIAN), 'Tugas') ?></select></label>
@@ -47,7 +47,6 @@ judul_baris('Penilaian', '<a class="tombol" href="?p=nilai_rekap' . ($f ? '&amp;
     <button class="utama lebar">Buat & isi nilai</button>
   </form>
 </details>
-<datalist id="dl-mapel"><?php foreach (mapel_saya() as $m): ?><option value="<?= h($m) ?>"><?php endforeach; ?></datalist>
 
 <form class="cari" method="get"><input type="hidden" name="p" value="penilaian">
   <select name="kelas" onchange="this.form.submit()"><option value="">Semua kelas</option><?= pilihan(array_combine($kelas_list, $kelas_list) ?: [], $f) ?></select></form>

@@ -162,3 +162,23 @@ function panel_status(array $d): void
 </div>
 <?php
 }
+
+/**
+ * Kolom pilihan mata pelajaran dari Profil guru (+ jadwal).
+ * Punya ≥2 mapel dan belum ada nilai → mulai dari "— Pilih mapel —" (wajib dipilih).
+ * Punya 1 mapel → langsung terpilih. "Lainnya…" memunculkan kotak isian.
+ */
+function pilih_mapel(?string $nilai = '', bool $wajib = true, string $atribut = ''): string
+{
+    $nilai = trim((string)$nilai);
+    $daftar = mapel_saya();
+    if (!$daftar) return '<input name="mapel" value="' . h($nilai) . '"' . ($wajib ? ' required' : '') . ' placeholder="mis. Informatika"' . $atribut . '>';
+    if ($nilai === '' && count($daftar) === 1) $nilai = $daftar[0];
+    $ada = $nilai === '' || in_array($nilai, $daftar, true);
+    $o = '<span class="pilih-mapel-bungkus"><select name="mapel" class="pilih-mapel"' . ($wajib ? ' required' : '') . $atribut . '>';
+    $o .= '<option value=""' . ($nilai === '' ? ' selected' : '') . '>— Pilih mapel —</option>';
+    foreach ($daftar as $m) $o .= '<option value="' . h($m) . '"' . ($m === $nilai ? ' selected' : '') . '>' . h($m) . '</option>';
+    $o .= '<option value="__lain"' . ($ada ? '' : ' selected') . '>Lainnya…</option></select>';
+    $o .= '<input class="mapel-lain" placeholder="Tulis nama mapel" value="' . ($ada ? '' : h($nilai)) . '"' . ($ada ? ' hidden' : ' name="mapel"' . ($wajib ? ' required' : '')) . '>';
+    return $o . '</span>';
+}

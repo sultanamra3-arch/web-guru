@@ -14,7 +14,7 @@ judul_baris($judul, '<a class="tombol" href="?p=perangkat">‹ Perangkat</a>');
 <form class="formulir" id="form-dokumen-ai" data-token="<?= h(token()) ?>" data-jenis="<?= h($jenis) ?>">
   <fieldset><legend>Data</legend>
     <div class="baris2">
-      <label>Mata pelajaran<input name="mapel" list="dl-mapel" required value="<?= h(mapel_saya()[0] ?? '') ?>"></label>
+      <label>Mata pelajaran<?= pilih_mapel('') ?></label>
       <label>Kelas<select name="kelas"><?= pilihan(['7' => 'Kelas 7', '8' => 'Kelas 8', '9' => 'Kelas 9'], '8') ?></select></label>
     </div>
     <label>Materi / topik<input name="topik" required placeholder="mis. Teks prosedur"></label>
@@ -45,6 +45,5 @@ judul_baris($judul, '<a class="tombol" href="?p=perangkat">‹ Perangkat</a>');
   <button class="utama lebar" id="tombol-buat-dokumen"><?= $judul ?></button>
   <div id="status-ai" class="kecil"></div>
 </form>
-<datalist id="dl-mapel"><?php foreach (mapel_saya() as $m): ?><option value="<?= h($m) ?>"><?php endforeach; ?></datalist>
 <?php
 kaki();

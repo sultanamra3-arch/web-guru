@@ -71,7 +71,7 @@ if ($pk): ?><p class="kecil redup">Paket: <b><?= h($pk['judul']) ?></b><?= $s ? 
   <?= input_token() ?>
   <fieldset><legend>Identitas</legend>
     <div class="baris3">
-      <label>Mapel<input name="mapel" list="dl-mapel" required value="<?= h($s['mapel'] ?? (mapel_saya()[0] ?? '')) ?>"></label>
+      <label>Mapel<?= pilih_mapel((string)($s['mapel'] ?? '')) ?></label>
       <label>Kelas<select name="kelas"><?= pilihan(['' => '-', '7' => '7', '8' => '8', '9' => '9'], $s['kelas'] ?? '') ?></select></label>
       <label>Topik<input name="topik" value="<?= h($s['topik'] ?? '') ?>"></label>
     </div>
@@ -111,6 +111,5 @@ if ($pk): ?><p class="kecil redup">Paket: <b><?= h($pk['judul']) ?></b><?= $s ? 
     <?php if (!$s): ?><button name="lagi" value="1">Simpan & tambah lagi</button><?php endif; ?>
   </div>
 </form>
-<datalist id="dl-mapel"><?php foreach (mapel_saya() as $m): ?><option value="<?= h($m) ?>"><?php endforeach; ?></datalist>
 <?php
 kaki();

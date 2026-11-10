@@ -45,7 +45,7 @@ judul_baris($t ? 'Ubah tugas' : 'Tugas online baru', '<a class="tombol" href="' 
   <label>Judul tugas<input name="judul" required value="<?= $v('judul') ?>" placeholder="mis. Membuat flowchart peminjaman buku"></label>
   <div class="baris2">
     <label>Kelas<select name="kelas" required><?= pilihan(array_combine($kl, $kl) ?: [], $t['kelas'] ?? '') ?></select></label>
-    <label>Mapel<input name="mapel" list="dl-mapel" value="<?= $v('mapel', mapel_saya()[0] ?? '') ?>"></label>
+    <label>Mapel<?= pilih_mapel((string)($t['mapel'] ?? '')) ?></label>
   </div>
   <label>Petunjuk / soal tugas<textarea name="petunjuk" rows="4" placeholder="Tulis perintah tugasnya…"><?= $v('petunjuk') ?></textarea></label>
   <div class="unggah-gambar" data-nama="gambar_data">
@@ -67,6 +67,5 @@ judul_baris($t ? 'Ubah tugas' : 'Tugas online baru', '<a class="tombol" href="' 
   </fieldset>
   <button class="utama lebar"><?= $t ? 'Simpan' : 'Buat & buka tugas' ?></button>
 </form>
-<datalist id="dl-mapel"><?php foreach (mapel_saya() as $m): ?><option value="<?= h($m) ?>"><?php endforeach; ?></datalist>
 <?php
 kaki();

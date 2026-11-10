@@ -42,7 +42,7 @@ $jml = [];
 foreach (array_keys($NAMA) as $t) $jml[$t] = max(0, min(60, (int)get('jml_' . $t, $t === 'pg' ? '10' : '0')));
 $siap = get('mulai') && array_sum($jml) > 0;
 $opsi_n = (int)get('opsi', '4') === 5 ? 5 : 4;
-$mapel = (string)get('mapel', mapel_saya()[0] ?? '');
+$mapel = (string)get('mapel', '');
 
 kepala('Buat soal manual', 'soal');
 judul_baris('Buat soal manual', '<a class="tombol" href="?p=soal">‹ Bank soal</a>');
@@ -51,7 +51,7 @@ judul_baris('Buat soal manual', '<a class="tombol" href="?p=soal">‹ Bank soal<
 <form method="get" class="kartu formulir">
   <input type="hidden" name="p" value="soal_manual"><input type="hidden" name="mulai" value="1">
   <div class="baris2">
-    <label>Mata pelajaran<input name="mapel" list="dl-mapel" required value="<?= h($mapel) ?>"></label>
+    <label>Mata pelajaran<?= pilih_mapel($mapel) ?></label>
     <label>Kelas<select name="kelas"><?= pilihan(['7' => 'Kelas 7', '8' => 'Kelas 8', '9' => 'Kelas 9'], (string)get('kelas', '8')) ?></select></label>
   </div>
   <label>Materi / topik<input name="topik" value="<?= h((string)get('topik')) ?>" placeholder="mis. Algoritma"></label>
@@ -103,6 +103,5 @@ judul_baris('Buat soal manual', '<a class="tombol" href="?p=soal">‹ Bank soal<
   </div>
 </form>
 <?php endif; ?>
-<datalist id="dl-mapel"><?php foreach (mapel_saya() as $m): ?><option value="<?= h($m) ?>"><?php endforeach; ?></datalist>
 <?php
 kaki();

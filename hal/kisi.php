@@ -221,7 +221,7 @@ kepala($d['judul'], 'perangkat');
     <?= input_token() ?><input type="hidden" name="aksi" value="simpan">
     <label>Judul<input name="judul_kop" value="<?= h($isi['judul_kop'] ?? '') ?>"></label>
     <div class="baris3">
-      <label>Mapel<input name="mapel" value="<?= h($isi['mapel'] ?? '') ?>"></label>
+      <label>Mapel<?= pilih_mapel((string)($isi['mapel'] ?? '')) ?></label>
       <label>Kelas<input name="kelas" value="<?= h($isi['kelas'] ?? '') ?>"></label>
       <label>Semester<select name="semester"><?= pilihan(['Ganjil' => 'Ganjil', 'Genap' => 'Genap'], $isi['semester'] ?? 'Ganjil') ?></select></label>
     </div>

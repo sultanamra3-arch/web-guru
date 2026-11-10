@@ -23,7 +23,7 @@ if ($aksi === 'pantau') {
     foreach (semua('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ?', [$u['id']]) as $p) $peserta[$p['kode']] = $p;
     $out = [];
     $sekarang = time();
-    foreach (siswa_kelas((string)$u['kelas'], (string)($u['tahun'] ?: tahun_aktif((int)$u['guru_id'])), (int)$u['guru_id']) as $s) {
+    foreach (ujian_siswa($u) as $s) {
         $p = $peserta[$s['member_id']] ?? null;
         unset($peserta[$s['member_id']]);
         $out[] = ujian_baris_pantau($s['member_id'], $s['member_name'], $p, $n_soal, $sekarang);

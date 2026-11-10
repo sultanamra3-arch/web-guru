@@ -27,7 +27,7 @@ judul_baris('Ujian online');
   <?php foreach ($daftar as $u): ?>
   <li><a href="?p=ujian_lihat&amp;id=<?= (int)$u['id'] ?>"><b><?= h($u['judul']) ?></b>
     <small>Kelas <?= h($u['kelas']) ?> · <?= (int)$u['durasi'] ?> menit · kode <b><?= h($u['kode']) ?></b></small>
-    <small class="kode"><?= ujian_latihan($u) ? '<span class="lencana">latihan</span> ' : '' ?><span class="lencana st-<?= h($u['status']) ?>"><?= h(ujian_status_teks($u)) ?></span>
+    <small class="kode"><?= !empty($u['tindak']) ? '<span class="lencana">' . h($u['tindak']) . '</span> ' : (ujian_latihan($u) ? '<span class="lencana">latihan</span> ' : '') ?><span class="lencana st-<?= h($u['status']) ?>"><?= h(ujian_status_teks($u)) ?></span>
       <?= (int)$u['jalan_n'] ? (int)$u['jalan_n'] . ' sedang mengerjakan · ' : '' ?><?= (int)$u['selesai_n'] ?> selesai</small></a></li>
   <?php endforeach; ?>
 </ul>

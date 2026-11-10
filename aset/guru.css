@@ -580,3 +580,13 @@ b.merah{color:var(--merah)}
 .teks-merah{color:var(--merah);font-weight:700}
 .peringatan-batas{color:#8a5a00;background:#FFF6D6;border-radius:8px;padding:.35rem .55rem;margin:.4rem 0}
 .wajib{color:var(--merah);font-weight:700}
+.pilih-mapel-bungkus{display:flex;flex-direction:column;gap:.35rem;min-width:0}
+.pilih-mapel-bungkus select,.pilih-mapel-bungkus input{width:100%}
+.cari .pilih-mapel-bungkus{flex:1 1 140px}
+.unduh-absen{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin:-.2rem 0 .8rem}
+.pilih-mapel-bungkus>[hidden]{display:none!important}
+.cari .pilih-mapel-bungkus{align-self:center}
+.pilih-mapel-bungkus>select{flex:none}
+.tindak-blok{border-top:1px solid var(--garis,#E3E8F2);padding-top:.7rem;margin-top:.7rem}
+.tindak-blok:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.tindak-blok p.kecil{margin:.3rem 0 .5rem}

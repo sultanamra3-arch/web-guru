@@ -20,8 +20,8 @@ foreach (semua("SELECT id, judul, kelas, status, (SELECT COUNT(*) FROM guru_kuis
 foreach (semua("SELECT u.*, (SELECT COUNT(*) FROM guru_ujian_peserta p WHERE p.ujian_id = u.id AND p.selesai IS NOT NULL) n_selesai,
                 (SELECT COUNT(*) FROM guru_ujian_peserta p WHERE p.ujian_id = u.id AND p.mulai IS NOT NULL AND p.selesai IS NULL) n_jalan
                 FROM guru_ujian u WHERE guru_id = ? AND status = 'buka' ORDER BY id DESC", [uid()]) as $u) {
-    $n = count(siswa_kelas($u['kelas'], $u['tahun'] ?: null));
-    $berjalan[] = ['ikon' => 'ujian', 'judul' => (ujian_latihan($u) ? 'Latihan: ' : '') . $u['judul'], 'kelas' => $u['kelas'],
+    $n = count(ujian_siswa($u));
+    $berjalan[] = ['ikon' => 'ujian', 'judul' => (ujian_latihan($u) && empty($u['tindak']) ? 'Latihan: ' : '') . $u['judul'], 'kelas' => $u['kelas'],
         'ket' => (int)$u['n_selesai'] . ($n ? '/' . $n : '') . ' mengumpulkan' . ((int)$u['n_jalan'] ? ' · ' . (int)$u['n_jalan'] . ' sedang mengerjakan' : ''),
         'url' => '?p=ujian_lihat&id=' . (int)$u['id'], 'tombol' => 'Pantau'];
 }

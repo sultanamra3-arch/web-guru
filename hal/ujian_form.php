@@ -71,7 +71,7 @@ judul_baris($u ? 'Pengaturan ujian' : 'Ujian online baru', '<a class="tombol" hr
   <label>Judul ujian<input name="judul" required value="<?= $v('judul', ($cfg['jenis_ujian'] ?? 'Ulangan') . ' ' . ($cfg['mapel'] ?? '')) ?>"></label>
   <div class="baris2">
     <label>Kelas<select name="kelas" required><?= pilihan(array_combine($kl, $kl) ?: [], $u['kelas'] ?? '') ?></select></label>
-    <label>Mapel<input name="mapel" value="<?= $v('mapel', $cfg['mapel'] ?? '') ?>"></label>
+    <label>Mapel<?= pilih_mapel((string)($u['mapel'] ?? ($cfg['mapel'] ?? ''))) ?></label>
   </div>
   <fieldset class="pilih-mode">
     <legend>Jenis</legend>

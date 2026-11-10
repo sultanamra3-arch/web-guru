@@ -345,3 +345,19 @@
     }
   });
 })();
+
+/* Pilihan mapel: "Lainnya…" → kotak isian yang dikirim sebagai mapel */
+(function () {
+  function atur(s) {
+    var lain = s.parentNode.querySelector('.mapel-lain'); if (!lain) return;
+    var pakaiLain = s.value === '__lain';
+    lain.hidden = !pakaiLain;
+    if (pakaiLain) { s.removeAttribute('name'); lain.name = 'mapel'; lain.required = s.required || s.dataset.wajib === '1'; }
+    else { s.name = 'mapel'; lain.removeAttribute('name'); lain.required = false; }
+  }
+  document.querySelectorAll('select.pilih-mapel').forEach(function (s) {
+    if (s.required) s.dataset.wajib = '1';
+    atur(s);
+    s.addEventListener('change', function () { atur(s); if (s.value === '__lain') s.parentNode.querySelector('.mapel-lain').focus(); });
+  });
+})();

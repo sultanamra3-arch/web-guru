@@ -38,7 +38,7 @@ if ($u && $_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') !== 'mulai') {
     $siswa = (string)post('siswa');
     $_SESSION['coba_token'] = $_SESSION['coba_token'] ?? ['n' => 0, 't' => 0];
     $ct = &$_SESSION['coba_token'];
-    $kelas_siswa = array_column(siswa_kelas((string)$u['kelas'], (string)($u['tahun'] ?: tahun_aktif((int)$u['guru_id'])), (int)$u['guru_id']), 'member_name', 'member_id');
+    $kelas_siswa = array_column(ujian_siswa($u), 'member_name', 'member_id');
     if (($m = ujian_bisa_masuk($u)) !== '') $galat = $m;
     elseif (!isset($kelas_siswa[$siswa])) $galat = 'Pilih namamu dari daftar.';
     elseif (!ujian_latihan($u) && $ct['n'] >= 5 && time() - $ct['t'] < 60) $galat = 'Terlalu sering salah token. Tunggu 1 menit.';
@@ -125,7 +125,7 @@ kepala($u ? $u['judul'] : 'Masuk ujian', '', true);
     <label>Kode ujian<input name="k" class="isian-kode" maxlength="10" autocomplete="off" autocapitalize="characters" required placeholder="mis. K7M2QX"></label>
     <button class="utama lebar">Lanjut</button>
   </form>
-  <?php else: $alasan = ujian_bisa_masuk($u); $siswa = siswa_kelas((string)$u['kelas'], (string)($u['tahun'] ?: tahun_aktif((int)$u['guru_id'])), (int)$u['guru_id']); ?>
+  <?php else: $alasan = ujian_bisa_masuk($u); $siswa = ujian_siswa($u); ?>
   <div class="kartu">
     <h2 style="margin:0 0 .3rem"><?= h($u['judul']) ?></h2>
     <p class="redup" style="margin:0"><?= ujian_latihan($u) ? '<span class="lencana">latihan</span> ' : '' ?>Kelas <?= h($u['kelas']) ?><?= $u['mapel'] ? ' · ' . h($u['mapel']) : '' ?> · <?= count(ujian_soal($u)) ?> soal · <?= (int)$u['durasi'] ?> menit</p>
@@ -158,6 +158,7 @@ kepala($u ? $u['judul'] : 'Masuk ujian', '', true);
   <?php else: ?>
   <form method="post" class="kartu formulir">
     <?= input_token() ?><input type="hidden" name="k" value="<?= h($u['kode']) ?>">
+    <?php if (!empty($u['tindak'])): ?><p class="kecil" style="margin-top:0">📌 Latihan <b><?= h($u['tindak']) ?></b> ini khusus untuk <?= count($siswa) ?> siswa. Kalau namamu tidak ada, tanyakan ke guru.</p><?php endif; ?>
     <label>Nama kamu
       <select name="siswa" required><option value="">— pilih nama —</option>
         <?php foreach ($siswa as $i => $s): ?><option value="<?= h($s['member_id']) ?>" <?= post('siswa') === $s['member_id'] ? 'selected' : '' ?>><?= ($s['absen'] ?: $i + 1) . '. ' . h($s['member_name']) ?></option><?php endforeach; ?>

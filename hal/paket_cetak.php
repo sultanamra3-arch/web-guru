@@ -132,7 +132,7 @@ kepala($d['judul'], 'soal');
     <label>Judul paket<input name="judul" required value="<?= h($d['judul']) ?>"></label>
     <label>Jenis ujian<input name="jenis_ujian" value="<?= h($isi['jenis_ujian'] ?? '') ?>"></label>
     <div class="baris3">
-      <label>Mapel<input name="mapel" value="<?= h($isi['mapel'] ?? '') ?>"></label>
+      <label>Mapel<?= pilih_mapel((string)($isi['mapel'] ?? '')) ?></label>
       <label>Kelas<input name="kelas" value="<?= h($isi['kelas'] ?? '') ?>"></label>
       <label>Waktu<input name="waktu" value="<?= h($isi['waktu'] ?? '') ?>"></label>
     </div>

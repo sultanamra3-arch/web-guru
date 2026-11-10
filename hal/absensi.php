@@ -4,7 +4,12 @@ declare(strict_types=1);
 $kelas_list = kelas_saya();
 $kelas = (string)get('kelas', $kelas_list[0] ?? '');
 $tanggal = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)get('tanggal')) ? (string)get('tanggal') : hari_ini();
-$mapel = trim((string)get('mapel', mapel_saya()[0] ?? ''));
+$mapel = trim((string)get('mapel', ''));
+if ($mapel === '' || $mapel === '__lain') {
+    // otomatis: mapel di jadwal kelas ini pada hari itu; bila guru hanya punya 1 mapel, pakai itu
+    $mapel = mapel_jadwal($kelas, $tanggal);
+    if ($mapel === '' && count(mapel_saya()) === 1) $mapel = mapel_saya()[0];
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $kelas = (string)post('kelas');
@@ -12,6 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $mapel = trim((string)post('mapel'));
     if (!kelas_valid($kelas) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)) {
         pesan('Kelas atau tanggal tidak valid.', 'galat');
+    } elseif ($mapel === '' && post('aksi') !== 'hapus' && count(mapel_saya()) > 1) {
+        pesan('Pilih mata pelajaran dulu, lalu isi absensi.', 'galat');
     } else {
         $siswa = array_column(siswa_kelas($kelas), 'member_id');
         if (post('aksi') === 'hapus') {
@@ -74,13 +81,19 @@ judul_baris('Absensi siswa', '<a class="tombol" href="?p=absensi_rekap&amp;kelas
 ?>
 <form class="cari" method="get">
   <input type="hidden" name="p" value="absensi">
-  <select name="kelas" onchange="this.form.submit()"><?= pilihan(array_combine($kelas_list, array_map(fn($k) => 'Kelas ' . $k, $kelas_list)) ?: [], $kelas) ?></select>
-  <input type="date" name="tanggal" value="<?= h($tanggal) ?>" onchange="this.form.submit()">
-  <input name="mapel" list="dl-mapel" value="<?= h($mapel) ?>" placeholder="Mapel" style="flex:1 1 140px">
+  <select name="kelas" onchange="var m=this.form.querySelector('[name=mapel]');if(m)m.value='';this.form.submit()"><?= pilihan(array_combine($kelas_list, array_map(fn($k) => 'Kelas ' . $k, $kelas_list)) ?: [], $kelas) ?></select>
+  <input type="date" name="tanggal" value="<?= h($tanggal) ?>" onchange="var m=this.form.querySelector('[name=mapel]');if(m)m.value='';this.form.submit()">
+  <?= pilih_mapel($mapel, false, ' onchange="if(this.value!==\'__lain\')this.form.submit()"') ?>
   <button>Buka</button>
 </form>
-<datalist id="dl-mapel"><?php foreach (mapel_saya() as $m): ?><option value="<?= h($m) ?>"><?php endforeach; ?></datalist>
 
+<?php if ($siswa && !empty($ada)): $q_unduh = ['p' => 'absensi_rekap', 'kelas' => $kelas, 'mapel' => $mapel, 'dari' => $tanggal, 'sampai' => $tanggal]; ?>
+<div class="unduh-absen tak-cetak"><span class="kecil redup">Absensi <?= h(tgl($tanggal)) ?>:</span>
+  <a class="tombol kecil" href="?<?= h(http_build_query($q_unduh + ['unduh' => 1])) ?>">⬇ Excel</a>
+  <a class="tombol kecil" href="?<?= h(http_build_query($q_unduh + ['cetak' => 1])) ?>">🖨 Cetak / PDF</a>
+  <a class="tombol kecil" href="?<?= h(http_build_query(['p' => 'absensi_rekap', 'kelas' => $kelas, 'mapel' => $mapel, 'dari' => substr($tanggal, 0, 8) . '01', 'sampai' => $tanggal])) ?>">Rentang tanggal…</a></div>
+<?php endif; ?>
+<?php if ($siswa && $mapel === '' && count(mapel_saya()) > 1): ?><div class="pesan galat">Pilih <b>mata pelajaran</b> dulu (kotak di atas), baru isi absensi.</div><?php endif; ?>
 <?php if (!$siswa): ?>
   <?php if (daftar_kelas()): ?><div class="pesan info">Pilih kelas.</div><?php else: ?><div class="pesan info">Belum ada kelas. <a href="?p=siswa_tambah">Tambahkan kelas &amp; siswamu dulu →</a></div><?php endif; ?>
 <?php else: ?>

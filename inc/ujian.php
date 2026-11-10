@@ -331,7 +331,7 @@ function ujian_status_kumpul(array $u): array
     $peserta = [];
     foreach (semua('SELECT kode, mulai, selesai FROM guru_ujian_peserta WHERE ujian_id = ?', [$u['id']]) as $p) $peserta[$p['kode']] = $p;
     $daftar = [];
-    foreach (siswa_kelas((string)$u['kelas'], (string)($u['tahun'] ?: tahun_aktif((int)$u['guru_id'])), (int)$u['guru_id']) as $s) {
+    foreach (ujian_siswa($u) as $s) {
         $daftar[] = [$s['member_name'], $peserta[$s['member_id']] ?? null];
         unset($peserta[$s['member_id']]);
     }
@@ -343,4 +343,160 @@ function ujian_status_kumpul(array $u): array
         else $o['jalan'][] = $nama;
     }
     return $o;
+}
+
+/* ===================== Remedial & pengayaan ===================== */
+
+/** Siswa peserta ujian: seluruh kelas, atau hanya siswa tertentu (latihan remedial/pengayaan). */
+function ujian_siswa(array $u): array
+{
+    $s = siswa_kelas((string)$u['kelas'], (string)($u['tahun'] ?: tahun_aktif((int)$u['guru_id'])), (int)$u['guru_id']);
+    $k = json_decode((string)($u['khusus'] ?? ''), true);
+    if (is_array($k) && $k) {
+        $boleh = array_flip(array_map('strval', $k));
+        $s = array_values(array_filter($s, fn($x) => isset($boleh[(string)$x['member_id']])));
+    }
+    return $s;
+}
+
+/** Nilai yang dipakai untuk satu peserta (latihan: nilai terbaik). null bila belum selesai. */
+function ujian_nilai_peserta(array $u, array $p): ?float
+{
+    $nl = $p['selesai'] && $p['nilai'] !== null ? (float)$p['nilai'] : null;
+    if (ujian_latihan($u) && $p['nilai_terbaik'] !== null) $nl = max((float)$p['nilai_terbaik'], (float)($nl ?? 0));
+    return $nl;
+}
+
+/** Kirim nilai ujian ke Penilaian (buat penilaian bila belum ada). Mengembalikan [id penilaian, jumlah nilai]. */
+function ujian_kirim_penilaian(array $u, float $kktp, string $jenis = 'Ulangan Harian'): array
+{
+    $pid = (int)$u['penilaian_id'];
+    if (!$pid || !nilai('SELECT 1 FROM guru_penilaian WHERE id = ? AND guru_id = ?', [$pid, uid()])) {
+        q('INSERT INTO guru_penilaian (guru_id, kelas, mapel, judul, jenis, tanggal, kktp, dibuat) VALUES (?,?,?,?,?,?,?,?)',
+            [uid(), $u['kelas'], $u['mapel'] ?: '-', mb_substr($u['judul'] . ' (online)', 0, 200), $jenis,
+             substr((string)($u['mulai'] ?: $u['dibuat']), 0, 10), $kktp, sekarang()]);
+        $pid = (int)db()->lastInsertId();
+        q('UPDATE guru_ujian SET penilaian_id = ? WHERE id = ?', [$pid, $u['id']]);
+    }
+    $n = 0;
+    foreach (semua('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ?', [$u['id']]) as $p) {
+        $nl = ujian_nilai_peserta($u, $p);
+        if ($nl === null) continue;
+        q('INSERT INTO guru_nilai (penilaian_id, member_id, nilai, catatan) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE nilai = VALUES(nilai), catatan = VALUES(catatan)',
+            [$pid, $p['kode'], $nl, (ujian_latihan($u) ? 'Latihan online, nilai terbaik dari ' . (int)$p['percobaan'] . ' percobaan' : 'Ujian online') . ($p['perlu_koreksi'] ? ' (uraian belum dinilai)' : '')]);
+        $n++;
+    }
+    return [$pid, $n];
+}
+
+/** KKTP ujian: dari Penilaian yang terhubung, atau 75. */
+function ujian_kktp(array $u): float
+{
+    if ($u['kktp'] !== null && $u['kktp'] !== '') return (float)$u['kktp'];
+    $k = $u['penilaian_id'] ? nilai('SELECT kktp FROM guru_penilaian WHERE id = ? AND guru_id = ?', [$u['penilaian_id'], uid()]) : null;
+    return $k !== null && $k !== false ? (float)$k : 75.0;
+}
+
+/** Soal pilihan ganda baru dari AI dalam bentuk snapshot ujian. */
+function ujian_soal_ai(array $u, int $jumlah, string $tingkat, string $fokus): array
+{
+    if ($jumlah < 1) return [];
+    $r = ai_buat_soal(['mapel' => $u['mapel'] ?: 'umum', 'kelas' => (string)$u['kelas'], 'topik' => $u['judul'],
+        'tingkat' => $tingkat, 'catatan' => $fokus, 'jml_pg' => $jumlah, 'jumlah_opsi' => 4]);
+    if (!$r['ok']) return [];
+    $out = [];
+    foreach ($r['soal'] as $s) {
+        if ($s['tipe'] !== 'pg' || count($s['opsi']) < 2) continue;
+        $out[] = ['tipe' => 'pg', 'teks' => $s['pertanyaan'], 'gambar' => null, 'gambar_opsi' => [], 'opsi' => $s['opsi'],
+            'kunci' => strtoupper(mb_substr($s['kunci'], 0, 1)), 'pembahasan' => (string)($s['pembahasan'] ?? ''), 'maks' => 1.0, 'ai' => 1];
+    }
+    return $out;
+}
+
+/**
+ * Buat latihan remedial / pengayaan dari ujian asal untuk siswa tertentu.
+ * $o: kode[] , kktp, batasi (bool), ai (jumlah soal AI)
+ * Remedial: soal yang paling banyak dijawab salah oleh siswa remedial (+ soal AI mirip bila diminta).
+ * Pengayaan: soal AI tingkat sulit (bila AI gagal: soal tersulit dari ujian asal).
+ */
+function ujian_buat_tindak(array $u, string $jenis, array $o): array
+{
+    $kode = array_values(array_unique(array_map('strval', (array)$o['kode'])));
+    if (!$kode) return ['ok' => false, 'galat' => 'Tidak ada siswa untuk ' . $jenis . '.'];
+    $soal = ujian_soal($u);
+    $salah = array_fill(0, count($soal), 0);   // salah oleh siswa terpilih
+    $semua = array_fill(0, count($soal), 0);   // salah oleh semua peserta
+    foreach (semua('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ? AND mulai IS NOT NULL AND selesai IS NOT NULL', [$u['id']]) as $p) {
+        $h = ujian_hitung($u, $p);
+        foreach ($soal as $i => $_) {
+            $r = $h['rinci'][$i] ?? null;
+            if (!$r || $r['skor'] >= $r['maks']) continue;
+            $semua[$i]++;
+            if (in_array((string)$p['kode'], $kode, true)) $salah[$i]++;
+        }
+    }
+    $pilih = [];
+    $catatan = [];
+    if ($jenis === 'remedial') {
+        $urut = array_keys($salah);
+        usort($urut, fn($a, $b) => [$salah[$b], $semua[$b], $a] <=> [$salah[$a], $semua[$a], $b]);
+        foreach ($urut as $i) if ($salah[$i] > 0) $pilih[] = $i;
+        if (count($pilih) < 5) foreach ($urut as $i) if (!in_array($i, $pilih, true) && count($pilih) < min(5, count($soal))) $pilih[] = $i;
+        $baru = array_map(fn($i) => $soal[$i], $pilih);
+        if ((int)$o['ai'] > 0) {
+            $fokus = "Soal remedial (lebih mudah–sedang, bertahap) untuk siswa yang belum tuntas. Fokus pada materi soal yang banyak dijawab salah:\n- "
+                . implode("\n- ", array_map(fn($s) => mb_substr(strip_tags((string)$s['teks']), 0, 160), array_slice($baru, 0, 6)));
+            $ai = ujian_soal_ai($u, (int)$o['ai'], 'mudah sampai sedang (LOTS–MOTS)', $fokus);
+            if ($ai) $baru = array_merge($baru, $ai); else $catatan[] = 'soal tambahan AI gagal dibuat';
+        }
+    } else {
+        $fokus = 'Soal pengayaan HOTS (C4–C6) untuk siswa yang sudah sangat menguasai materi ujian ini. Gunakan konteks nyata, analisis, dan penalaran. Materi ujian:'
+            . "\n- " . implode("\n- ", array_map(fn($s) => mb_substr(strip_tags((string)$s['teks']), 0, 120), array_slice($soal, 0, 8)));
+        $baru = ujian_soal_ai($u, max(3, (int)$o['ai']), 'sulit (HOTS, C4–C6)', $fokus);
+        if (!$baru) {
+            $urut = array_keys($semua);
+            usort($urut, fn($a, $b) => [$semua[$b], $a] <=> [$semua[$a], $b]);
+            $baru = array_map(fn($i) => $soal[$i], array_slice($urut, 0, min(5, count($soal))));
+            $catatan[] = 'AI gagal, dipakai soal tersulit dari ujian asal';
+        }
+    }
+    if (!$baru) return ['ok' => false, 'galat' => 'Tidak ada soal untuk ' . $jenis . '.'];
+    $judul = ($jenis === 'remedial' ? 'Remedial: ' : 'Pengayaan: ') . preg_replace('/^(Remedial|Pengayaan): /', '', (string)$u['judul']);
+    $data = ['guru_id' => uid(), 'paket_id' => null, 'judul' => mb_substr($judul, 0, 200), 'mapel' => $u['mapel'], 'kelas' => $u['kelas'], 'tahun' => $u['tahun'],
+        'kode' => ujian_kode_baru(), 'rahasia' => bin2hex(random_bytes(16)), 'token_menit' => 0, 'mulai' => null, 'selesai' => null,
+        'durasi' => max(10, min(120, (int)round(count($baru) * 2.5))), 'acak_soal' => 1, 'acak_opsi' => 1, 'tampil_nilai' => 1,
+        'status' => 'buka', 'soal' => json_encode($baru, JSON_UNESCAPED_UNICODE), 'dibuat' => sekarang(),
+        'mode' => 'latihan', 'pengaman' => 0, 'tampil_hasil' => 1, 'tampil_tertib' => (int)$u['tampil_tertib'], 'tata_tertib' => $u['tata_tertib'],
+        'khusus' => json_encode($kode), 'induk_id' => (int)$u['id'], 'tindak' => $jenis, 'kktp' => (float)$o['kktp'], 'batasi_kktp' => !empty($o['batasi']) ? 1 : 0];
+    q('INSERT INTO guru_ujian (' . implode(', ', array_keys($data)) . ') VALUES (' . implode(',', array_fill(0, count($data), '?')) . ')', array_values($data));
+    return ['ok' => true, 'id' => (int)db()->lastInsertId(), 'soal' => count($baru), 'catatan' => $catatan];
+}
+
+/** Masukkan nilai latihan remedial ke Penilaian ujian asal (nilai naik bila lebih tinggi; dibatasi KKTP bila diatur). */
+function ujian_kirim_remedial(array $r): array
+{
+    $induk = ujian_ambil((int)$r['induk_id']);
+    if (!$induk) return ['ok' => false, 'galat' => 'Ujian asal tidak ditemukan.'];
+    $kktp = (float)($r['kktp'] ?? 75);
+    $pid = (int)$induk['penilaian_id'];
+    if (!$pid || !nilai('SELECT 1 FROM guru_penilaian WHERE id = ? AND guru_id = ?', [$pid, uid()])) [$pid] = ujian_kirim_penilaian($induk, $kktp);
+    $naik = 0; $n = 0;
+    foreach (semua('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ?', [$r['id']]) as $p) {
+        $nl = ujian_nilai_peserta($r, $p);
+        if ($nl === null) continue;
+        $n++;
+        $akhir = $r['batasi_kktp'] ? min($nl, $kktp) : $nl;
+        $lama = satu('SELECT nilai, catatan FROM guru_nilai WHERE penilaian_id = ? AND member_id = ?', [$pid, $p['kode']]);
+        $awal = $lama && $lama['nilai'] !== null ? (float)$lama['nilai'] : null;
+        $teks = 'Remedial: nilai remedial ' . ($nl + 0) . ($awal !== null ? ', nilai awal ' . ($awal + 0) : '') . ($r['batasi_kktp'] && $nl > $kktp ? ', dibatasi KKTP ' . ($kktp + 0) : '');
+        if ($awal === null || $akhir > $awal) {
+            q('INSERT INTO guru_nilai (penilaian_id, member_id, nilai, catatan) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE nilai = VALUES(nilai), catatan = VALUES(catatan)',
+                [$pid, $p['kode'], $akhir, mb_substr($teks, 0, 255)]);
+            $naik++;
+        } else {
+            q('UPDATE guru_nilai SET catatan = ? WHERE penilaian_id = ? AND member_id = ?', [mb_substr($teks . ' (nilai awal tetap dipakai)', 0, 255), $pid, $p['kode']]);
+        }
+    }
+    q('UPDATE guru_ujian SET penilaian_id = ? WHERE id = ?', [$pid, $r['id']]);
+    return ['ok' => true, 'pid' => $pid, 'n' => $n, 'naik' => $naik];
 }

@@ -30,7 +30,7 @@ judul_baris('✨ Buat soal dengan AI', '<a class="tombol" href="?p=soal">‹ Ban
 <form class="formulir" id="form-soal-ai" data-token="<?= h(token()) ?>">
   <fieldset><legend>Permintaan</legend>
     <div class="baris2">
-      <label>Mata pelajaran<input name="mapel" list="dl-mapel" required value="<?= h(mapel_saya()[0] ?? '') ?>"></label>
+      <label>Mata pelajaran<?= pilih_mapel('') ?></label>
       <label>Kelas<select name="kelas"><?= pilihan(['7' => 'Kelas 7', '8' => 'Kelas 8', '9' => 'Kelas 9'], '8') ?></select></label>
     </div>
     <label>Materi / topik<input name="topik" required placeholder="mis. Sistem pencernaan manusia"></label>
@@ -69,6 +69,5 @@ judul_baris('✨ Buat soal dengan AI', '<a class="tombol" href="?p=soal">‹ Ban
   </div>
   <ol class="daftar kartu bank-soal" id="daftar-hasil"></ol>
 </form>
-<datalist id="dl-mapel"><?php foreach (mapel_saya() as $m): ?><option value="<?= h($m) ?>"><?php endforeach; ?></datalist>
 <?php
 kaki();

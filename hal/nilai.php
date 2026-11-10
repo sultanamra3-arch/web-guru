@@ -75,7 +75,7 @@ judul_baris(h($p['judul']), '<a class="tombol" href="?p=penilaian">‹ Penilaian
       <label>Nama penilaian<input name="judul" value="<?= h($p['judul']) ?>" required maxlength="200"></label>
       <div class="baris2">
         <label>Jenis<select name="jenis"><?= pilihan(array_combine(JENIS_PENILAIAN, JENIS_PENILAIAN), in_array($p['jenis'], JENIS_PENILAIAN, true) ? $p['jenis'] : 'Lainnya') ?></select></label>
-        <label>Mapel<input name="mapel" value="<?= h($p['mapel']) ?>"></label>
+        <label>Mapel<?= pilih_mapel((string)$p['mapel']) ?></label>
       </div>
       <div class="baris2">
         <label>Tanggal<input type="date" name="tanggal" value="<?= h($p['tanggal']) ?>"></label>

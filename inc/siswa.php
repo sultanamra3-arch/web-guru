@@ -339,3 +339,16 @@ function jam_sudah_diatur(): bool
     foreach (array_keys(HARI) as $h) if (setelan('jam_h' . $h . ':' . uid()) !== null) return true;
     return setelan('jam_umum:' . uid()) !== null;
 }
+
+/** Mapel yang dijadwalkan untuk kelas itu pada hari tanggal tsb (yang sedang berjalan bila hari ini). '' bila tidak ada. */
+function mapel_jadwal(string $kelas, string $tanggal): string
+{
+    if ($kelas === '' || !($t = strtotime($tanggal))) return '';
+    $baris = semua('SELECT mapel, mulai, selesai FROM guru_jadwal WHERE guru_id = ? AND kelas = ? AND hari = ? ORDER BY jam_ke', [uid(), $kelas, (int)date('N', $t)]);
+    if (!$baris) return '';
+    if ($tanggal === hari_ini()) {
+        $jam = date('H:i:s');
+        foreach ($baris as $b) if ($b['mulai'] && $b['selesai'] && $b['mulai'] <= $jam && $jam <= $b['selesai']) return (string)$b['mapel'];
+    }
+    return (string)$baris[0]['mapel'];
+}
