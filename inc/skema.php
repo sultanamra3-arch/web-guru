@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 12;
+const SKEMA_VERSI = 13;
 
 function pastikan_skema(): void
 {
@@ -285,6 +285,7 @@ function pastikan_skema(): void
     skema_migrasi_9();
     skema_migrasi_10();
     skema_migrasi_12();
+    skema_migrasi_13();
     @file_put_contents($f, date('c'));
 }
 
@@ -363,4 +364,12 @@ function skema_migrasi_12(): void
 {
     if (!kolom_ada('guru_tugas', 'kelompok')) db()->exec('ALTER TABLE guru_tugas ADD COLUMN kelompok TINYINT NOT NULL DEFAULT 0');
     if (!kolom_ada('guru_tugas_kirim', 'oleh')) db()->exec('ALTER TABLE guru_tugas_kirim ADD COLUMN oleh VARCHAR(20) NULL');
+}
+
+/** v13: nomor resi tugas & ujian (bukti mengumpulkan + halaman status ?p=resi). */
+function skema_migrasi_13(): void
+{
+    foreach (['guru_tugas_kirim', 'guru_ujian_peserta'] as $t) {
+        if (!kolom_ada($t, 'resi')) db()->exec("ALTER TABLE $t ADD COLUMN resi VARCHAR(12) NULL, ADD UNIQUE KEY resi (resi)");
+    }
 }

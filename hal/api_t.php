@@ -36,4 +36,5 @@ q("INSERT INTO guru_tugas_kirim (tugas_id, kode, perangkat, foto, teks, dikirim,
    ON DUPLICATE KEY UPDATE perangkat = VALUES(perangkat), foto = VALUES(foto), teks = VALUES(teks), dikirim = VALUES(dikirim), telat = VALUES(telat),
    kali = kali + 1, status = 'kirim', saran_ai = NULL, oleh = VALUES(oleh)",
     [$tid, $kode, $alat, json_encode(array_merge($lama, $simpan)), $teks, sekarang(), tugas_lewat($t) ? 1 : 0, (string)$siswa]);
+resi_tugas($tid, $kode);
 balas_t(['ok' => true, 'jam' => date('H.i'), 'telat' => tugas_lewat($t)]);

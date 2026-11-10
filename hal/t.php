@@ -97,6 +97,9 @@ kepala($t ? $t['judul'] : 'Tugas online', '', true);
       <?php endif; ?>
       <div class="pesan" style="background:#dff3e4;color:#1d6b33">✅ Terkirim <?= h(ujian_waktu_teks($k['dikirim'])) ?><?= $pengirim ? ' oleh <b>' . h($pengirim) . '</b>' : '' ?> · <?= count($foto_lama) ?> foto<?= $k['telat'] ? ' · <b>terlambat</b>' : '' ?><?= $k['status'] === 'kirim' ? '. Menunggu dinilai guru.' : '' ?></div>
       <?php if ($kel_n && trim((string)$k['teks']) !== ''): ?><div class="kartu kecil" style="white-space:pre-line"><span class="redup">Catatan kelompok:</span> <?= h($k['teks']) ?></div><?php endif; ?>
+      <?php $resi = resi_tugas($tid, (string)$k['kode']);
+        echo resi_kotak($resi, resi_teks_wa($resi, $kel_n ? 'tugas kelompok' : 'tugas', (string)$t['judul'], (string)$t['mapel'],
+            $kel_n ? 'Kelompok ' . $kel_n . ' (' . implode(', ', $anggota) . ')' : $nama_ada[$saya], (string)$t['kelas'], ujian_waktu_teks((string)$k['dikirim']))); ?>
       <?php if ($foto_lama && !($kel_n && $bisa === '')): ?><div class="foto-tugas kecil-foto"><?php foreach ($foto_lama as $f): ?><img src="<?= h(tugas_foto_url($tid, $f)) ?>" alt="" loading="lazy"><?php endforeach; ?></div><?php endif; ?>
     <?php else: ?>
       <div class="pesan">Tugas atas nama <b><?= h($nama_ada[$saya]) ?></b> sudah dikirim dari HP lain (<?= h(ujian_waktu_teks($k['dikirim'])) ?>). Mengirim lagi akan <b>menggantikan</b> kiriman itu.</div>

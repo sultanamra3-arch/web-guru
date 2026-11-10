@@ -49,6 +49,7 @@ function ujian_baris_pantau(string $kode, string $nama, ?array $p, int $n_soal, 
         'percobaan' => (int)($p['percobaan'] ?? 1), 'terbaik' => $p['nilai_terbaik'] !== null ? (float)$p['nilai_terbaik'] : null,
         'perlu' => (bool)$p['perlu_koreksi'],
         'perangkat' => $p['perangkat'] !== null,
+        'resi' => $p['selesai'] ? resi_teks_wa(resi_ujian((int)$p['ujian_id'], $kode), ($GLOBALS['u']['mode'] ?? '') === 'latihan' ? 'latihan' : 'ujian', (string)($GLOBALS['u']['judul'] ?? ''), (string)($GLOBALS['u']['mapel'] ?? ''), $nama, (string)($GLOBALS['u']['kelas'] ?? ''), ujian_waktu_teks((string)$p['selesai'])) : '',
     ];
 }
 

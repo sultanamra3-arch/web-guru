@@ -293,6 +293,16 @@
     hitung();
   }
 
+  /* ---------- Salin resi (tombol data-salin, juga yang dibuat belakangan) ---------- */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-salin]');
+    if (!b) return;
+    var teks = b.dataset.salin, asli = b.textContent;
+    function beres() { b.textContent = '✓ Tersalin'; setTimeout(function () { b.textContent = asli; }, 1800); }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(teks).then(beres, function () { window.prompt('Salin teks ini:', teks); });
+    else window.prompt('Salin teks ini:', teks);
+  });
+
   /* ---------- Nilai: tandai di bawah KKTP ---------- */
   var tn = $('.tabel-nilai');
   if (tn) {

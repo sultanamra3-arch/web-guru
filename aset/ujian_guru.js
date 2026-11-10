@@ -54,6 +54,7 @@
         var f = tpl.content.firstElementChild.cloneNode(true);
         f.querySelector('[name=kode]').value = s.kode;
         if (s.st === 'selesai') { f.querySelector('[value=tambah_waktu]').remove(); f.querySelector('[value=akhiri]').remove(); }
+        if (s.resi) { var sr = el('button', 'kecil', 'Salin resi'); sr.type = 'button'; sr.dataset.salin = s.resi; f.prepend(sr); }
         f.hidden = !terbuka[s.kode];
         tb.onclick = function () { terbuka[s.kode] = f.hidden; f.hidden = !f.hidden; };
         li.append(tb, f);

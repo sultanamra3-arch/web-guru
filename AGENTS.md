@@ -14,9 +14,9 @@ Dipasang di cPanel lewat Git (subdomain `guru.otomasismpn6keritang.my.id`). Mema
 Struktur:
 - `index.php` — router (`?p=nama_halaman`), daftar halaman yang diizinkan, `HALAMAN_UMUM` (halaman siswa tanpa login).
 - `hal/` — satu file per halaman (mis. `hal/kuis.php`), termasuk API (`hal/api_*.php`).
-- `inc/` — fungsi bersama: `inti.php` (VERSI, database, helper), `skema.php` (tabel & migrasi), `tampilan.php` (kepala/kaki, menu, panel bagikan), `ikon.php` (ikon garis Lucide), `ai.php` & `guru_ai.php` (AI), `siswa.php`, `ujian.php`, `tugas.php`, `kuis.php`, `koreksi.php`, `gambar.php`, `asisten.php`.
+- `inc/` — fungsi bersama: `inti.php` (VERSI, database, helper), `skema.php` (tabel & migrasi), `tampilan.php` (kepala/kaki, menu, panel bagikan), `ikon.php` (ikon garis Lucide), `ai.php` & `guru_ai.php` (AI), `siswa.php`, `ujian.php`, `tugas.php`, `resi.php`, `kuis.php`, `koreksi.php`, `gambar.php`, `asisten.php`.
 - `aset/` — CSS (`gaya.css`, `guru.css`) dan JavaScript.
-- `u/`, `t/`, `k/` — alamat pendek untuk siswa (ujian, tugas, kuis).
+- `u/`, `t/`, `k/`, `r/` — alamat pendek untuk siswa (ujian, tugas, kuis, resi).
 - `data/` — berkas di server (kunci AI, gambar soal, foto tugas). **Tidak ikut Git dan jangan pernah dimasukkan ke Git.**
 
 ## 3. Aturan wajib setiap perubahan
@@ -52,6 +52,7 @@ Struktur:
 - Ujian online (v1.37): **kunci lanjut** (`kunci_lanjut` di `guru_ujian_peserta`, hash; kunci asli hanya di HP siswa/localStorage `sgu-kunci-ID`). Bila sesi/cookie di HP hilang, `api_u` menyambung lagi otomatis memakai kunci ini, dan halaman pilih nama tidak meminta token/"Buka ulang" untuk HP yang sama. `api_u` memeriksa tokennya sendiri (dikecualikan dari `cek_token()` di `index.php`). Tombol "Ya, kumpulkan" tidak boleh diam: bila sesi tidak bisa disambung, siswa diarahkan masuk lagi.
 - Kelompok belajar (v1.38): tabel `guru_kelompok` (guru_id, tahun, kelas, kode → nomor kelompok), halaman `?p=kelompok` (acak dengan L/P dicampur, atau atur sendiri). Di halaman nilai, kotak "Nilai per kelompok" hanya alat bantu JavaScript: mengisi nilai semua anggota sekaligus; nilai tetap disimpan per siswa di `guru_nilai` sehingga anggota yang tidak ikut bekerja bisa diberi nilai berbeda.
 - Tugas online kelompok (v1.39): `guru_tugas.kelompok = 1`. Satu baris kiriman per kelompok di `guru_tugas_kirim` dengan kode `K<nomor>` (`oleh` = siswa yang terakhir mengirim). Anggota diambil dari `guru_kelompok` (fungsi `tugas_kode_kirim()`, `tugas_anggota()` di `inc/tugas.php`). Semua anggota kelompok boleh melihat foto & mengirim ulang/menambah foto (foto lama yang dicentang dipertahankan). Saat dikirim ke Penilaian, nilai kelompok ditulis ke setiap anggota. Jenis tugas tidak bisa diganti setelah ada kiriman.
+- Resi tugas & ujian (v1.40): kolom `resi` (unik, 10 huruf: T… tugas, U… ujian) di `guru_tugas_kirim` & `guru_ujian_peserta`, dibuat oleh `resi_tugas()` / `resi_ujian()` di `inc/resi.php`. Halaman umum tanpa login `?p=resi&k=KODE` (alamat pendek `/r/?k=`), memeriksa perubahan tiap 30 detik (`&sig=1`) lalu memuat ulang sendiri. Kode resi = kunci akses, hanya menampilkan kiriman/peserta itu. Kotak resi (Lihat resi + Kirim ke WA) muncul untuk siswa setelah mengirim tugas (hanya di HP pengirim; tugas kelompok: semua anggota) dan di layar selesai ujian. Guru punya tombol "Salin resi" (`data-salin`). Nilai ujian di resi mengikuti `tampil_nilai` / hasil terbuka — jangan dibuka lebih dari itu.
 - Kuis cepat: yang salah/tidak menjawab tetap lanjut sampai habis; **jawaban, poin, dan peringkat baru dibuka di akhir**. Mode mandiri: siswa maju sendiri-sendiri, soal & pilihan diacak per siswa.
 - Data contoh di repo hanya nama siswa fiktif.
 

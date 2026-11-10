@@ -48,6 +48,8 @@ if ($p['selesai']):
       <?php elseif ($h['perlu']): ?><p class="pesan">Nilai pilihan ganda sudah dihitung. Soal uraian sedang diperiksa guru, nilai akhir diumumkan kemudian.</p>
       <?php else: ?><div class="nilai-siswa"><?= h((string)$h['nilai']) ?></div><p class="redup">nilai kamu<?= ujian_latihan($u) && $p['nilai_terbaik'] !== null ? ' · terbaik sebelumnya ' . h((string)(float)$p['nilai_terbaik']) : '' ?></p><?php endif; ?>
     <?php else: ?><p>Nilai akan diumumkan oleh guru.</p><?php endif; ?>
+    <?php $resi = resi_ujian($id, (string)$kode);
+      echo resi_kotak($resi, resi_teks_wa($resi, ujian_latihan($u) ? 'latihan' : 'ujian', (string)$u['judul'], (string)$u['mapel'], $nama, (string)$u['kelas'], ujian_waktu_teks((string)$p['selesai']))); ?>
     <?php if (!$terbuka && $u['tampil_hasil']): ?><p class="kecil">Setelah guru menutup ujian, buka lagi link ujian ini di HP ini untuk melihat <b>nilai &amp; pembahasan</b>.</p><?php endif; ?>
     <?php if (ujian_latihan($u) && $u['status'] === 'buka' && !ujian_bisa_masuk_kerja($u)): ?>
       <form method="post"><?= input_token() ?><input type="hidden" name="aksi" value="ulang"><button class="utama lebar">↻ Ulangi latihan</button></form>

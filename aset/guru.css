@@ -610,3 +610,40 @@ b.merah{color:var(--merah)}
 .foto-lama .foto-mini input{position:absolute;top:4px;right:4px;width:22px;height:22px;min-height:auto;margin:0}
 .foto-lama .foto-mini.dibuang img{opacity:.3}
 .jenis-tugas label.centang{margin:.3rem 0}
+
+/* v1.40 resi tugas & ujian */
+.kotak-resi{border:1px dashed var(--garis,#E3E8F2);border-radius:12px;padding:.7rem .8rem;margin:.7rem 0;text-align:left;background:#fff}
+.resi-nomor{display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.resi-nomor small{display:block}
+.resi-nomor b{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.15rem;letter-spacing:.04em}
+.resi-nomor .ikon{width:26px;height:26px;color:var(--redup)}
+.kotak-resi .dua-tombol{margin:.6rem 0 .4rem}
+.resi-kartu{padding:0!important;overflow:hidden}
+.resi-kop{background:#2A2C84;color:#fff;padding:.8rem 1rem;border-bottom:3px solid #F2C230}
+.resi-kop small{display:block;opacity:.85;font-size:.78rem}
+.resi-kop b{font-size:1.1rem}
+.resi-info{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.6rem;padding:.8rem 1rem}
+.resi-info small{display:block;color:var(--redup);font-size:.78rem}
+.resi-info b,.resi-info span{overflow-wrap:anywhere}
+.resi-no{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.03em}
+.lencana.resi-hijau{background:#dff3e4;color:#1d6b33}.lencana.resi-kuning{background:#fff3c4;color:#7a5200}.lencana.resi-merah{background:var(--merah-muda,#fde2e2);color:var(--merah,#b42318)}
+.resi-live{background:#dff3e4;color:#1d6b33;font-size:.82rem;padding:.35rem 1rem}
+.resi-live .titik{margin-right:.2rem}
+.resi-langkah{list-style:none;margin:0;padding:.9rem 1rem .2rem}
+.resi-langkah li{display:flex;gap:.7rem;padding:0 0 .8rem;position:relative}
+.resi-langkah li:not(:last-child)::after{content:"";position:absolute;left:12px;top:26px;bottom:2px;width:2px;background:var(--garis,#E3E8F2)}
+.resi-langkah small{display:block;color:var(--redup);font-size:.8rem}
+.rl-titik{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;background:#f2f4f8;border:1px solid var(--garis,#E3E8F2);color:var(--redup)}
+.rl-ok .rl-titik{background:#dff3e4;border-color:#bfe5c9;color:#1d6b33}
+.rl-tunggu .rl-titik{background:#fff3c4;border-color:#f3dc8a;color:#7a5200}
+.rl-ulang .rl-titik{background:var(--merah-muda,#fde2e2);border-color:#f5b5b5;color:var(--merah,#b42318)}
+.rl-kosong{color:var(--redup)}
+.resi-nilai{display:flex;gap:1rem;align-items:center;padding:.6rem 1rem .8rem;border-top:1px solid var(--garis,#E3E8F2)}
+.resi-nilai small{display:block;color:var(--redup);font-size:.8rem}
+.resi-bulat{flex:none;width:72px;height:72px;border-radius:50%;border:3px solid #2E9E48;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1d6b33}
+.resi-bulat b{font-size:1.6rem;line-height:1}
+.resi-bulat small{color:#1d6b33!important}
+.resi-komentar{margin:.2rem 1rem .6rem}
+.resi-catatan{margin:.2rem 1rem .7rem;padding:.6rem .8rem;background:#f2f4f8;border-radius:10px;font-size:.9rem}
+.resi-kartu>.tombol{margin:.2rem 1rem .8rem;width:calc(100% - 2rem)}
+.resi-kaki{margin:0;padding:.7rem 1rem;border-top:1px solid var(--garis,#E3E8F2);font-size:.78rem;color:var(--redup)}
