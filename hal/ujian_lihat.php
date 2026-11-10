@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'buka_ulang':
             // izinkan masuk dari perangkat lain / lanjut lagi setelah dikumpulkan
             // pengaman: hitungan keluar direset, jumlah "pernah dikunci" dicatat
-            q("UPDATE guru_ujian_peserta SET dikunci = dikunci + (alasan = 'pengaman'), keluar = IF(alasan = 'pengaman', 0, keluar), alasan = NULL,
+            q("UPDATE guru_ujian_peserta SET dikunci = dikunci + (alasan <=> 'pengaman'), keluar = IF(alasan <=> 'pengaman', 0, keluar), alasan = NULL,
                perangkat = NULL, selesai = NULL,
                batas = GREATEST(COALESCE(batas, NOW()), NOW() + INTERVAL 5 MINUTE) WHERE ujian_id = ? AND kode = ?", [$id, $kode]);
             pesan(h(nama_siswa($kode)) . ' boleh masuk lagi (perangkat apa pun, token tetap diperlukan).');
