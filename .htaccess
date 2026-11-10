@@ -8,7 +8,7 @@ DirectoryIndex index.php
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteRule ^(inc|hal|data|\.git|\.github|\.devcontainer)(/|$) - [F,L]
+  RewriteRule ^(inc|hal|data|apk|android|\.git|\.github|\.devcontainer)(/|$) - [F,L]
   RewriteCond %{HTTPS} !=on
   RewriteCond %{HTTP:X-Forwarded-Proto} !=https
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]

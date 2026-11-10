@@ -12,7 +12,7 @@ $grup = [
     'Akun dan data' => [['profil', 'profil', 'Profil, kata sandi, ukuran huruf', pengguna()['nama'] . ' (' . pengguna()['username'] . ')'], ['cadangan', 'unduh', 'Cadangan data', 'Unduh semua datamu (ZIP)']],
 ];
 if (adalah_admin()) $grup['Khusus admin'] = [['akun', 'akun', 'Akun guru', 'Tambah, ubah, nonaktifkan akun guru'], ['asisten', 'asisten', 'Asisten AI', 'Ubah datamu lewat chat, setiap perubahan dikonfirmasi'],
-    ['pengaturan_ai', 'pengaturan', 'Pengaturan AI', 'Kunci & model AI sekolah']];
+    ['pengaturan_ai', 'pengaturan', 'Pengaturan AI', 'Kunci & model AI sekolah'], ['apk', 'unduh', 'Aplikasi Android (APK)', 'SiGuru Admin: semua aplikasi sekolah layar penuh']];
 foreach ($grup as $judul => $isi): ?>
 <h2 class="grup-judul"><?= h($judul) ?></h2>
 <ul class="daftar kartu menu-lainnya">

@@ -88,7 +88,7 @@ kepala('Beranda', 'beranda');
   <?php endif; ?>
   <div class="ikon-kisi apk-sekolah">
     <?php foreach (APLIKASI_SEKOLAH as $i => [$jd, $ket, $ik, $kc, $url]): ?>
-    <a href="<?= $i === 0 ? '?p=ke_pustaka' : h(sekolah_url($kc, $url)) ?>" <?= $i === 0 ? 'data-tanpa-siap' : 'target="_blank" rel="noopener"' ?>><span class="ikon-kotak"><?= ikon($ik) ?></span><?= h($jd) ?><small><?= h($ket) ?></small></a>
+    <a href="<?= $i === 0 ? '?p=ke_pustaka' : h(sekolah_url($kc, $url)) ?>" data-tanpa-siap><span class="ikon-kotak"><?= ikon($ik) ?></span><?= h($jd) ?><small><?= h($ket) ?></small></a>
     <?php endforeach; ?>
   </div>
   <?php if (!sso_kunci() || sso_akun_slims() === ''): ?><p class="kecil redup" style="margin:.5rem 0 0">SiPustaka belum bisa terbuka tanpa login: <?= !sso_kunci() ? 'kunci bersama belum bisa dibuat di folder data SiPustaka.' : 'atur nama pengguna SLiMS di <a href="?p=profil">Profil</a>.' ?></p><?php endif; ?>

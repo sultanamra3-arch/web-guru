@@ -832,3 +832,8 @@ html.apl,html.apl body{overscroll-behavior:none}
 .apk-sekolah a{font-size:.72rem}
 .apk-sekolah .ikon-kotak{width:2.5rem;height:2.5rem}
 @media(max-width:420px){.apk-sekolah small{display:none}}
+
+/* v1.47: tanpa efek memantul di semua mode (permintaan pengguna) */
+html,body{overscroll-behavior:none}
+.langkah-pasang{padding-left:1.2rem;margin:.3rem 0}
+.langkah-pasang li{margin:.35rem 0}

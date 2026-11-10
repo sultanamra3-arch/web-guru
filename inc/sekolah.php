@@ -30,9 +30,11 @@ function sekolah_ringkas(): ?array
     return $r;
 }
 
+/** Alamat aplikasi sekolah + penanda `dari=siguru` (memunculkan tombol "‹ SiGuru" di aplikasi itu). */
 function sekolah_url(string $kunci, string $bawaan): string
 {
-    return (string)k($kunci, $bawaan);
+    $u = (string)k($kunci, $bawaan);
+    return $u . (str_contains($u, '?') ? '&' : '?') . 'dari=siguru';
 }
 
 /** Lokasi kunci bersama SSO: di folder data SiPustaka (sama dengan kunci AI). Dibuat bila belum ada. */
@@ -68,10 +70,10 @@ function sso_akun_slims(): string
 /** Alamat SiPustaka yang langsung masuk (berlaku 60 detik, sekali pakai). Kosong bila belum bisa → buka halaman masuk biasa. */
 function sso_alamat_sipustaka(): string
 {
-    $dasar = rtrim(sekolah_url('url_sipustaka', APLIKASI_SEKOLAH[0][4]), '/') . '/';
+    $dasar = rtrim((string)k('url_sipustaka', APLIKASI_SEKOLAH[0][4]), '/') . '/';
     $kunci = sso_kunci();
     $akun = sso_akun_slims();
-    if (!adalah_admin() || !$kunci || $akun === '') return $dasar;
+    if (!adalah_admin() || !$kunci || $akun === '') return $dasar . '?dari=siguru';
     $isi = ['u' => $akun, 't' => (string)time(), 'n' => bin2hex(random_bytes(8))];
     $isi['s'] = hash_hmac('sha256', $isi['u'] . '|' . $isi['t'] . '|' . $isi['n'], $kunci);
     return $dasar . '?p=sso&' . http_build_query($isi);
