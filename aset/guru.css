@@ -812,3 +812,8 @@ main:has(.beranda-dua){max-width:1080px}
 body:not(.polos){padding-bottom:calc(92px + env(safe-area-inset-bottom))}
 .statistik.tiga{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 .bar-aksi select{max-width:120px}
+
+/* v1.45 aplikasi terpasang: tanpa efek memantul/meregang saat mentok atas/bawah */
+html.apl,html.apl body{overscroll-behavior:none}
+.tab-geser{overscroll-behavior-x:contain}
+.tirai-buat,.tirai-buat .lembar,.menu-titik>div{overscroll-behavior:contain}
