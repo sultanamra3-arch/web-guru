@@ -71,6 +71,29 @@ kepala('Beranda', 'beranda');
   <?= ikon('cari') ?><input type="search" name="q" placeholder="Cari siswa, soal, ujian, tugas…" aria-label="Cari"></form>
 
 <div class="beranda-dua"><div>
+<?php if (adalah_admin()): $sk = sekolah_ringkas(); ?>
+<div class="kartu kartu-sekolah">
+  <h2>Sekolah <span class="lencana">khusus admin</span></h2>
+  <?php if ($sk): ?>
+  <?php if ((int)$sk['terlambat']): ?>
+  <ul class="baris-tindak"><li><span class="bt-ikon"><?= ikon('buku') ?></span><span class="bt-isi"><b><?= (int)$sk['terlambat'] ?> pinjaman lewat jatuh tempo</b><small>Perpustakaan · buku belum dikembalikan</small></span>
+    <a class="tombol kecil" href="?p=ke_pustaka&amp;ke=pinjaman" data-tanpa-siap>Lihat</a></li></ul>
+  <?php endif; ?>
+  <div class="statistik sekolah-angka">
+    <span><b><?= (int)$sk['tamu'] ?></b>pengunjung hari ini</span>
+    <span><b><?= (int)$sk['aktif'] ?></b>pinjaman aktif</span>
+    <span><b><?= number_format((int)$sk['eksemplar'], 0, ',', '.') ?></b>eksemplar</span>
+    <span><b><?= number_format((int)$sk['anggota'], 0, ',', '.') ?></b>anggota</span>
+  </div>
+  <?php endif; ?>
+  <div class="ikon-kisi apk-sekolah">
+    <?php foreach (APLIKASI_SEKOLAH as $i => [$jd, $ket, $ik, $kc, $url]): ?>
+    <a href="<?= $i === 0 ? '?p=ke_pustaka' : h(sekolah_url($kc, $url)) ?>" <?= $i === 0 ? 'data-tanpa-siap' : 'target="_blank" rel="noopener"' ?>><span class="ikon-kotak"><?= ikon($ik) ?></span><?= h($jd) ?><small><?= h($ket) ?></small></a>
+    <?php endforeach; ?>
+  </div>
+  <?php if (!sso_kunci() || sso_akun_slims() === ''): ?><p class="kecil redup" style="margin:.5rem 0 0">SiPustaka belum bisa terbuka tanpa login: <?= !sso_kunci() ? 'kunci bersama belum bisa dibuat di folder data SiPustaka.' : 'atur nama pengguna SLiMS di <a href="?p=profil">Profil</a>.' ?></p><?php endif; ?>
+</div>
+<?php endif; ?>
 <?php if ($tindak): ?>
 <div class="kartu kartu-tindak">
   <h2>Perlu tindakan <span class="lencana kuning"><?= count($tindak) ?></span></h2>

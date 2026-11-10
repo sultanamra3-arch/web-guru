@@ -817,3 +817,18 @@ body:not(.polos){padding-bottom:calc(92px + env(safe-area-inset-bottom))}
 html.apl,html.apl body{overscroll-behavior:none}
 .tab-geser{overscroll-behavior-x:contain}
 .tirai-buat,.tirai-buat .lembar,.menu-titik>div{overscroll-behavior:contain}
+
+/* v1.46 kotak Sekolah (admin) */
+.kartu-sekolah{border:1.5px dashed var(--navy)!important;background:#F7FAFF!important}
+.kartu-sekolah h2{display:flex;align-items:center;gap:.5rem}
+.sekolah-angka{grid-template-columns:repeat(2,minmax(0,1fr))!important;margin:.5rem 0 .7rem}
+.apk-sekolah{grid-template-columns:repeat(5,minmax(0,1fr))}
+.apk-sekolah small{display:block;font-weight:500;color:var(--redup);font-size:.68rem}
+@media(max-width:420px){.apk-sekolah{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.sekolah-angka{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:.35rem!important}
+.sekolah-angka span{padding:.45rem .15rem!important;font-size:.68rem!important;line-height:1.2}
+.sekolah-angka span b{font-size:1.05rem!important}
+.apk-sekolah{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:.4rem .2rem}
+.apk-sekolah a{font-size:.72rem}
+.apk-sekolah .ikon-kotak{width:2.5rem;height:2.5rem}
+@media(max-width:420px){.apk-sekolah small{display:none}}

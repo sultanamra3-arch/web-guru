@@ -8,6 +8,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'huruf') {
     pesan('Ukuran huruf disimpan.');
     ke('?p=profil');
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'slims' && adalah_admin()) {
+    setelan_simpan('slims_user:' . uid(), mb_substr(trim((string)post('slims_user')), 0, 50));
+    pesan('Akun SLiMS untuk SiPustaka disimpan.');
+    ke('?p=profil');
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim((string)post('nama'));
     $baru = (string)($_POST['sandi_baru'] ?? '');
@@ -39,6 +44,14 @@ foreach ($galat as $g) echo '<div class="pesan galat">' . h($g) . '</div>';
   </div>
   <small class="redup">Huruf besar lebih nyaman dibaca di HP atau saat layar ditampilkan di proyektor.</small>
 </form>
+<?php if (adalah_admin()): ?>
+<form method="post" class="kartu formulir">
+  <?= input_token() ?><input type="hidden" name="aksi" value="slims">
+  <label>Akun SLiMS / SiPustaka <small>(nama pengguna untuk masuk SiPustaka tanpa login ulang)</small>
+    <input name="slims_user" value="<?= h(sso_akun_slims()) ?>" placeholder="mis. admin" autocomplete="off"></label>
+  <button class="kecil">Simpan</button>
+</form>
+<?php endif; ?>
 <form method="post" class="formulir">
   <?= input_token() ?>
   <fieldset><legend>Data guru</legend>

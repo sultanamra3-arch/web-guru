@@ -241,7 +241,7 @@ function siap_cepat_aturan(): array
         ['href_matches' => '/?*batal_tertib=*'], ['href_matches' => '/?*kaya=*'], ['href_matches' => '/?*cetak*'], ['href_matches' => '/?*hapus*'],
         ['href_matches' => '/?p=keluar*'], ['href_matches' => '/?p=cadangan*'], ['href_matches' => '/?p=kuis_main*'],
         ['href_matches' => '/?p=presentasi*'], ['href_matches' => '/?p=koreksi_lj*'], ['href_matches' => '/?p=gambar*'],
-        ['href_matches' => '/?p=tugas_foto*'], ['href_matches' => '/?p=api_*'],
+        ['href_matches' => '/?p=tugas_foto*'], ['href_matches' => '/?p=api_*'], ['href_matches' => '/?p=ke_pustaka*'],
         ['selector_matches' => '[target], [download], [data-tanpa-siap], [onclick]'],
     ];
     $syarat = ['and' => array_merge([['href_matches' => '/?p=*']], array_map(fn($t) => ['not' => $t], $tolak))];
