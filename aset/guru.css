@@ -579,3 +579,4 @@ b.merah{color:var(--merah)}
 .berjalan .tombol{flex:none}
 .teks-merah{color:var(--merah);font-weight:700}
 .peringatan-batas{color:#8a5a00;background:#FFF6D6;border-radius:8px;padding:.35rem .55rem;margin:.4rem 0}
+.wajib{color:var(--merah);font-weight:700}
