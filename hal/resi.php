@@ -23,7 +23,8 @@ kepala($d ? (!empty($d['pdf']) ? $d['pdf'] . ' - ' . $d['judul'] . ' - ' . $d['n
 <?php else: [$st, $warna] = $d['status']; ?>
   <div class="hanya-cetak kop-pdf-resi">
     <div><b><?= h((string)k('sekolah', '')) ?></b><br><?= h($d['pdf'] ?? $d['judul_resi']) ?> · SiGuru</div>
-    <div style="text-align:right">No. resi<br><b><?= h(resi_teks($r)) ?></b></div>
+    <div class="kop-pdf-kanan"><div style="text-align:right">No. resi<br><b><?= h(resi_teks($r)) ?></b><br><small>Pindai QR untuk status terbaru</small></div>
+      <div class="qr-cetak" data-qr="<?= h(resi_url($r)) ?>"></div></div>
   </div>
   <div class="kartu resi-kartu">
     <div class="resi-kop tak-cetak">
@@ -76,6 +77,13 @@ kepala($d ? (!empty($d['pdf']) ? $d['pdf'] . ' - ' . $d['judul'] . ' - ' . $d['n
       <small class="redup">Di jendela yang muncul, pilih <b>Simpan sebagai PDF</b>, lalu tekan Simpan.</small></div>
     <?php endif; ?>
     <?php if ($d['tombol']): ?><a class="tombol utama lebar tak-cetak" href="<?= h($d['tombol'][1]) ?>"><?= h($d['tombol'][0]) ?></a><?php endif; ?>
+    <div class="resi-qr-blok tak-cetak">
+      <button type="button" class="kecil" data-buka-qr="panel-qr" aria-expanded="false"><?= ikon('kamera') ?> Tunjukkan QR</button>
+      <div id="panel-qr" class="panel-qr" hidden>
+        <div class="qr-besar" data-qr="<?= h(resi_url($r)) ?>"></div>
+        <small>Minta orang tua atau guru memindai QR ini dengan kamera HP untuk membuka resi ini.</small>
+      </div>
+    </div>
     <p class="resi-kaki"><?= h($d['guru']) ?><?= $d['mapel'] !== '' ? ' · ' . h($d['mapel']) : '' ?><br>Link pribadi untuk <?= $d['anggota'] ? 'kelompok ini' : 'siswa ini' ?>. Jangan dibagikan ke orang lain.</p>
   </div>
 <?php endif; ?>
@@ -95,5 +103,5 @@ kepala($d ? (!empty($d['pdf']) ? $d['pdf'] . ' - ' . $d['judul'] . ' - ' . $d['n
   document.addEventListener('visibilitychange', function () { if (!document.hidden) cek(); });
 })();
 </script>
-<?php endif;
+<?php $GLOBALS['skrip_tambahan'][] = 'aset/lib/qrcode.js'; $GLOBALS['skrip_tambahan'][] = 'aset/qr-isi.js'; endif;
 kaki(true);

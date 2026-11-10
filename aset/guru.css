@@ -692,3 +692,15 @@ b.merah{color:var(--merah)}
 .pengingat-tutup button{flex:none}
 .peringatan-waktu{position:fixed;left:.6rem;right:.6rem;top:.6rem;z-index:60;background:#fff3c4;color:#5c3d00;border:2px solid #F2C230;border-radius:12px;padding:.7rem .8rem;display:flex;gap:.6rem;align-items:center;justify-content:space-between;box-shadow:0 6px 20px rgba(0,0,0,.18);font-size:.95rem;max-width:560px;margin:0 auto}
 .peringatan-waktu button{flex:none}
+
+/* v1.43 QR di resi, PDF hasil, rekap */
+.qr-cetak{width:22mm;height:22mm;flex:none}
+.qr-cetak svg,.qr-besar svg{width:100%;height:100%;display:block}
+.kop-pdf-kanan{display:flex;gap:.6rem;align-items:center}
+.kop-pdf-kanan small{font-size:7.5pt;color:#555}
+.resi-qr-blok{padding:.2rem 1rem .6rem;text-align:center}
+.resi-qr-blok button .ikon{width:16px;height:16px;vertical-align:-3px}
+.panel-qr{margin:.6rem auto 0;max-width:260px}
+.qr-besar{width:220px;height:220px;margin:0 auto .4rem;background:#fff;padding:6px;border:1px solid var(--garis,#E3E8F2);border-radius:10px}
+.panel-qr small{display:block;color:var(--redup)}
+.lembar-rekap .qr-cetak{width:20mm;height:20mm}

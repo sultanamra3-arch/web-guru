@@ -102,7 +102,8 @@ echo '<div class="judul-baris tak-cetak"><h1>Rekap kelas</h1><span><a class="tom
   <button type="button" class="utama lebar" onclick="window.print()"><?= ikon('cetak') ?> Cetak / simpan PDF</button>
 </div>
 <div class="kertas lembar-rekap">
-  <div class="kop-cetak hanya-cetak"><img src="aset/logo.png" alt=""><div><b><?= h((string)k('sekolah')) ?></b><br><?= h($sub) ?></div></div>
+  <div class="kop-cetak hanya-cetak"><img src="aset/logo.png" alt=""><div style="flex:1"><b><?= h((string)k('sekolah')) ?></b><br><?= h($sub) ?></div>
+    <div class="qr-cetak" data-qr="<?= h(alamat_dasar() . ($jenis === 'tugas' ? '/?p=tugas_lihat&id=' : '/?p=ujian_lihat&id=') . $id) ?>" title="Buka di SiGuru (perlu login guru)"></div></div>
   <h2 class="rekap-judul"><?= h($judul) ?></h2>
   <p class="rekap-sub">Kelas <?= h($kelas) ?><?= $mapel !== '' ? ' · ' . h($mapel) : '' ?> · <?= h(pengguna()['nama']) ?><span class="tak-cetak"> · <?= h($sub) ?></span></p>
   <div class="tabel-gulir">
@@ -124,4 +125,6 @@ echo '<div class="judul-baris tak-cetak"><h1>Rekap kelas</h1><span><a class="tom
   <p class="hanya-cetak rekap-dicetak">Dicetak dari SiGuru · <?= h(ujian_waktu_teks(sekarang())) ?></p>
 </div>
 <?php
+$GLOBALS['skrip_tambahan'][] = 'aset/lib/qrcode.js';
+$GLOBALS['skrip_tambahan'][] = 'aset/qr-isi.js';
 kaki();
