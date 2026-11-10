@@ -1,15 +1,23 @@
-# APK "SiGuru Admin" (v1.47)
+# APK "SiGuru Admin"
 
-Aplikasi Android pembungkus Chrome asli (Trusted Web Activity) untuk admin. Layar penuh tanpa bilah alamat untuk:
-guru.*, kelola.*, otomasismpn6keritang.my.id (SLiMS), kartu.*, bukutamu.*, katalog.* — masing-masing wajib punya
-`/.well-known/assetlinks.json` (isi sama dengan `.well-known/assetlinks.json` di repo ini).
+Sejak versi 1.1 (SiGuru v1.50) APK ini adalah aplikasi **WebView biasa** (folder `aplikasi/`),
+bukan lagi TWA. Alasan: APK TWA 1.0 dan 1.0.1 terpasang tetapi tidak mau terbuka di HP pengguna.
 
-- Paket: `id.my.otomasismpn6keritang.siguruadmin`, minSdk 24 (Android 7.0+).
-- Sidik jari SHA-256 kunci: `6B:FF:14:36:70:5A:A1:B9:76:9E:57:E3:FF:83:FA:9A:28:26:82:4B:F6:84:1F:BD:35:F2:20:DF:99:CB:CE:37`
-- **Berkas kunci (`siguru-admin.keystore`) dan sandinya TIDAK ada di repo** — disimpan oleh Pak Sultan. Tanpa kunci yang sama,
-  APK baru tidak bisa memperbarui APK lama dan semua `assetlinks.json` harus diganti.
-- APK hanya perlu dibuat ulang bila daftar alamat/nama/ikon berubah. Isi aplikasi (SiGuru, SiPustaka, dll.) selalu terbaru dari web.
+Ciri:
+- Membuka `https://guru.otomasismpn6keritang.my.id/?p=beranda` langsung di dalam aplikasi — tanpa Chrome, tanpa bilah alamat.
+- Semua alamat `*.otomasismpn6keritang.my.id` dibuka di dalam aplikasi; alamat lain dibuka di aplikasi luar.
+- Tanpa efek memantul (`OVER_SCROLL_NEVER`), tombol Kembali HP = kembali satu halaman.
+- `window.print()` diarahkan ke layanan cetak Android (bisa "Simpan sebagai PDF").
+- Unggah foto/berkas (kamera & galeri), kamera untuk pemindai (getUserMedia), unduhan lewat DownloadManager.
+- Bila aplikasi sempat tertutup sendiri, pesan galatnya tampil saat dibuka lagi (untuk dikirim ke Claude).
+- Paket `id.my.otomasismpn6keritang.siguruadmin`, nama aktivitas tetap `LauncherActivity` agar ikon lama tetap jalan.
 
-Membuat ulang: `npm i @bubblewrap/core` → `node buat-proyek.js` (sesuaikan path ikon & kunci) → di folder proyek ganti `jcenter()`
-dengan mirror Maven Central, minSdk 24 → `./gradlew assembleRelease` → `zipalign` → `apksigner sign` dengan kunci di atas →
-salin hasilnya ke `apk/SiGuru-Admin.apk`, naikkan `appVersionCode`.
+Membuat ulang:
+1. Android SDK (platform 35, build-tools 35/36), JDK 17+.
+2. `cd aplikasi && ANDROID_HOME=... ./gradlew assembleRelease`
+3. `zipalign -p -f 4 app/build/outputs/apk/release/app-release-unsigned.apk al.apk`
+4. `apksigner sign --ks siguru-admin.keystore --ks-key-alias siguru --out SiGuru-Admin.apk al.apk`
+   (keystore + sandi disimpan Pak Sultan — JANGAN di-commit). Naikkan `versionCode` tiap rilis.
+5. Salin ke `apk/SiGuru-Admin.apk`, naikkan VERSI SiGuru.
+
+`/.well-known/assetlinks.json` di tiap subdomain tidak dibutuhkan lagi oleh APK ini (aman dibiarkan).
