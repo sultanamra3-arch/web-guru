@@ -6,6 +6,7 @@ $t = tugas_ambil((int)get('id'));
 if (!$t) ke('?p=tugas');
 $id = (int)$t['id'];
 $siswa = siswa_kelas((string)$t['kelas'], (string)($t['tahun'] ?: tahun_aktif()));
+$kel = tugas_kelompok($t);
 $kirim = [];
 foreach (semua('SELECT * FROM guru_tugas_kirim WHERE tugas_id = ?', [$id]) as $k) $kirim[$k['kode']] = $k;
 
@@ -15,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'buka': q("UPDATE guru_tugas SET status = 'buka' WHERE id = ?", [$id]); pesan('Tugas dibuka lagi.'); break;
         case 'hapus_kiriman':
             $k = $kirim[(string)post('kode')] ?? null;
-            if ($k) { tugas_hapus_foto(tugas_foto_daftar($k)); q('DELETE FROM guru_tugas_kirim WHERE tugas_id = ? AND kode = ?', [$id, $k['kode']]); pesan('Kiriman ' . h(nama_siswa($k['kode'])) . ' dihapus; siswa bisa mengirim ulang.'); }
+            if ($k) { tugas_hapus_foto(tugas_foto_daftar($k)); q('DELETE FROM guru_tugas_kirim WHERE tugas_id = ? AND kode = ?', [$id, $k['kode']]); pesan('Kiriman ' . h(tugas_nama_kirim($k['kode'])) . ' dihapus; ' . ($kel ? 'kelompok itu' : 'siswa') . ' bisa mengirim ulang.'); }
             break;
         case 'kirim_penilaian':
             $pid = (int)$t['penilaian_id'];
@@ -29,9 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $n = 0;
             foreach ($kirim as $k) {
                 if ($k['nilai'] === null) continue;
-                q('INSERT INTO guru_nilai (penilaian_id, member_id, nilai, catatan) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE nilai = VALUES(nilai), catatan = VALUES(catatan)',
-                    [$pid, $k['kode'], $k['nilai'], 'Tugas online' . ($k['telat'] ? ' (terlambat)' : '')]);
-                $n++;
+                $kn = tugas_kode_kelompok($k['kode']);
+                // tugas kelompok: satu nilai untuk semua anggota kelompok
+                $penerima = $kn ? array_keys(tugas_anggota($t, $kn)) : [$k['kode']];
+                foreach ($penerima as $mid) {
+                    q('INSERT INTO guru_nilai (penilaian_id, member_id, nilai, catatan) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE nilai = VALUES(nilai), catatan = VALUES(catatan)',
+                        [$pid, $mid, $k['nilai'], ($kn ? 'Kelompok ' . $kn . ' · tugas online' : 'Tugas online') . ($k['telat'] ? ' (terlambat)' : '')]);
+                    $n++;
+                }
             }
             q('UPDATE guru_tugas SET nilai_dikirim = ? WHERE id = ?', [sekarang(), $id]);
             pesan("$n nilai dikirim ke Penilaian. Foto kiriman akan dihapus otomatis " . TUGAS_HAPUS_FOTO_HARI . ' hari setelah ini (nilai tetap tersimpan).');
@@ -49,12 +55,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $n = ['kirim' => 0, 'telat' => 0, 'belum' => 0, 'nilai' => 0];
 $baris = [];
 $belum_nama = [];
-foreach ($siswa as $s) {
-    $k = $kirim[$s['member_id']] ?? null;
-    unset($kirim[$s['member_id']]);
-    $baris[] = [$s['member_id'], $s['member_name'], $k];
+$anggota = [];
+if ($kel) {
+    foreach (tugas_daftar_kelompok($t) as $kn) {
+        $anggota['K' . $kn] = tugas_anggota($t, $kn);
+        $baris[] = ['K' . $kn, 'Kelompok ' . $kn, $kirim['K' . $kn] ?? null];
+        unset($kirim['K' . $kn]);
+    }
+} else {
+    foreach ($siswa as $s) {
+        $k = $kirim[$s['member_id']] ?? null;
+        unset($kirim[$s['member_id']]);
+        $baris[] = [$s['member_id'], $s['member_name'], $k];
+    }
 }
-foreach ($kirim as $kd => $k) $baris[] = [(string)$kd, nama_siswa((string)$kd), $k];
+foreach ($kirim as $kd => $k) $baris[] = [(string)$kd, tugas_nama_kirim((string)$kd), $k];
 foreach ($baris as [$kd, $nm, $k]) {
     if (!$k || !$k['dikirim']) { $n['belum']++; $belum_nama[] = $nm; continue; }
     $n[$k['telat'] ? 'telat' : 'kirim']++;
@@ -66,7 +81,7 @@ kepala($t['judul'], 'kelas');
 judul_baris('Tugas: ' . h($t['judul']), '<a class="tombol" href="?p=tugas">‹ Tugas</a>');
 ?>
 <div class="kartu">
-  <p style="margin-top:0">Kelas <b><?= h($t['kelas']) ?></b><?= $t['mapel'] ? ' · ' . h($t['mapel']) : '' ?> · batas <b><?= $t['batas'] ? h(ujian_waktu_teks($t['batas'])) : 'tidak ada' ?></b>
+  <p style="margin-top:0"><?= $kel ? '<span class="lencana">tugas kelompok</span> ' : '' ?>Kelas <b><?= h($t['kelas']) ?></b><?= $t['mapel'] ? ' · ' . h($t['mapel']) : '' ?> · batas <b><?= $t['batas'] ? h(ujian_waktu_teks($t['batas'])) : 'tidak ada' ?></b>
     <?= $t['status'] !== 'buka' ? '<span class="lencana st-tutup">ditutup</span>' : (tugas_lewat($t) ? '<span class="lencana st-draf">lewat batas' . ($t['terima_telat'] ? ', masih menerima (terlambat)' : '') . '</span>' : '<span class="lencana st-buka">dibuka</span>') ?></p>
   <?php if ($t['petunjuk']): ?><p class="kecil" style="white-space:pre-line"><?= h(mb_strimwidth((string)$t['petunjuk'], 0, 300, '…')) ?></p><?php endif; ?>
   <div class="layar-token" style="margin:.4rem 0">
@@ -99,12 +114,12 @@ panel_status(['jenis' => 'tugas', 'id' => $id, 'judul' => $t['judul'], 'kelas' =
   <ul class="daftar daftar-tugas">
   <?php foreach ($baris as [$kd, $nm, $k]): $sudah = $k && $k['dikirim']; ?>
     <li>
-      <div><b><?= h($nm) ?></b>
+      <div><b><?= h($nm) ?></b><?php if ($kel && isset($anggota[$kd])): ?><br><small class="redup"><?= h(implode(', ', $anggota[$kd])) ?></small><?php endif; ?>
         <?php if (!$sudah): ?> <span class="lencana merah">belum</span>
         <?php elseif ($k['status'] === 'perbaiki'): ?> <span class="lencana st-draf">↩ diminta perbaiki</span>
         <?php elseif ($k['telat']): ?> <span class="lencana st-draf">⏰ terlambat</span>
         <?php else: ?> <span class="lencana st-buka">✓ terkirim</span><?php endif; ?>
-        <?php if ($sudah): ?><br><small class="redup"><?= h(ujian_waktu_teks($k['dikirim'])) ?> · <?= count(tugas_foto_daftar($k)) ?> foto<?= trim((string)$k['teks']) !== '' ? ' · ada teks' : '' ?><?= (int)$k['kali'] > 1 ? ' · kirim ke-' . (int)$k['kali'] : '' ?></small><?php endif; ?>
+        <?php if ($sudah): ?><br><small class="redup"><?= h(ujian_waktu_teks($k['dikirim'])) ?> · <?= count(tugas_foto_daftar($k)) ?> foto<?= trim((string)$k['teks']) !== '' ? ' · ada teks' : '' ?><?= (int)$k['kali'] > 1 ? ' · kirim ke-' . (int)$k['kali'] : '' ?><?= $kel && $k['oleh'] ? ' · oleh ' . h(nama_siswa((string)$k['oleh'])) : '' ?></small><?php endif; ?>
       </div>
       <?php if ($sudah): ?>
         <a class="<?= $k['nilai'] !== null ? 'nilai-tugas' : 'tombol kecil' ?>" href="?p=tugas_nilai&amp;id=<?= $id ?>&amp;kode=<?= h(rawurlencode($kd)) ?>"><?= $k['nilai'] !== null ? h(rtrim(rtrim((string)$k['nilai'], '0'), '.')) : 'Nilai' ?></a>
@@ -117,7 +132,8 @@ panel_status(['jenis' => 'tugas', 'id' => $id, 'judul' => $t['judul'], 'kelas' =
 <form method="post" class="kartu formulir">
   <?= input_token() ?><input type="hidden" name="aksi" value="kirim_penilaian">
   <div class="baris2"><label>KKTP<input type="number" name="kktp" value="75" min="0" max="100"></label><div></div></div>
-  <button class="utama lebar">Kirim <?= $n['nilai'] ?> nilai ke Penilaian<?= $t['penilaian_id'] ? ' (perbarui)' : '' ?></button>
+  <button class="utama lebar">Kirim <?= $n['nilai'] ?> nilai <?= $kel ? 'kelompok ' : '' ?>ke Penilaian<?= $t['penilaian_id'] ? ' (perbarui)' : '' ?></button>
+  <?php if ($kel): ?><p class="kecil redup">Nilai kelompok diberikan ke semua anggotanya. Anggota yang tidak ikut bekerja bisa diubah nilainya di halaman Penilaian.</p><?php endif; ?>
   <p class="kecil redup">Foto kiriman dihapus otomatis <?= TUGAS_HAPUS_FOTO_HARI ?> hari setelah nilai dikirim, supaya hosting tidak penuh. Nilainya tetap tersimpan.</p>
 </form>
 <?php endif; ?>

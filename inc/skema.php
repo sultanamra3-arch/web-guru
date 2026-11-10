@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 11;
+const SKEMA_VERSI = 12;
 
 function pastikan_skema(): void
 {
@@ -284,6 +284,7 @@ function pastikan_skema(): void
     skema_migrasi_8();
     skema_migrasi_9();
     skema_migrasi_10();
+    skema_migrasi_12();
     @file_put_contents($f, date('c'));
 }
 
@@ -355,4 +356,11 @@ function skema_migrasi_9(): void
 function skema_migrasi_10(): void
 {
     if (!kolom_ada('guru_ujian_peserta', 'kunci_lanjut')) db()->exec('ALTER TABLE guru_ujian_peserta ADD COLUMN kunci_lanjut VARCHAR(64) NULL');
+}
+
+/** v12: tugas online kelompok (satu kiriman per kelompok, kode kiriman "K<nomor>"; `oleh` = siswa yang mengirim). */
+function skema_migrasi_12(): void
+{
+    if (!kolom_ada('guru_tugas', 'kelompok')) db()->exec('ALTER TABLE guru_tugas ADD COLUMN kelompok TINYINT NOT NULL DEFAULT 0');
+    if (!kolom_ada('guru_tugas_kirim', 'oleh')) db()->exec('ALTER TABLE guru_tugas_kirim ADD COLUMN oleh VARCHAR(20) NULL');
 }

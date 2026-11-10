@@ -79,10 +79,12 @@ function siswa_kelas(string $kelas, ?string $tahun = null, ?int $guru = null): a
 }
 
 /** Pembagian kelompok kelas ini (tahun aktif): [kode siswa => nomor kelompok]. */
-function kelompok_kelas(string $kelas): array
+function kelompok_kelas(string $kelas, ?string $tahun = null, ?int $guru = null): array
 {
+    $guru ??= uid();
+    $tahun ??= tahun_aktif($guru);
     $r = [];
-    foreach (semua('SELECT kode, kelompok FROM guru_kelompok WHERE guru_id = ? AND tahun = ? AND kelas = ?', [uid(), tahun_aktif(), $kelas]) as $b) {
+    foreach (semua('SELECT kode, kelompok FROM guru_kelompok WHERE guru_id = ? AND tahun = ? AND kelas = ? ORDER BY kelompok', [$guru, $tahun, $kelas]) as $b) {
         $r[$b['kode']] = (int)$b['kelompok'];
     }
     return $r;

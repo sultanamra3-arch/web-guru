@@ -603,3 +603,10 @@ b.merah{color:var(--merah)}
 .nilai-kelompok h3{margin:0 0 .3rem}
 .baris-kel{display:grid!important;grid-template-columns:1fr 84px;gap:.6rem;align-items:center}
 .baris-kel small{display:block;overflow-wrap:anywhere}
+
+/* v1.39 tugas kelompok */
+.kelompok-saya{border-left:4px solid var(--emas,#F2C230)}
+.foto-lama .foto-mini{position:relative;cursor:pointer}
+.foto-lama .foto-mini input{position:absolute;top:4px;right:4px;width:22px;height:22px;min-height:auto;margin:0}
+.foto-lama .foto-mini.dibuang img{opacity:.3}
+.jenis-tugas label.centang{margin:.3rem 0}

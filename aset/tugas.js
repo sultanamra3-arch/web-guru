@@ -16,7 +16,7 @@
   }
   var K = $('kirim-tugas');
   if (!K) return;
-  var maks = +K.dataset.maks, foto = [], wadah = $('foto-pilih'), ambil = $('ambil-foto'), st = $('status-kirim'), tombol = $('tombol-kirim');
+  var maks0 = +K.dataset.maks, maks = maks0, foto = [], wadah = $('foto-pilih'), ambil = $('ambil-foto'), st = $('status-kirim'), tombol = $('tombol-kirim');
   function kecilkan(berkas) {
     return new Promise(function (ok, gagal) {
       var url = URL.createObjectURL(berkas), img = new Image();
@@ -30,6 +30,15 @@
       img.src = url;
     });
   }
+  // tugas kelompok: foto lama yang tetap dipakai mengurangi jatah foto baru
+  var lama = Array.prototype.slice.call(document.querySelectorAll('.pakai-lama'));
+  function lamaDipakai() { return lama.filter(function (c) { return c.checked; }).map(function (c) { return c.value; }); }
+  function aturMaks() {
+    maks = Math.max(0, maks0 - lamaDipakai().length);
+    if (foto.length > maks) foto = foto.slice(0, maks);
+    gambar();
+  }
+  lama.forEach(function (c) { c.addEventListener('change', function () { c.parentNode.classList.toggle('dibuang', !c.checked); aturMaks(); }); });
   function gambar() {
     Array.prototype.slice.call(wadah.querySelectorAll('.foto-mini')).forEach(function (e) { e.remove(); });
     foto.forEach(function (f, i) {
@@ -49,13 +58,13 @@
   var token = (document.querySelector('input[name=_t]') || {}).value || K.dataset.t;
   tombol.addEventListener('click', function () {
     var teks = $('teks-tugas').value.trim();
-    if (!foto.length && !teks) { st.textContent = '⚠ Tambahkan foto atau tulis jawaban dulu.'; return; }
+    if (!foto.length && !teks && !lamaDipakai().length) { st.textContent = '⚠ Tambahkan foto atau tulis jawaban dulu.'; return; }
     tombol.disabled = true;
     var coba = 0;
     (function kirim() {
       coba++;
       st.textContent = '⏳ Mengirim' + (coba > 1 ? ' (percobaan ' + coba + ')' : '') + '… jangan tutup halaman ini.';
-      var fd = new FormData(); fd.append('_t', token); fd.append('id', K.dataset.id); fd.append('foto', JSON.stringify(foto)); fd.append('teks', teks);
+      var fd = new FormData(); fd.append('_t', token); fd.append('id', K.dataset.id); fd.append('foto', JSON.stringify(foto)); fd.append('teks', teks); fd.append('lama', JSON.stringify(lamaDipakai()));
       fetch('?p=api_t', { method: 'POST', body: fd, credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (r) {
         if (!r.ok) { st.textContent = '⚠ ' + (r.galat || 'Gagal mengirim.'); tombol.disabled = false; return; }
         st.textContent = '✅ Terkirim pukul ' + r.jam + (r.telat ? ' (terlambat)' : '') + '.';
@@ -66,4 +75,5 @@
       });
     })();
   });
+  if (lama.length) aturMaks();
 })();

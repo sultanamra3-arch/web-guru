@@ -10,6 +10,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $kelas = (string)post('kelas');
     $judul = mb_substr(trim((string)post('judul')), 0, 200);
     if (!kelas_valid($kelas) || $judul === '') { pesan('Judul dan kelas wajib diisi.', 'galat'); ke($_SERVER['REQUEST_URI']); }
+    $ada_kiriman = $t && nilai('SELECT 1 FROM guru_tugas_kirim WHERE tugas_id = ?', [$t['id']]);
+    $kelompok = $ada_kiriman ? (int)$t['kelompok'] : (post('jenis_tugas') === 'kelompok' ? 1 : 0);
+    if ($ada_kiriman && $kelas !== $t['kelas']) $kelas = (string)$t['kelas'];
+    if ($kelompok && !kelompok_kelas($kelas, $t['tahun'] ?? null)) {
+        pesan('Kelas ' . $kelas . ' belum punya kelompok. Bentuk kelompok dulu di menu Kelas → Kelompok, lalu buat tugasnya lagi.', 'galat');
+        ke('?p=kelompok&kelas=' . rawurlencode($kelas));
+    }
     $batas = null;
     if (preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)post('batas_tgl'))) $batas = post('batas_tgl') . ' ' . (jam_rapi((string)post('batas_jam')) ?: '23:59') . ':00';
     $lampiran = $t['lampiran'] ?? null;
@@ -20,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'petunjuk' => mb_substr(trim((string)post('petunjuk')), 0, 5000), 'lampiran' => $lampiran, 'batas' => $batas,
         'terima_telat' => post('terima_telat') ? 1 : 0, 'maks_foto' => max(1, min(10, (int)post('maks_foto', 5))),
         'tampil_tertib' => post('tampil_tertib') ? 1 : 0, 'tata_tertib' => mb_substr(trim((string)post('tata_tertib')), 0, 3000),
-        'kunci' => mb_substr(trim((string)post('kunci')), 0, 5000),
+        'kunci' => mb_substr(trim((string)post('kunci')), 0, 5000), 'kelompok' => $kelompok,
     ];
     if (post('tertib_bawaan') && $data['tata_tertib'] !== '') setelan_simpan('tertib_tugas:' . uid(), $data['tata_tertib']);
     if ($t) {
@@ -36,6 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $kl = kelas_saya();
+$ada_kiriman = $t && nilai('SELECT 1 FROM guru_tugas_kirim WHERE tugas_id = ?', [$t['id']]);
+$kelas_berkelompok = array_values(array_filter($kl, fn($x) => (bool)kelompok_kelas($x)));
 $v = fn($k, $d = '') => h((string)($t[$k] ?? $d));
 kepala($t ? 'Ubah tugas' : 'Tugas baru', 'kelas');
 judul_baris($t ? 'Ubah tugas' : 'Tugas online baru', '<a class="tombol" href="' . ($t ? '?p=tugas_lihat&amp;id=' . $t['id'] : '?p=tugas') . '">‹ Kembali</a>');
@@ -47,6 +56,18 @@ judul_baris($t ? 'Ubah tugas' : 'Tugas online baru', '<a class="tombol" href="' 
     <label>Kelas<select name="kelas" required><?= pilihan(array_combine($kl, $kl) ?: [], $t['kelas'] ?? '') ?></select></label>
     <label>Mapel<?= pilih_mapel((string)($t['mapel'] ?? '')) ?></label>
   </div>
+  <fieldset class="jenis-tugas">
+    <legend>Dikerjakan</legend>
+    <?php if ($ada_kiriman): ?>
+      <p style="margin:.2rem 0"><b><?= $t['kelompok'] ? 'Berkelompok' : 'Sendiri-sendiri (individu)' ?></b> <small class="redup">— tidak bisa diganti karena sudah ada kiriman.</small></p>
+    <?php else: ?>
+      <label class="centang"><input type="radio" name="jenis_tugas" value="individu" <?= empty($t['kelompok']) ? 'checked' : '' ?>> <span><b>Individu</b> — tiap siswa mengirim sendiri</span></label>
+      <label class="centang"><input type="radio" name="jenis_tugas" value="kelompok" <?= !empty($t['kelompok']) ? 'checked' : '' ?>> <span><b>Kelompok</b> — satu kiriman per kelompok, satu nilai untuk semua anggota</span></label>
+      <p class="kecil redup" style="margin:.2rem 0 0">Tugas kelompok memakai kelompok dari menu Kelas → Kelompok.
+        <?= $kelas_berkelompok ? 'Kelas yang sudah punya kelompok: <b>' . h(implode(', ', $kelas_berkelompok)) . '</b>.' : '<b>Belum ada kelas yang punya kelompok.</b>' ?>
+        <a href="?p=kelompok">Atur kelompok →</a></p>
+    <?php endif; ?>
+  </fieldset>
   <label>Petunjuk / soal tugas<textarea name="petunjuk" rows="4" placeholder="Tulis perintah tugasnya…"><?= $v('petunjuk') ?></textarea></label>
   <div class="unggah-gambar" data-nama="gambar_data">
     <div class="pratinjau-gambar"><?= gambar_html($t['lampiran'] ?? null, 'gambar-soal') ?></div>

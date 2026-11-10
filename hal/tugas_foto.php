@@ -1,5 +1,5 @@
 <?php
-/* Foto kiriman tugas: hanya untuk guru pemilik tugas atau siswa pengirimnya (di HP yang sama). */
+/* Foto kiriman tugas: hanya untuk guru pemilik tugas atau siswa pengirimnya (tugas kelompok: anggota kelompoknya). */
 declare(strict_types=1);
 
 $tid = (int)get('t');
@@ -11,8 +11,9 @@ if (preg_match('/^[a-f0-9]{24}\.(jpg|png|webp)$/', $f) && is_file($path)) {
     $kode_siswa = $_SESSION['tugas'][$tid] ?? null;
     if ($t && pengguna() && (int)$t['guru_id'] === uid()) {
         $boleh = (bool)nilai('SELECT 1 FROM guru_tugas_kirim WHERE tugas_id = ? AND foto LIKE ?', [$tid, '%' . $f . '%']);
-    } elseif ($t && $kode_siswa) {
-        $boleh = (bool)nilai('SELECT 1 FROM guru_tugas_kirim WHERE tugas_id = ? AND kode = ? AND foto LIKE ?', [$tid, $kode_siswa, '%' . $f . '%']);
+    } elseif ($t && $kode_siswa && ($kode_kirim = tugas_kode_kirim($t, (string)$kode_siswa)) !== null) {
+        // tugas kelompok: semua anggota kelompok boleh melihat foto kelompoknya
+        $boleh = (bool)nilai('SELECT 1 FROM guru_tugas_kirim WHERE tugas_id = ? AND kode = ? AND foto LIKE ?', [$tid, $kode_kirim, '%' . $f . '%']);
     }
 }
 if (!$boleh) { http_response_code(404); exit; }

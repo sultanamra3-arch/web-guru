@@ -29,8 +29,8 @@ foreach (semua("SELECT t.*, (SELECT COUNT(*) FROM guru_tugas_kirim k WHERE k.tug
                 (SELECT COUNT(*) FROM guru_tugas_kirim k WHERE k.tugas_id = t.id AND k.dikirim IS NOT NULL AND k.status = 'kirim') n_nilai
                 FROM guru_tugas t WHERE guru_id = ? ORDER BY (t.batas IS NULL), t.batas, t.id DESC", [uid()]) as $t) {
     if ($t['status'] !== 'buka' && !(int)$t['n_nilai']) continue;
-    $n = count(siswa_kelas($t['kelas'], $t['tahun'] ?: null));
-    $ket = (int)$t['n_kirim'] . ($n ? '/' . $n : '') . ' terkumpul';
+    $n = tugas_kelompok($t) ? count(tugas_daftar_kelompok($t)) : count(siswa_kelas($t['kelas'], $t['tahun'] ?: null));
+    $ket = (int)$t['n_kirim'] . ($n ? '/' . $n : '') . (tugas_kelompok($t) ? ' kelompok' : '') . ' terkumpul';
     if ((int)$t['n_nilai']) $ket .= ' · <b>' . (int)$t['n_nilai'] . ' perlu dinilai</b>';
     if ($t['status'] !== 'buka') $ket .= ' · ditutup';
     elseif ($t['batas']) {

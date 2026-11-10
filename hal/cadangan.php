@@ -29,7 +29,7 @@ function cadangan_bagian(): array
         'ujian' => ['SELECT * FROM guru_ujian WHERE guru_id = ? ORDER BY id', [$g]],
         'ujian_peserta' => ['SELECT * FROM guru_ujian_peserta WHERE ujian_id IN (' . $in($uji) . ')', []],
         'tugas' => ['SELECT * FROM guru_tugas WHERE guru_id = ? ORDER BY id', [$g]],
-        'tugas_kiriman' => ['SELECT tugas_id, kode, teks, foto, dikirim, telat, kali, status, nilai, komentar, dinilai FROM guru_tugas_kirim WHERE tugas_id IN (' . $in($tug) . ')', []],
+        'tugas_kiriman' => ['SELECT tugas_id, kode, oleh, teks, foto, dikirim, telat, kali, status, nilai, komentar, dinilai FROM guru_tugas_kirim WHERE tugas_id IN (' . $in($tug) . ')', []],
         'sertifikat' => ['SELECT * FROM guru_sertifikat WHERE guru_id = ? ORDER BY id', [$g]],
         'sertifikat_penerima' => ['SELECT * FROM guru_sertifikat_penerima WHERE sertifikat_id IN (' . $in($ser) . ')', []],
         'setelan' => ["SELECT k, v FROM guru_setelan WHERE k LIKE ?", ['%:' . $g]],

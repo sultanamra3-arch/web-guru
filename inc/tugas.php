@@ -52,6 +52,7 @@ function tugas_tata_tertib(array $t): array
         $poin[] = 'Kirim sebelum <b>' . h(ujian_waktu_teks((string)$t['batas'])) . '</b>. '
             . ($t['terima_telat'] ? 'Yang lewat batas tetap diterima tapi <b>ditandai terlambat</b>.' : 'Setelah lewat batas, tugas <b>tidak bisa dikirim lagi</b>.');
     }
+    if (tugas_kelompok($t)) $poin[] = 'Ini <b>tugas kelompok</b>: cukup <b>satu anggota</b> yang mengirim. Anggota lain bisa melihat, menambah foto, atau mengirim ulang.';
     $poin[] = 'Foto paling banyak <b>' . (int)$t['maks_foto'] . '</b> lembar; foto otomatis dikecilkan agar hemat kuota.';
     $poin[] = 'Kamu boleh mengirim ulang sebelum batas waktu; kiriman terakhir yang dinilai.';
     return $poin;
@@ -150,17 +151,77 @@ function ai_nilai_tugas(array $t, array $k): array
         'ragu' => !empty($j['ragu']), 'oleh' => $r['oleh']];
 }
 
+/* ---------- tugas kelompok (v1.39): satu kiriman per kelompok, kode kiriman "K<nomor>" ---------- */
+function tugas_kelompok(array $t): bool
+{
+    return !empty($t['kelompok']);
+}
+
+/** [kode siswa => nomor kelompok] untuk kelas & tahun tugas ini. */
+function tugas_peta_kelompok(array $t): array
+{
+    static $cache = [];
+    $id = (int)$t['id'];
+    return $cache[$id] ??= kelompok_kelas((string)$t['kelas'], (string)($t['tahun'] ?: tahun_aktif((int)$t['guru_id'])), (int)$t['guru_id']);
+}
+
+/** Kode baris kiriman untuk siswa ini (individu: kode siswa; kelompok: "K<n>", null bila belum masuk kelompok). */
+function tugas_kode_kirim(array $t, string $siswa): ?string
+{
+    if (!tugas_kelompok($t)) return $siswa;
+    $n = tugas_peta_kelompok($t)[$siswa] ?? 0;
+    return $n ? 'K' . $n : null;
+}
+
+function tugas_kode_kelompok(string $kode): int
+{
+    return preg_match('/^K(\d{1,2})$/', $kode, $m) ? (int)$m[1] : 0;
+}
+
+/** Anggota kelompok: [kode siswa => nama], urut nomor absen. */
+function tugas_anggota(array $t, int $n): array
+{
+    $peta = tugas_peta_kelompok($t);
+    $o = [];
+    foreach (siswa_kelas((string)$t['kelas'], (string)($t['tahun'] ?: tahun_aktif((int)$t['guru_id'])), (int)$t['guru_id']) as $s) {
+        if (($peta[$s['member_id']] ?? 0) === $n) $o[$s['member_id']] = $s['member_name'];
+    }
+    return $o;
+}
+
+/** Nomor-nomor kelompok yang ada untuk tugas ini. */
+function tugas_daftar_kelompok(array $t): array
+{
+    $n = array_values(array_unique(tugas_peta_kelompok($t)));
+    sort($n);
+    return $n;
+}
+
+/** Nama untuk ditampilkan: "Kelompok 2" atau nama siswa. */
+function tugas_nama_kirim(string $kode): string
+{
+    $n = tugas_kode_kelompok($kode);
+    return $n ? 'Kelompok ' . $n : nama_siswa($kode);
+}
+
 /** Nama siswa per status kiriman untuk dibagikan ke grup WA (tanpa nilai). */
 function tugas_status_kumpul(array $t): array
 {
     $kirim = [];
     foreach (semua('SELECT kode, dikirim, status FROM guru_tugas_kirim WHERE tugas_id = ?', [$t['id']]) as $k) $kirim[$k['kode']] = $k;
     $daftar = [];
-    foreach (siswa_kelas((string)$t['kelas'], (string)($t['tahun'] ?: tahun_aktif())) as $s) {
-        $daftar[] = [$s['member_name'], $kirim[$s['member_id']] ?? null];
-        unset($kirim[$s['member_id']]);
+    if (tugas_kelompok($t)) {
+        foreach (tugas_daftar_kelompok($t) as $n) {
+            $daftar[] = ['Kelompok ' . $n . ' (' . implode(', ', tugas_anggota($t, $n)) . ')', $kirim['K' . $n] ?? null];
+            unset($kirim['K' . $n]);
+        }
+    } else {
+        foreach (siswa_kelas((string)$t['kelas'], (string)($t['tahun'] ?: tahun_aktif())) as $s) {
+            $daftar[] = [$s['member_name'], $kirim[$s['member_id']] ?? null];
+            unset($kirim[$s['member_id']]);
+        }
     }
-    foreach ($kirim as $kd => $k) $daftar[] = [nama_siswa((string)$kd), $k];
+    foreach ($kirim as $kd => $k) $daftar[] = [tugas_nama_kirim((string)$kd), $k];
     $o = ['sudah' => [], 'jalan' => [], 'belum' => [], 'perbaiki' => []];
     foreach ($daftar as [$nama, $k]) {
         if ($k && $k['status'] === 'perbaiki') $o['perbaiki'][] = $nama;
