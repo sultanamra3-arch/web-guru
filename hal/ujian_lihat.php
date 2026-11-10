@@ -74,6 +74,7 @@ judul_baris(h($u['judul']), '<a class="tombol" href="?p=ujian">‹ Ujian</a>');
     <form method="post" onsubmit="return confirm('Tutup ujian? Siswa yang belum selesai akan dikumpulkan otomatis.')"><?= input_token() ?><input type="hidden" name="aksi" value="tutup"><button class="lebar bahaya">■ Tutup ujian</button></form>
     <?php endif; ?>
     <a class="tombol" href="?p=ujian_hasil&amp;id=<?= $id ?>">📊 Hasil & nilai</a>
+    <a class="tombol" href="?p=rekap_cetak&amp;jenis=ujian&amp;id=<?= $id ?>"><?= ikon('cetak') ?> Rekap kelas (PDF)</a>
   </div>
   <p class="kecil"><a href="?p=ujian_form&amp;id=<?= $id ?>">⚙ Pengaturan</a>
     · <?= !ujian_latihan($u) ? ($u['pengaman'] ? '🛡 pengaman <b>aktif</b> (' . (int)$u['batas_keluar'] . '× keluar)' : '🛡 pengaman mati') : 'tanpa token, boleh diulang' ?>

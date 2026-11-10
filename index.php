@@ -24,7 +24,7 @@ mulai_sesi();
 
 $halaman = [
     'masuk', 'keluar', 'beranda', 'lainnya', 'akun', 'profil', 'pengaturan_ai',
-    'kelas', 'erapor', 'cadangan', 'siswa', 'siswa_tambah', 'siswa_ubah', 'siswa_naik', 'jadwal', 'absensi', 'absensi_rekap', 'penilaian', 'nilai', 'nilai_rekap', 'kelompok', 'resi', 'koreksi', 'koreksi_lj', 'koreksi_lihat',
+    'kelas', 'erapor', 'cadangan', 'siswa', 'siswa_tambah', 'siswa_ubah', 'siswa_naik', 'jadwal', 'absensi', 'absensi_rekap', 'penilaian', 'nilai', 'nilai_rekap', 'kelompok', 'resi', 'rekap_cetak', 'koreksi', 'koreksi_lj', 'koreksi_lihat',
     'soal', 'soal_form', 'soal_manual', 'soal_ai', 'paket', 'paket_cetak', 'kisi',
     'perangkat', 'dokumen', 'dokumen_buat', 'dokumen_lihat', 'presentasi',
     'sertifikat', 'sertifikat_form', 'sertifikat_cetak',

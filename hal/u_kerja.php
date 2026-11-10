@@ -67,32 +67,7 @@ if ($p['selesai']):
     Nama: <b><?= h($nama) ?></b><?= $lihat_nilai && !$h['perlu'] ? ' · Nilai: <b>' . h((string)$h['nilai']) . '</b>' : '' ?> · <?= h(tgl_panjang(substr((string)$p['selesai'], 0, 10))) ?>
   </div>
   <h3 style="margin:1.2rem 0 .5rem">Pembahasan</h3>
-  <ol class="ulasan-siswa">
-  <?php foreach ($soal_semua as $i => $x): $a = (string)($jw[$i] ?? ''); $r = $h['rinci'][$i]; $pg = in_array($x['tipe'], ['pg', 'bs'], true);
-      $kelas_r = $r['status'] === 'perlu' ? 'tunggu' : ($r['skor'] >= $r['maks'] && $r['maks'] > 0 ? 'benar' : ($r['skor'] > 0 ? 'sebagian' : 'salah')); ?>
-    <li class="kartu <?= $kelas_r ?>">
-      <div class="ulasan-kepala"><b>Soal <?= $i + 1 ?></b><span><?= ['benar' => '✓ Benar', 'salah' => '✗ Salah', 'sebagian' => '◐ Sebagian', 'tunggu' => '⏳ Menunggu guru'][$kelas_r] ?></span></div>
-      <div class="ujian-teks" style="font-size:1rem;margin-bottom:.4rem"><?= nl2br(h($x['teks'])) ?></div>
-      <?= gambar_html($x['gambar'] ?? null, 'gambar-soal kecil') ?>
-      <?php if ($pg): ?>
-        <ul class="ulasan-opsi">
-        <?php foreach ($x['opsi'] as $k => $t): $kls = ($k === $x['kunci'] ? 'kunci ' : '') . ($k === strtoupper($a) ? 'dipilih' : ''); ?>
-          <li class="<?= trim($kls) ?>"><span class="huruf"><?= h($k) ?></span><span><?= h($t) ?><?= gambar_html($x['gambar_opsi'][$k] ?? null, 'gambar-opsi') ?></span>
-            <?= $k === strtoupper($a) ? '<small>jawabanmu</small>' : '' ?><?= $k === $x['kunci'] ? '<small class="ok">kunci</small>' : '' ?></li>
-        <?php endforeach; ?>
-        </ul>
-        <?php if ($a === ''): ?><p class="kecil redup" style="margin:.3rem 0 0">Tidak dijawab.</p><?php endif; ?>
-      <?php else: ?>
-        <div class="kecil redup">Jawabanmu:</div><div class="jawaban-uraian"><?= $a === '' ? '(kosong)' : nl2br(h($a)) ?></div>
-        <?php if ($x['tipe'] === 'isian' && $x['kunci'] !== ''): ?><div class="kecil" style="margin-top:.3rem">Kunci: <b><?= h($x['kunci']) ?></b></div><?php endif; ?>
-        <?php if ($r['status'] !== 'perlu' && $x['tipe'] === 'esai'): ?><div class="kecil" style="margin-top:.3rem">Skor: <b><?= h((string)$r['skor']) ?></b> / <?= h((string)$r['maks']) ?></div><?php endif; ?>
-        <?php if (!empty($nu[$i]['catatan'])): ?><div class="catatan-k"><?= h($nu[$i]['catatan']) ?></div><?php endif; ?>
-      <?php endif; ?>
-      <?php if (trim((string)$x['pembahasan']) !== ''): ?><div class="pembahasan-siswa"><b>Pembahasan:</b> <?= nl2br(h($x['pembahasan'])) ?></div>
-      <?php elseif ($x['tipe'] === 'esai' && trim((string)$x['kunci']) !== ''): ?><div class="pembahasan-siswa"><b>Pedoman jawaban:</b> <?= nl2br(h($x['kunci'])) ?></div><?php endif; ?>
-    </li>
-  <?php endforeach; ?>
-  </ol>
+  <?= ujian_pembahasan_html($u, $p, $h) ?>
   <?php endif; ?>
 </div>
 <?php

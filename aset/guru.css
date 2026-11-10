@@ -647,3 +647,41 @@ b.merah{color:var(--merah)}
 .resi-catatan{margin:.2rem 1rem .7rem;padding:.6rem .8rem;background:#f2f4f8;border-radius:10px;font-size:.9rem}
 .resi-kartu>.tombol{margin:.2rem 1rem .8rem;width:calc(100% - 2rem)}
 .resi-kaki{margin:0;padding:.7rem 1rem;border-top:1px solid var(--garis,#E3E8F2);font-size:.78rem;color:var(--redup)}
+
+/* v1.41 hasil tugas/ujian (PDF dari resi) & rekap kelas */
+.resi-hasil{padding:.6rem 1rem .4rem;border-top:1px solid var(--garis,#E3E8F2)}
+.resi-hasil h4{margin:.5rem 0 .35rem;font-size:.95rem}
+.resi-hasil h4 small{font-weight:400;color:var(--redup);font-size:.78rem}
+.resi-teks{white-space:normal;font-size:.95rem;margin:.2rem 0 .5rem}
+.resi-foto{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem;margin:.3rem 0 .6rem}
+.resi-foto img{width:100%;border-radius:8px;border:1px solid var(--garis,#E3E8F2);display:block}
+.resi-bahas{background:#EAF6FD;border-left:4px solid #2A2C84;border-radius:0;padding:.5rem .8rem;margin:.6rem 0}
+.resi-bahas h4{margin-top:.1rem;color:#1B1D5E}
+.resi-hasil .ulasan-siswa{padding-left:0}
+.resi-pdf{padding:.4rem 1rem .8rem}
+.resi-pdf small{display:block;margin-top:.35rem;text-align:center}
+.kop-pdf-resi{justify-content:space-between;align-items:flex-end;border-bottom:2px solid #2A2C84;padding-bottom:.35rem;margin-bottom:.6rem;font-size:10pt}
+.lembar-rekap .rekap-judul{margin:.2rem 0 .1rem;font-size:1.15rem}
+.rekap-sub{margin:0 0 .6rem;color:var(--redup);font-size:.88rem}
+.tabel-rekap td.nilai{text-align:center;font-weight:700}
+.tabel-rekap small{color:var(--redup)}
+.tabel-rekap tr.r-belum td{color:var(--merah,#b42318)}
+.tabel-rekap tr.r-telat td:nth-child(4){color:#7a5200}
+.rekap-ringkas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.4rem .8rem;margin:.8rem 0}
+.rekap-ringkas div{display:flex;justify-content:space-between;gap:.5rem;border-bottom:1px dashed var(--garis,#E3E8F2);padding:.2rem 0;font-size:.9rem}
+.rekap-dicetak{font-size:8pt;color:#666;margin-top:.6rem}
+@media print{
+  .halaman-resi{max-width:none;padding:0}
+  .kop-pdf-resi{display:flex!important}
+  .resi-kartu{border:0!important}
+  .resi-info{padding:.2rem 0 .6rem}
+  .resi-langkah,.resi-hasil,.resi-nilai{padding-left:0;padding-right:0}
+  .resi-kaki{padding:.5rem 0}
+  .resi-foto img{max-height:120mm;object-fit:contain;break-inside:avoid}
+  .resi-bahas{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ulasan-siswa li{break-inside:avoid}
+  .tabel-rekap{font-size:9.5pt}
+  .tabel-rekap th,.tabel-rekap td{border:1px solid #000!important;padding:3px 5px}
+  .tabel-rekap tr{break-inside:avoid}
+  .rekap-ringkas div{font-size:10pt}
+}

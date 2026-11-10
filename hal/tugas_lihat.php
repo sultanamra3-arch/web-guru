@@ -93,6 +93,7 @@ judul_baris('Tugas: ' . h($t['judul']), '<a class="tombol" href="?p=tugas">‹ T
     <button type="button" class="utama kecil" id="tombol-bagikan">📤 Bagikan</button>
     <button type="button" class="kecil" id="tombol-status">📋 Status ke WA</button>
     <a class="tombol kecil" href="?p=tugas_form&amp;id=<?= $id ?>">⚙ Ubah tugas</a>
+    <a class="tombol kecil" href="?p=rekap_cetak&amp;jenis=tugas&amp;id=<?= $id ?>"><?= ikon('cetak') ?> Rekap kelas (PDF)</a>
     <form method="post" class="sebaris"><?= input_token() ?><?php if ($t['status'] === 'buka'): ?><button name="aksi" value="tutup" class="kecil">■ Tutup</button><?php else: ?><button name="aksi" value="buka" class="kecil">▶ Buka lagi</button><?php endif; ?></form>
   </div>
 </div>

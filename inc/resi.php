@@ -112,6 +112,18 @@ function resi_data_tugas(string $r): ?array
         $d['langkah'][] = ['ok', 'Selesai dinilai', ''];
         $d['nilai'] = rtrim(rtrim((string)$k['nilai'], '0'), '.');
         $d['komentar'] = (string)$k['komentar'];
+        // hasil tugas (untuk layar & PDF): soal, jawaban siswa, pembahasan guru bila sudah dibuka
+        $bahas_ada = trim((string)$t['pembahasan']) !== '' || !empty($t['pembahasan_gambar']);
+        $bahas_buka = $bahas_ada && (($t['buka_bahas'] ?? 'tutup') === 'nilai' || $t['status'] !== 'buka');
+        $d['hasil'] = [
+            'petunjuk' => (string)$t['petunjuk'], 'lampiran' => $t['lampiran'],
+            'foto' => array_map(fn($f) => tugas_foto_url((int)$t['id'], $f) . '&r=' . rawurlencode($r), tugas_foto_daftar($k)),
+            'foto_hapus' => !tugas_foto_daftar($k) && $t['nilai_dikirim'],
+            'teks' => (string)$k['teks'], 'bahas_ada' => $bahas_ada, 'bahas_buka' => $bahas_buka,
+            'bahas' => $bahas_buka ? (string)$t['pembahasan'] : '', 'bahas_gambar' => $bahas_buka ? $t['pembahasan_gambar'] : null,
+            'dikirim' => ujian_waktu_teks((string)$k['dikirim']),
+        ];
+        $d['pdf'] = 'Hasil tugas';
     } else {
         $d['status'] = ['Menunggu dinilai', 'kuning'];
         $d['langkah'][] = ['tunggu', 'Sedang diperiksa guru', ''];
@@ -165,10 +177,12 @@ function resi_data_ujian(string $r): ?array
         $d['status'] = ['Nilai keluar', 'hijau'];
         $d['langkah'][] = ['ok', 'Nilai keluar', ''];
         $d['nilai'] = (string)$h['nilai'];
+        $d['pdf'] = $lat ? 'Hasil latihan' : 'Hasil ujian';
+        if (ujian_hasil_terbuka($u)) $d['pembahasan_html'] = ujian_pembahasan_html($u, $p, $h);
         $kktp = $u['kktp'] !== null ? (float)$u['kktp'] : null;
         $d['rincian'] = ($kktp !== null ? 'KKTP ' . rtrim(rtrim((string)$kktp, '0'), '.') . ' · ' . ((float)$h['nilai'] >= $kktp ? 'Tuntas' : 'Belum tuntas') : '')
             . ($lat && $p['nilai_terbaik'] !== null ? ' · terbaik ' . rtrim(rtrim((string)max((float)$p['nilai_terbaik'], (float)$h['nilai']), '0'), '.') : '');
-        if (ujian_hasil_terbuka($u)) $d['catatan'] = 'Pembahasan bisa dilihat lewat link ' . ($lat ? 'latihan' : 'ujian') . ' di HP yang dipakai mengerjakan.';
+        if (ujian_hasil_terbuka($u)) $d['catatan'] = '';
         elseif ($u['tampil_hasil']) $d['catatan'] = 'Pembahasan dibuka setelah ujian ditutup guru.';
     }
     return $d;
