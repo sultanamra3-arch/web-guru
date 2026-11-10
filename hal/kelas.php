@@ -53,6 +53,7 @@ judul_baris('Kelas & siswa', '<a class="tombol" href="?p=siswa_tambah">＋ Siswa
       <a class="tombol kecil" href="?p=siswa&amp;kelas=<?= h(rawurlencode($k)) ?>">Siswa</a>
       <a class="tombol kecil" href="?p=absensi&amp;kelas=<?= h(rawurlencode($k)) ?>">Absen</a>
       <a class="tombol kecil" href="?p=nilai_rekap&amp;kelas=<?= h(rawurlencode($k)) ?>">Nilai</a>
+      <a class="tombol kecil" href="?p=kelompok&amp;kelas=<?= h(rawurlencode($k)) ?>">Kelompok</a>
       <a class="tombol kecil" href="?p=absensi_rekap&amp;kelas=<?= h(rawurlencode($k)) ?>">Rekap</a>
     </div>
   </li>

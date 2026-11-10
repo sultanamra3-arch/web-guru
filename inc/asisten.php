@@ -404,6 +404,7 @@ function asisten_jalankan(string $nama, array $d): array
                 return ['ok' => true, 'teks' => 'Siswa sudah punya nilai/absensi, jadi ditandai "keluar".'];
             }
             q('DELETE FROM guru_kelas_siswa WHERE kode = ?', [$d['kode']]);
+            q('DELETE FROM guru_kelompok WHERE kode = ?', [$d['kode']]);
             q('DELETE FROM guru_siswa WHERE kode = ?', [$d['kode']]);
             return ['ok' => true, 'teks' => 'Siswa dihapus.'];
         case 'tambah_kelas':

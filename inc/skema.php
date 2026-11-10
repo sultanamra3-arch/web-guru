@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 10;
+const SKEMA_VERSI = 11;
 
 function pastikan_skema(): void
 {
@@ -64,6 +64,14 @@ function pastikan_skema(): void
             nilai DECIMAL(5,2) NULL,
             catatan VARCHAR(255) NULL,
             PRIMARY KEY (penilaian_id, member_id)
+        ) DEFAULT CHARSET=utf8mb4",
+        "CREATE TABLE IF NOT EXISTS guru_kelompok (
+            guru_id INT NOT NULL,
+            tahun VARCHAR(9) NOT NULL,
+            kelas VARCHAR(50) NOT NULL,
+            kode VARCHAR(20) NOT NULL,
+            kelompok TINYINT NOT NULL,
+            PRIMARY KEY (guru_id, tahun, kelas, kode)
         ) DEFAULT CHARSET=utf8mb4",
         "CREATE TABLE IF NOT EXISTS guru_koreksi_kunci (
             penilaian_id INT NOT NULL PRIMARY KEY,

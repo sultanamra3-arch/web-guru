@@ -303,6 +303,17 @@
       i.addEventListener('input', function () { warnai(i); });
       i.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); var b = semua[n + 1]; if (b) b.focus(); } });
     });
+    /* Nilai per kelompok: isi semua anggota sekaligus */
+    $$('.isi-kelompok', tn).forEach(function (g) {
+      g.addEventListener('input', function () {
+        $$('.isi-nilai[data-kelompok="' + g.dataset.kelompok + '"]', tn).forEach(function (i) {
+          i.value = g.value; warnai(i);
+          var ket = i.parentNode.querySelector('.ket');
+          if (ket && (ket.value === '' || /^Kelompok \d+$/.test(ket.value))) ket.value = g.value === '' ? '' : 'Kelompok ' + g.dataset.kelompok;
+        });
+      });
+      g.addEventListener('keydown', function (e) { if (e.key === 'Enter') e.preventDefault(); });
+    });
   }
 
   /* ---------- Bank soal ---------- */

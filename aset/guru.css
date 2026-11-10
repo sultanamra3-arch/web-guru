@@ -590,3 +590,16 @@ b.merah{color:var(--merah)}
 .tindak-blok{border-top:1px solid var(--garis,#E3E8F2);padding-top:.7rem;margin-top:.7rem}
 .tindak-blok:first-of-type{border-top:0;margin-top:0;padding-top:0}
 .tindak-blok p.kecil{margin:.3rem 0 .5rem}
+
+/* v1.38 kelompok */
+.kelompok-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.8rem;margin:.8rem 0}
+.kelompok-grid .kartu{margin:0}
+.kelompok-kartu h3{margin:0 0 .4rem;font-size:1rem}
+.kelompok-kartu ol{margin:0;padding-left:1.3rem}
+.kelompok-kartu li{margin:.15rem 0}
+.baris-kelompok{display:flex!important;align-items:center;gap:.5rem;flex-wrap:wrap}
+.baris-kelompok b{flex:1;min-width:8rem}
+.baris-kelompok select{width:auto;min-width:8.5rem}
+.nilai-kelompok h3{margin:0 0 .3rem}
+.baris-kel{display:grid!important;grid-template-columns:1fr 84px;gap:.6rem;align-items:center}
+.baris-kel small{display:block;overflow-wrap:anywhere}

@@ -5,6 +5,7 @@ $id = (int)get('id');
 $p = satu('SELECT * FROM guru_penilaian WHERE id = ? AND guru_id = ?', [$id, uid()]);
 if (!$p) { pesan('Penilaian tidak ditemukan.', 'galat'); ke('?p=penilaian'); }
 $siswa = siswa_kelas($p['kelas']);
+$kel = kelompok_kelas($p['kelas']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (post('aksi') === 'hapus') {
@@ -46,10 +47,12 @@ $tuntas = count(array_filter($angka, fn($v) => (float)$v >= (float)$p['kktp']));
 
 if (get('unduh')) {
     $out = [[$p['judul'] . ' - ' . $p['mapel'] . ' - Kelas ' . $p['kelas'] . ' (' . tgl($p['tanggal']) . ')'], ['No', 'Nama', 'Nilai', 'Keterangan', 'Catatan']];
+    if ($kel) $out[1][] = 'Kelompok';
     foreach ($siswa as $i => $s) {
         $v = $ada[$s['member_id']]['nilai'] ?? null;
         $out[] = [$i + 1, $s['member_name'], $v === null ? '' : str_replace('.', ',', rtrim(rtrim((string)$v, '0'), '.')),
             $v === null ? '' : ((float)$v >= (float)$p['kktp'] ? 'Tuntas' : 'Belum tuntas'), $ada[$s['member_id']]['catatan'] ?? ''];
+        if ($kel) $out[array_key_last($out)][] = isset($kel[$s['member_id']]) ? 'Kelompok ' . $kel[$s['member_id']] : '';
     }
     kirim_csv('nilai_' . $p['kelas'] . '_' . $p['judul'] . '.csv', $out);
 }
@@ -86,15 +89,36 @@ judul_baris(h($p['judul']), '<a class="tombol" href="?p=penilaian">‹ Penilaian
     </form>
   </details>
 </div>
+<?php if (!$kel): ?><p class="kecil redup">Tugas kelompok? <a href="?p=kelompok&amp;kelas=<?= h(rawurlencode($p['kelas'])) ?>&amp;balik=<?= $id ?>">Bentuk kelompok kelas <?= h($p['kelas']) ?> dulu →</a> lalu nilai bisa diisi per kelompok.</p><?php endif; ?>
 <a class="tombol utama tombol-foto-nilai" href="?p=koreksi&amp;id=<?= $id ?>">📷 Nilai otomatis dari foto lembar jawaban</a>
 <form method="post" class="tabel-nilai" data-kktp="<?= h($p['kktp']) ?>">
   <?= input_token() ?>
+  <?php if ($kel):
+    $grup = [];
+    foreach ($siswa as $s) if (isset($kel[$s['member_id']])) $grup[$kel[$s['member_id']]][] = $s;
+    ksort($grup); ?>
+  <div class="kartu nilai-kelompok">
+    <h3>Nilai per kelompok</h3>
+    <p class="kecil redup">Ketik satu nilai untuk kelompok → otomatis terisi ke semua anggotanya. Nilai anggota yang tidak ikut bekerja bisa diubah sendiri di daftar bawah. Jangan lupa tekan <b>Simpan nilai</b>.</p>
+    <ul class="daftar">
+    <?php foreach ($grup as $k => $anggota):
+      $vs = array_unique(array_map(fn($s) => (string)($ada[$s['member_id']]['nilai'] ?? ''), $anggota));
+      $sama = count($vs) === 1 ? angka(reset($vs) === '' ? null : reset($vs)) : ''; ?>
+      <li class="baris-kel">
+        <div><b>Kelompok <?= $k ?></b><small class="redup"><?= h(implode(', ', array_column($anggota, 'member_name'))) ?></small></div>
+        <input class="isi-kelompok" data-kelompok="<?= $k ?>" value="<?= h($sama) ?>" inputmode="decimal" placeholder="<?= count($vs) > 1 ? 'beda' : '0–100' ?>" autocomplete="off" aria-label="Nilai kelompok <?= $k ?>">
+      </li>
+    <?php endforeach; ?>
+    </ul>
+    <p class="kecil"><a href="?p=kelompok&amp;kelas=<?= h(rawurlencode($p['kelas'])) ?>&amp;balik=<?= $id ?>">Ubah anggota kelompok</a></p>
+  </div>
+  <?php endif; ?>
   <ul class="daftar kartu">
   <?php foreach ($siswa as $i => $s): $v = $ada[$s['member_id']]['nilai'] ?? null; ?>
     <li class="baris-nilai">
       <span class="no"><?= $i + 1 ?></span>
-      <b class="nm"><?= h($s['member_name']) ?></b>
-      <input class="isi-nilai" name="nilai[<?= h($s['member_id']) ?>]" value="<?= h(angka($v)) ?>" inputmode="decimal" placeholder="0–100" autocomplete="off">
+      <b class="nm"><?= h($s['member_name']) ?><?= isset($kel[$s['member_id']]) ? ' <span class="lencana abu">K' . $kel[$s['member_id']] . '</span>' : '' ?></b>
+      <input class="isi-nilai" <?= isset($kel[$s['member_id']]) ? 'data-kelompok="' . $kel[$s['member_id']] . '"' : '' ?> name="nilai[<?= h($s['member_id']) ?>]" value="<?= h(angka($v)) ?>" inputmode="decimal" placeholder="0–100" autocomplete="off">
       <input class="ket" name="catatan[<?= h($s['member_id']) ?>]" value="<?= h($ada[$s['member_id']]['catatan'] ?? '') ?>" placeholder="catatan">
     </li>
   <?php endforeach; ?>

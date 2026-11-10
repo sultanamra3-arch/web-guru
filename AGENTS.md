@@ -50,6 +50,7 @@ Struktur:
 - Absensi yang belum diisi **tidak boleh** tampil sebagai "hadir"; hari yang tidak diisi tidak dihitung di rekap.
 - Ujian online: tata tertib sebelum mulai, pengaman bisa ON/OFF, mode latihan, hasil & pembahasan setelah ujian ditutup, tombol bagikan WA (token opsional).
 - Ujian online (v1.37): **kunci lanjut** (`kunci_lanjut` di `guru_ujian_peserta`, hash; kunci asli hanya di HP siswa/localStorage `sgu-kunci-ID`). Bila sesi/cookie di HP hilang, `api_u` menyambung lagi otomatis memakai kunci ini, dan halaman pilih nama tidak meminta token/"Buka ulang" untuk HP yang sama. `api_u` memeriksa tokennya sendiri (dikecualikan dari `cek_token()` di `index.php`). Tombol "Ya, kumpulkan" tidak boleh diam: bila sesi tidak bisa disambung, siswa diarahkan masuk lagi.
+- Kelompok belajar (v1.38): tabel `guru_kelompok` (guru_id, tahun, kelas, kode → nomor kelompok), halaman `?p=kelompok` (acak dengan L/P dicampur, atau atur sendiri). Di halaman nilai, kotak "Nilai per kelompok" hanya alat bantu JavaScript: mengisi nilai semua anggota sekaligus; nilai tetap disimpan per siswa di `guru_nilai` sehingga anggota yang tidak ikut bekerja bisa diberi nilai berbeda.
 - Kuis cepat: yang salah/tidak menjawab tetap lanjut sampai habis; **jawaban, poin, dan peringkat baru dibuka di akhir**. Mode mandiri: siswa maju sendiri-sendiri, soal & pilihan diacak per siswa.
 - Data contoh di repo hanya nama siswa fiktif.
 

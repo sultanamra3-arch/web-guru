@@ -15,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             pesan('Siswa sudah punya absensi/nilai, jadi ditandai "keluar" (riwayat tetap tersimpan).');
         } else {
             q('DELETE FROM guru_kelas_siswa WHERE kode = ?', [$kode]);
+            q('DELETE FROM guru_kelompok WHERE kode = ?', [$kode]);
             q('DELETE FROM guru_siswa WHERE kode = ?', [$kode]);
             pesan('Siswa dihapus.');
         }

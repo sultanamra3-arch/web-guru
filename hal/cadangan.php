@@ -17,6 +17,7 @@ function cadangan_bagian(): array
         'siswa' => ['SELECT kode, nisn, nama, jk, status, dibuat, diubah FROM guru_siswa WHERE guru_id = ? ORDER BY nama', [$g]],
         'kelas' => ['SELECT tahun, nama FROM guru_kelas WHERE guru_id = ? ORDER BY tahun, nama', [$g]],
         'anggota_kelas' => ['SELECT ks.tahun, ks.kelas, ks.absen, s.nisn, s.nama, ks.kode FROM guru_kelas_siswa ks JOIN guru_siswa s ON s.kode = ks.kode WHERE s.guru_id = ? ORDER BY ks.tahun, ks.kelas, ks.absen, s.nama', [$g]],
+        'kelompok' => ['SELECT k.tahun, k.kelas, k.kelompok, s.nama, k.kode FROM guru_kelompok k LEFT JOIN guru_siswa s ON s.kode = k.kode WHERE k.guru_id = ? ORDER BY k.tahun, k.kelas, k.kelompok, s.nama', [$g]],
         'jadwal' => ['SELECT hari, jam_ke, mulai, selesai, kelas, mapel, ruang FROM guru_jadwal WHERE guru_id = ? ORDER BY hari, jam_ke', [$g]],
         'absensi' => ['SELECT a.tanggal, a.kelas, a.mapel, s.nama, a.status, a.ket, a.member_id FROM guru_absensi a LEFT JOIN guru_siswa s ON s.kode = a.member_id WHERE a.guru_id = ? ORDER BY a.tanggal, a.kelas, s.nama', [$g]],
         'penilaian' => ['SELECT id, kelas, mapel, judul, jenis, tanggal, kktp, dibuat FROM guru_penilaian WHERE guru_id = ? ORDER BY tanggal', [$g]],
