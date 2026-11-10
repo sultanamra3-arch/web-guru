@@ -12,7 +12,18 @@ foreach (semua('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ?', [$id]) as 
 $nama = array_column($siswa, 'member_name', 'member_id');
 foreach ($peserta as $k => $_) if (!isset($nama[$k])) $nama[$k] = nama_siswa((string)$k);
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'susulan') {
+    $r = ujian_buat_susulan($u, (array)($_POST['kode'] ?? []));
+    if (!$r['ok']) { pesan($r['galat'], 'galat'); ke('?p=ujian_hasil&id=' . $id); }
+    pesan('Ujian susulan untuk ' . $r['n'] . ' siswa dibuat dan sudah dibuka (soal sama, link baru). Bagikan kodenya ke siswa tersebut. Nilainya otomatis masuk ke Penilaian ujian ini.');
+    ke('?p=ujian_lihat&id=' . $r['id']);
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'kirim_penilaian') {
+    if (($u['tindak'] ?? '') === 'susulan') {
+        [$pid, $n] = ujian_kirim_susulan($u);
+        pesan("$n nilai susulan dimasukkan ke Penilaian ujian asal.");
+        ke('?p=nilai&id=' . $pid);
+    }
     if (($u['tindak'] ?? '') === 'remedial') {
         $r = ujian_kirim_remedial($u);
         if (!$r['ok']) { pesan($r['galat'], 'galat'); ke('?p=ujian_hasil&id=' . $id); }
@@ -99,8 +110,8 @@ judul_baris('Hasil ujian', '<a class="tombol" href="?p=ujian_lihat&amp;id=' . $i
 $tindak = $u['tindak'] ?? '';
 if ($tindak):
     $induk = ujian_ambil((int)$u['induk_id']); ?>
-<div class="pesan info">Latihan <b><?= h($tindak) ?></b> khusus <?= count($siswa) ?> siswa<?= $induk ? ' dari <a href="?p=ujian_hasil&amp;id=' . (int)$induk['id'] . '">' . h($induk['judul']) . '</a>' : '' ?>.
-  <?php if ($tindak === 'remedial'): ?>Tombol kirim nilai di atas memasukkan nilai ke Penilaian ujian asal: nilai hanya naik bila lebih tinggi<?= $u['batasi_kktp'] ? ', paling tinggi sebesar KKTP ' . ((float)$u['kktp'] + 0) : '' ?>.<?php else: ?>Nilai pengayaan tercatat terpisah (tidak mengubah nilai ujian).<?php endif; ?></div>
+<div class="pesan info"><?= $tindak === 'susulan' ? 'Ujian <b>susulan</b>' : 'Latihan <b>' . h($tindak) . '</b>' ?> khusus <?= count($siswa) ?> siswa<?= $induk ? ' dari <a href="?p=ujian_hasil&amp;id=' . (int)$induk['id'] . '">' . h($induk['judul']) . '</a>' : '' ?>.
+  <?php if ($tindak === 'susulan'): ?>Nilai susulan masuk ke Penilaian ujian asal (otomatis saat ujian susulan ditutup).<?php elseif ($tindak === 'remedial'): ?>Tombol kirim nilai di atas memasukkan nilai ke Penilaian ujian asal: nilai hanya naik bila lebih tinggi<?= $u['batasi_kktp'] ? ', paling tinggi sebesar KKTP ' . ((float)$u['kktp'] + 0) : '' ?>.<?php else: ?>Nilai pengayaan tercatat terpisah (tidak mengubah nilai ujian).<?php endif; ?></div>
 <?php else:
     $kktp = ujian_kktp($u);
     $batas_kaya = max(0, min(100, (float)get('kaya', 90)));
@@ -116,6 +127,18 @@ if ($tindak):
     $daftar_nama = fn(array $x) => implode(', ', array_map(fn($k, $v) => h($nama[$k] ?? $k) . ' (' . ($v + 0) . ')', array_keys($x), $x)); ?>
 <div class="kartu tindak-lanjut">
   <h3 style="margin-top:0">Tindak lanjut <small class="redup">KKTP <?= $kktp + 0 ?></small></h3>
+  <?php $tidak_ikut = array_values(array_filter(array_column($siswa, 'member_id'), fn($k) => empty($peserta[$k]['selesai'])));
+    $sudah_susul = []; foreach ($anak as $a) if ($a['tindak'] === 'susulan') foreach ((array)json_decode((string)nilai('SELECT khusus FROM guru_ujian WHERE id = ?', [$a['id']]), true) as $k) $sudah_susul[] = (string)$k;
+    $perlu_susul = array_values(array_diff($tidak_ikut, $sudah_susul)); ?>
+  <?php if ($u['status'] === 'tutup' && $perlu_susul): ?>
+  <form method="post" class="tindak-blok">
+    <?= input_token() ?><input type="hidden" name="aksi" value="susulan">
+    <b>🕘 Belum ikut ujian: <?= count($perlu_susul) ?> siswa</b>
+    <p class="kecil"><?= h(implode(', ', array_map(fn($k) => $nama[$k] ?? $k, $perlu_susul))) ?></p>
+    <?php foreach ($perlu_susul as $k): ?><input type="hidden" name="kode[]" value="<?= h($k) ?>"><?php endforeach; ?>
+    <button class="lebar">Buat ujian susulan (soal sama, khusus siswa ini)</button>
+  </form>
+  <?php endif; ?>
   <?php if (!$selesai): ?><p class="redup kecil">Muncul setelah ada siswa yang selesai.</p><?php else: ?>
   <form method="post" class="tindak-blok">
     <?= input_token() ?><input type="hidden" name="aksi" value="remedial">
@@ -147,7 +170,7 @@ if ($tindak):
   <?php if ($anak): ?>
   <h4 style="margin:.8rem 0 .3rem">Sudah dibuat</h4>
   <ul class="daftar">
-    <?php foreach ($anak as $a): ?><li class="baris-status"><span><?= $a['tindak'] === 'remedial' ? '🔁' : '⭐' ?> <?= h($a['judul']) ?> <small class="redup">· <?= (int)$a['n'] ?> selesai</small></span>
+    <?php foreach ($anak as $a): ?><li class="baris-status"><span><?= $a['tindak'] === 'remedial' ? '🔁' : ($a['tindak'] === 'susulan' ? '🕘' : '⭐') ?> <?= h($a['judul']) ?> <small class="redup">· <?= (int)$a['n'] ?> selesai</small></span>
       <span><a href="?p=ujian_lihat&amp;id=<?= (int)$a['id'] ?>">Pantau</a> · <a href="?p=ujian_hasil&amp;id=<?= (int)$a['id'] ?>">Hasil</a></span></li><?php endforeach; ?>
   </ul>
   <?php endif; ?>

@@ -33,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'tampil_hasil' => post('tampil_hasil') ? 1 : 0,
         'tampil_tertib' => post('tampil_tertib') ? 1 : 0,
         'tata_tertib' => mb_substr(trim((string)post('tata_tertib')), 0, 3000),
+        'tutup_otomatis' => post('tutup_otomatis') ? 1 : 0,
     ];
     if ($data['mode'] === 'latihan') { $data['pengaman'] = 0; $data['tampil_hasil'] = 1; $data['tampil_nilai'] = 1; }
     if (post('tertib_bawaan') && $data['tata_tertib'] !== '') setelan_simpan('tertib_ujian:' . uid(), $data['tata_tertib']);
@@ -84,6 +85,8 @@ judul_baris($u ? 'Pengaturan ujian' : 'Ujian online baru', '<a class="tombol" hr
   </div>
     <label>Boleh mulai sejak (opsional)<span class="tgl-jam"><input type="date" name="mulai_tgl" value="<?= $tg('mulai') ?>"><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="07:30" autocomplete="off" name="mulai_jam" value="<?= $jm('mulai') ?>" aria-label="jam mulai"></span></label>
     <label>Batas akhir (opsional)<span class="tgl-jam"><input type="date" name="selesai_tgl" value="<?= $tg('selesai') ?>"><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="07:30" autocomplete="off" name="selesai_jam" value="<?= $jm('selesai') ?>" aria-label="jam batas"></span></label>
+    <p class="kecil redup" id="info-jadwal" hidden></p>
+    <label class="centang"><input type="checkbox" name="tutup_otomatis" value="1" <?= ($u['tutup_otomatis'] ?? 1) ? 'checked' : '' ?>> <span><b>Tutup otomatis</b> saat batas akhir lewat (atau, bila tanpa batas akhir, saat semua siswa sudah mengumpulkan). Nilai langsung masuk ke Penilaian.</span></label>
   <?php if ($ada_uraian && !$sudah_mulai): ?>
   <label>Poin per soal uraian (PG/isian = 1 poin)<input type="number" name="poin_uraian" min="1" max="50" step="0.5" value="<?= h((string)$poin) ?>"></label>
   <?php endif; ?>
@@ -116,5 +119,36 @@ judul_baris($u ? 'Pengaturan ujian' : 'Ujian online baru', '<a class="tombol" hr
   <?php endif; ?>
   <button class="utama lebar"><?= $u ? 'Simpan' : 'Buat ujian' ?></button>
 </form>
-<?php
+<?php if (!$u): ?>
+<script>
+/* Ujian baru: jam mulai & batas akhir diisi dari jadwal mengajar kelas itu (bisa diubah). Tanpa jadwal: batas akhir 23:59. */
+(function () {
+  var J = <?= json_encode(jadwal_blok_kelas(), JSON_UNESCAPED_UNICODE) ?>, HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  var f = document.querySelector('form.formulir'); if (!f) return;
+  var el = function (n) { return f.querySelector('[name=' + n + ']'); }, info = document.getElementById('info-jadwal');
+  var kls = el('kelas'), mt = el('mulai_tgl'), mj = el('mulai_jam'), st = el('selesai_tgl'), sj = el('selesai_jam');
+  [mj, st, sj].forEach(function (x) { x.addEventListener('input', function () { x.dataset.manual = 1; }); });
+  function dua(n) { return ('0' + n).slice(-2); }
+  function isi() {
+    var now = new Date(), hariIni = now.getFullYear() + '-' + dua(now.getMonth() + 1) + '-' + dua(now.getDate());
+    var tgl = mt.value || hariIni, h = new Date(tgl + 'T00:00').getDay(), jam = dua(now.getHours()) + ':' + dua(now.getMinutes());
+    var blok = (J[kls.value] || {})[h] || [], b = null;
+    if (blok.length) { b = blok[blok.length - 1]; for (var i = 0; i < blok.length; i++) if (tgl !== hariIni || blok[i][1] > jam) { b = blok[i]; break; } }
+    if (!mt.value) mt.value = tgl;
+    if (!st.dataset.manual) st.value = tgl;
+    if (b) {
+      if (!mj.dataset.manual) mj.value = b[0];
+      if (!sj.dataset.manual) sj.value = b[1];
+      info.textContent = 'Diisi dari jadwal mengajar: ' + HARI[h] + ', kelas ' + kls.value + ' jam ' + b[0] + '–' + b[1] + '. Boleh diubah.';
+    } else {
+      if (!sj.dataset.manual) sj.value = '23:59';
+      info.textContent = 'Kelas ' + kls.value + ' tidak ada di jadwal hari ' + HARI[h] + ', jadi batas akhir 23:59. Boleh diubah.';
+    }
+    info.hidden = false;
+  }
+  kls.addEventListener('change', isi); mt.addEventListener('change', isi);
+  isi();
+})();
+</script>
+<?php endif;
 kaki();

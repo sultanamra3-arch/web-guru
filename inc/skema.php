@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 14;
+const SKEMA_VERSI = 15;
 
 function pastikan_skema(): void
 {
@@ -287,6 +287,7 @@ function pastikan_skema(): void
     skema_migrasi_12();
     skema_migrasi_13();
     skema_migrasi_14();
+    skema_migrasi_15();
     @file_put_contents($f, date('c'));
 }
 
@@ -380,4 +381,16 @@ function skema_migrasi_14(): void
 {
     $kolom = ['pembahasan' => 'TEXT NULL', 'pembahasan_gambar' => 'VARCHAR(40) NULL', 'buka_bahas' => "VARCHAR(10) NOT NULL DEFAULT 'tutup'"];
     foreach ($kolom as $k => $def) if (!kolom_ada('guru_tugas', $k)) db()->exec("ALTER TABLE guru_tugas ADD COLUMN $k $def");
+}
+
+/** v15: tutup otomatis ujian & tugas, nilai ujian otomatis ke Penilaian (`nilai_masuk`), ujian susulan (tindak = 'susulan'). */
+function skema_migrasi_15(): void
+{
+    if (!kolom_ada('guru_ujian', 'tutup_otomatis')) db()->exec('ALTER TABLE guru_ujian ADD COLUMN tutup_otomatis TINYINT NOT NULL DEFAULT 1');
+    if (!kolom_ada('guru_ujian', 'nilai_masuk')) {
+        db()->exec('ALTER TABLE guru_ujian ADD COLUMN nilai_masuk TINYINT NOT NULL DEFAULT 0');
+        // ujian lama yang sudah ditutup tidak dikirim ulang (nilai yang sudah diubah guru tidak tertimpa)
+        db()->exec("UPDATE guru_ujian SET nilai_masuk = 1 WHERE status = 'tutup'");
+    }
+    if (!kolom_ada('guru_tugas', 'tutup_otomatis')) db()->exec('ALTER TABLE guru_tugas ADD COLUMN tutup_otomatis TINYINT NOT NULL DEFAULT 1');
 }

@@ -151,7 +151,7 @@ kepala($u ? $u['judul'] : 'Masuk ujian', '', true);
     <?= input_token() ?><input type="hidden" name="k" value="<?= h($u['kode']) ?>">
     <input type="hidden" name="kunci" id="kunci-lanjut" value="">
 
-    <?php if (!empty($u['tindak'])): ?><p class="kecil" style="margin-top:0">📌 Latihan <b><?= h($u['tindak']) ?></b> ini khusus untuk <?= count($siswa) ?> siswa. Kalau namamu tidak ada, tanyakan ke guru.</p><?php endif; ?>
+    <?php if (!empty($u['tindak'])): ?><p class="kecil" style="margin-top:0">📌 <?= $u['tindak'] === 'susulan' ? 'Ujian <b>susulan</b>' : 'Latihan <b>' . h($u['tindak']) . '</b>' ?> ini khusus untuk <?= count($siswa) ?> siswa. Kalau namamu tidak ada, tanyakan ke guru.</p><?php endif; ?>
     <label>Nama kamu
       <select name="siswa" required><option value="">— pilih nama —</option>
         <?php foreach ($siswa as $i => $s): ?><option value="<?= h($s['member_id']) ?>" <?= post('siswa') === $s['member_id'] ? 'selected' : '' ?>><?= ($s['absen'] ?: $i + 1) . '. ' . h($s['member_name']) ?></option><?php endforeach; ?>

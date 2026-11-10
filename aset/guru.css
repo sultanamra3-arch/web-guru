@@ -685,3 +685,10 @@ b.merah{color:var(--merah)}
   .tabel-rekap tr{break-inside:avoid}
   .rekap-ringkas div{font-size:10pt}
 }
+
+/* v1.42 tutup otomatis, pengingat, peringatan waktu */
+.berjalan li{flex-wrap:wrap}
+.pengingat-tutup{flex-basis:100%;display:flex;align-items:center;justify-content:space-between;gap:.5rem;background:#fff3c4;color:#7a5200;border-radius:8px;padding:.35rem .6rem;margin-top:.35rem;font-size:.82rem}
+.pengingat-tutup button{flex:none}
+.peringatan-waktu{position:fixed;left:.6rem;right:.6rem;top:.6rem;z-index:60;background:#fff3c4;color:#5c3d00;border:2px solid #F2C230;border-radius:12px;padding:.7rem .8rem;display:flex;gap:.6rem;align-items:center;justify-content:space-between;box-shadow:0 6px 20px rgba(0,0,0,.18);font-size:.95rem;max-width:560px;margin:0 auto}
+.peringatan-waktu button{flex:none}

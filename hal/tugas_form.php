@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'tampil_tertib' => post('tampil_tertib') ? 1 : 0, 'tata_tertib' => mb_substr(trim((string)post('tata_tertib')), 0, 3000),
         'kunci' => mb_substr(trim((string)post('kunci')), 0, 5000), 'kelompok' => $kelompok,
         'pembahasan' => mb_substr(trim((string)post('pembahasan')), 0, 8000), 'pembahasan_gambar' => $bahas_gambar,
-        'buka_bahas' => post('buka_bahas') === 'nilai' ? 'nilai' : 'tutup',
+        'buka_bahas' => post('buka_bahas') === 'nilai' ? 'nilai' : 'tutup', 'tutup_otomatis' => post('tutup_otomatis') ? 1 : 0,
     ];
     if (post('tertib_bawaan') && $data['tata_tertib'] !== '') setelan_simpan('tertib_tugas:' . uid(), $data['tata_tertib']);
     if ($t) {
@@ -82,6 +82,7 @@ judul_baris($t ? 'Ubah tugas' : 'Tugas online baru', '<a class="tombol" href="' 
   </div>
   <label>Batas pengumpulan<span class="tgl-jam"><input type="date" name="batas_tgl" value="<?= !empty($t['batas']) ? substr((string)$t['batas'], 0, 10) : date('Y-m-d', strtotime('+2 days')) ?>"><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="21:00" autocomplete="off" name="batas_jam" value="<?= !empty($t['batas']) ? substr((string)$t['batas'], 11, 5) : '21:00' ?>" aria-label="jam batas"></span></label>
   <label class="centang"><input type="checkbox" name="terima_telat" value="1" <?= ($t['terima_telat'] ?? 1) ? 'checked' : '' ?>> <span>Tetap terima kiriman yang lewat batas (ditandai <b>terlambat</b>)</span></label>
+  <label class="centang"><input type="checkbox" name="tutup_otomatis" value="1" <?= ($t['tutup_otomatis'] ?? 1) ? 'checked' : '' ?>> <span><b>Tutup otomatis</b> saat batas lewat (hanya bila kiriman terlambat tidak diterima). Tugas tanpa batas waktu tidak ditutup otomatis.</span></label>
   <label>Foto paling banyak<select name="maks_foto"><?= pilihan(['1' => '1 foto', '2' => '2 foto', '3' => '3 foto', '5' => '5 foto', '8' => '8 foto', '10' => '10 foto'], (string)($t['maks_foto'] ?? 5)) ?></select></label>
   <label>Kunci jawaban / rubrik <small>(opsional, tidak dilihat siswa — dipakai AI untuk menyarankan nilai)</small><textarea name="kunci" rows="3" placeholder="mis. Flowchart lengkap (mulai, input, proses, keputusan, selesai) = 40; benar urutannya = 40; rapi = 20"><?= $v('kunci') ?></textarea></label>
   <fieldset>

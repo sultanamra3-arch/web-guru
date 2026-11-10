@@ -14,9 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             pesan('Ujian dibuka. Bagikan kode/QR dan tampilkan token ke siswa.');
             break;
         case 'tutup':
-            q("UPDATE guru_ujian SET status = 'tutup' WHERE id = ?", [$id]);
-            ujian_akhiri_kedaluwarsa($u, true);
-            pesan('Ujian ditutup. Siswa yang masih mengerjakan otomatis dikumpulkan.');
+            ujian_tutup($u);
+            otomatis_nilai(uid());
+            pesan('Ujian ditutup. Siswa yang masih mengerjakan otomatis dikumpulkan, dan nilai masuk ke Penilaian'
+                . (nilai('SELECT 1 FROM guru_ujian_peserta WHERE ujian_id = ? AND perlu_koreksi = 1 LIMIT 1', [$id]) ? ' setelah soal uraian selesai dikoreksi.' : '.'));
             break;
         case 'buka_ulang':
             // izinkan masuk dari perangkat lain / lanjut lagi setelah dikumpulkan

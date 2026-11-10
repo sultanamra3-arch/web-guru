@@ -182,12 +182,21 @@
   }
 
   /* ---------- waktu ---------- */
-  var elWaktu = $('waktu');
+  var elWaktu = $('waktu'), peringatan5 = sisa <= 300;
   function detik(kurangi) {
     if (kurangi) sisa = Math.max(0, sisa - 1);
     var j = Math.floor(sisa / 3600), m = Math.floor(sisa % 3600 / 60), d = sisa % 60;
     elWaktu.textContent = (j ? j + ':' + ('0' + m).slice(-2) : m) + ':' + ('0' + d).slice(-2);
     elWaktu.classList.toggle('mepet', sisa <= 300);
+    if (sisa <= 300 && sisa > 0 && !peringatan5 && !selesaiDikirim) {
+      peringatan5 = true;
+      var w = document.createElement('div'); w.className = 'peringatan-waktu'; w.setAttribute('role', 'alert');
+      w.innerHTML = '<span><b>⏰ Waktu tinggal 5 menit lagi.</b><br>Periksa jawabanmu. Jawaban dikumpulkan otomatis saat waktu habis.</span>';
+      var x = document.createElement('button'); x.type = 'button'; x.textContent = 'Oke'; x.onclick = function () { w.remove(); };
+      w.append(x); document.body.append(w);
+      if (navigator.vibrate) try { navigator.vibrate([200, 100, 200]); } catch (e) {}
+      setTimeout(function () { w.remove(); }, 15000);
+    }
     if (sisa === 0 && !selesaiDikirim && !putus) { $('tirai-selesai').hidden = true; status('⏰ Waktu habis. Jawaban dikumpulkan…', 'galat'); kumpulkan(); }
   }
   detik(false);

@@ -13,6 +13,7 @@ require __DIR__ . '/inc/gambar.php';
 require __DIR__ . '/inc/ujian.php';
 require __DIR__ . '/inc/tugas.php';
 require __DIR__ . '/inc/resi.php';
+require __DIR__ . '/inc/otomatis.php';
 require __DIR__ . '/inc/kuis.php';
 require __DIR__ . '/inc/asisten.php';
 
@@ -57,6 +58,8 @@ if (pengguna() && !nilai('SELECT aktif FROM guru_akun WHERE id = ?', [uid()])) {
 }
 // api_u memeriksa tokennya sendiri (bisa menyambung ulang dengan kunci lanjut bila sesi di HP siswa hilang)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $p !== 'api_u') cek_token();
+// tutup ujian/tugas yang waktunya habis + nilai otomatis ke Penilaian (tanpa cron)
+otomatis_jalankan();
 
 try {
     require __DIR__ . '/hal/' . $p . '.php';

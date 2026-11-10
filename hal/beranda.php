@@ -10,6 +10,21 @@ $st = satu('SELECT
     (SELECT COUNT(DISTINCT kelas, tanggal) FROM guru_absensi WHERE guru_id = ?) absen', [uid(), uid(), uid(), uid()]);
 $dok = semua('SELECT id, jenis, judul, diubah FROM guru_dokumen WHERE guru_id = ? ORDER BY diubah DESC LIMIT 4', [uid()]);
 
+// tombol "Tutup" langsung dari Beranda (pengingat ujian/tugas yang lama terbuka)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(post('aksi'), ['tutup_ujian', 'tutup_tugas'], true)) {
+    $tid = (int)post('id');
+    if (post('aksi') === 'tutup_ujian' && ($x = ujian_ambil($tid))) { ujian_tutup($x); otomatis_nilai(uid()); pesan('Ujian "' . h($x['judul']) . '" ditutup. Nilai masuk ke Penilaian.'); }
+    if (post('aksi') === 'tutup_tugas' && ($x = tugas_ambil($tid))) { q("UPDATE guru_tugas SET status = 'tutup' WHERE id = ?", [$tid]); pesan('Tugas "' . h($x['judul']) . '" ditutup.'); }
+    ke('?p=beranda');
+}
+/** Sudah berapa hari terbuka (untuk pengingat; null = belum perlu diingatkan). */
+$lama_buka = function (array $x, ?string $batas): ?int {
+    $acuan = $batas && strtotime($batas) < time() ? $batas : ($batas ? null : ($x['mulai'] ?? null ?: $x['dibuat']));
+    if (!$acuan) return null;
+    $h = (int)floor((time() - strtotime((string)$acuan)) / 86400);
+    return $h >= 3 ? $h : null;
+};
+
 // ---- yang sedang berjalan: kuis, ujian/latihan yang dibuka, tugas yang dibuka / masih perlu dinilai ----
 $berjalan = [];
 foreach (semua("SELECT id, judul, kelas, status, (SELECT COUNT(*) FROM guru_kuis_peserta p WHERE p.kuis_id = k.id) n
@@ -23,7 +38,8 @@ foreach (semua("SELECT u.*, (SELECT COUNT(*) FROM guru_ujian_peserta p WHERE p.u
     $n = count(ujian_siswa($u));
     $berjalan[] = ['ikon' => 'ujian', 'judul' => (ujian_latihan($u) && empty($u['tindak']) ? 'Latihan: ' : '') . $u['judul'], 'kelas' => $u['kelas'],
         'ket' => (int)$u['n_selesai'] . ($n ? '/' . $n : '') . ' mengumpulkan' . ((int)$u['n_jalan'] ? ' · ' . (int)$u['n_jalan'] . ' sedang mengerjakan' : ''),
-        'url' => '?p=ujian_lihat&id=' . (int)$u['id'], 'tombol' => 'Pantau'];
+        'url' => '?p=ujian_lihat&id=' . (int)$u['id'], 'tombol' => 'Pantau',
+        'lama' => !ujian_latihan($u) ? $lama_buka($u, $u['selesai']) : null, 'tutup' => ['tutup_ujian', (int)$u['id']]];
 }
 foreach (semua("SELECT t.*, (SELECT COUNT(*) FROM guru_tugas_kirim k WHERE k.tugas_id = t.id AND k.dikirim IS NOT NULL) n_kirim,
                 (SELECT COUNT(*) FROM guru_tugas_kirim k WHERE k.tugas_id = t.id AND k.dikirim IS NOT NULL AND k.status = 'kirim') n_nilai
@@ -39,7 +55,8 @@ foreach (semua("SELECT t.*, (SELECT COUNT(*) FROM guru_tugas_kirim k WHERE k.tug
             : ' · batas ' . ($hari <= 0 ? 'hari ini ' . substr($t['batas'], 11, 5) : ($hari === 1 ? 'besok' : $hari . ' hari lagi'));
     }
     $berjalan[] = ['ikon' => 'tugas', 'judul' => $t['judul'], 'kelas' => $t['kelas'], 'ket' => $ket, 'html' => true,
-        'url' => '?p=tugas_lihat&id=' . (int)$t['id'], 'tombol' => (int)$t['n_nilai'] ? 'Nilai' : 'Lihat'];
+        'url' => '?p=tugas_lihat&id=' . (int)$t['id'], 'tombol' => (int)$t['n_nilai'] ? 'Nilai' : 'Lihat',
+        'lama' => $t['status'] === 'buka' ? $lama_buka($t, $t['batas']) : null, 'tutup' => ['tutup_tugas', (int)$t['id']]];
 }
 
 kepala('Beranda', 'beranda');
@@ -63,7 +80,13 @@ kepala('Beranda', 'beranda');
     <?php foreach (array_slice($berjalan, 0, 5) as $b): ?>
     <li><span class="berjalan-ikon"><?= ikon($b['ikon']) ?></span>
       <span class="berjalan-isi"><b><?= h($b['judul']) ?></b><small>Kelas <?= h($b['kelas']) ?> · <?= !empty($b['html']) ? $b['ket'] : h($b['ket']) ?></small></span>
-      <a class="tombol kecil" href="<?= h($b['url']) ?>"><?= h($b['tombol']) ?></a></li>
+      <a class="tombol kecil" href="<?= h($b['url']) ?>"><?= h($b['tombol']) ?></a>
+      <?php if (!empty($b['lama'])): ?>
+      <form method="post" class="pengingat-tutup" onsubmit="return confirm('Tutup sekarang? Siswa tidak bisa mengerjakan/mengirim lagi.')">
+        <?= input_token() ?><input type="hidden" name="aksi" value="<?= h($b['tutup'][0]) ?>"><input type="hidden" name="id" value="<?= (int)$b['tutup'][1] ?>">
+        <span>Sudah terbuka <?= (int)$b['lama'] ?> hari<?= $b['ikon'] === 'ujian' ? ' — pembahasan baru terbuka setelah ditutup' : '' ?>.</span><button class="kecil">Tutup sekarang</button>
+      </form>
+      <?php endif; ?></li>
     <?php endforeach; ?>
   </ul>
   <?php if (count($berjalan) > 5): ?><p class="kecil" style="margin:.4rem 0 0">Lihat semua: <a href="?p=kuis">Kuis</a> · <a href="?p=ujian">Ujian</a> · <a href="?p=tugas">Tugas</a></p><?php endif; ?>
