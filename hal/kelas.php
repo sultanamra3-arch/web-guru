@@ -25,14 +25,7 @@ rsort($tahun_ada);
 kepala('Kelas', 'kelas');
 judul_baris('Kelas & siswa', '<a class="tombol" href="?p=siswa_tambah">＋ Siswa</a>');
 ?>
-<div class="tombol-besar">
-  <a class="utama" href="?p=absensi"><?= ikon('absensi') ?><span>Isi absensi</span></a>
-  <a href="?p=penilaian"><?= ikon('nilai') ?><span>Penilaian</span></a>
-  <a href="?p=ujian"><?= ikon('ujian') ?><span>Ujian online</span></a>
-  <a href="?p=tugas"><?= ikon('tugas') ?><span>Tugas online</span></a>
-  <a href="?p=kuis"><?= ikon('kuis') ?><span>Kuis cepat</span></a>
-</div>
-<p class="redup kecil">Kelas & siswa milikmu sendiri (guru lain tidak melihatnya) · tahun ajaran <b><?= h($tahun) ?></b> ·
+<p class="redup kecil" style="margin-top:-.3rem">Kelas & siswa milikmu sendiri · tahun ajaran <b><?= h($tahun) ?></b> ·
   <a href="?p=siswa_naik">Naik kelas / tahun ajaran baru</a></p>
 
 <?php if (!$kelas): ?>
@@ -41,24 +34,31 @@ judul_baris('Kelas & siswa', '<a class="tombol" href="?p=siswa_tambah">＋ Siswa
   <p>Isi daftar siswa per kelas dengan salah satu cara: <b>foto daftar hadir</b> (dibaca AI), <b>tempel daftar nama</b>, atau <b>impor Excel</b>.</p>
   <a class="tombol utama lebar" href="?p=siswa_tambah">＋ Tambah siswa</a>
 </div>
-<?php endif; ?>
-
-<ul class="daftar kartu">
-<?php foreach ($kelas as $k): $j = $jumlah[$k] ?? ['n' => 0, 'l' => 0, 'pr' => 0]; ?>
-  <li>
-    <div class="eks-atas"><a href="?p=siswa&amp;kelas=<?= h(rawurlencode($k)) ?>"><b>Kelas <?= h($k) ?></b></a>
-      <?= in_array($k, $saya, true) ? '<span class="lencana">kelas saya</span>' : '' ?>
-      <small><?= (int)$j['n'] ?> siswa · L <?= (int)$j['l'] ?> · P <?= (int)$j['pr'] ?></small></div>
-    <div class="eks-aksi kelas-aksi">
-      <a class="tombol kecil" href="?p=siswa&amp;kelas=<?= h(rawurlencode($k)) ?>">Siswa</a>
-      <a class="tombol kecil" href="?p=absensi&amp;kelas=<?= h(rawurlencode($k)) ?>">Absen</a>
-      <a class="tombol kecil" href="?p=nilai_rekap&amp;kelas=<?= h(rawurlencode($k)) ?>">Nilai</a>
-      <a class="tombol kecil" href="?p=kelompok&amp;kelas=<?= h(rawurlencode($k)) ?>">Kelompok</a>
-      <a class="tombol kecil" href="?p=absensi_rekap&amp;kelas=<?= h(rawurlencode($k)) ?>">Rekap</a>
-    </div>
+<?php endif;
+$baris_kelas = function (string $k, bool $utama) use ($jumlah): void {
+    $j = $jumlah[$k] ?? ['n' => 0, 'l' => 0, 'pr' => 0]; $q = h(rawurlencode($k)); ?>
+  <li class="baris-kelas">
+    <a class="bk-nama" href="?p=kelas_lihat&amp;kelas=<?= $q ?>"><b>Kelas <?= h($k) ?></b><small><?= (int)$j['n'] ?> siswa · L <?= (int)$j['l'] ?> · P <?= (int)$j['pr'] ?></small></a>
+    <a class="tombol kecil<?= $utama ? ' utama' : '' ?>" href="?p=absensi&amp;kelas=<?= $q ?>">Absen</a>
+    <details class="menu-titik"><summary aria-label="Menu kelas <?= h($k) ?>"><?= ikon('titik') ?></summary>
+      <div><a href="?p=siswa&amp;kelas=<?= $q ?>">Siswa</a><a href="?p=nilai_rekap&amp;kelas=<?= $q ?>">Nilai</a><a href="?p=kelompok&amp;kelas=<?= $q ?>">Kelompok</a><a href="?p=absensi_rekap&amp;kelas=<?= $q ?>">Rekap absensi</a></div></details>
   </li>
-<?php endforeach; ?>
-</ul>
+<?php };
+$kelas_saya = array_values(array_intersect($kelas, $saya));
+$kelas_lain = array_values(array_diff($kelas, $saya));
+if ($kelas_saya): ?>
+<div class="kartu">
+  <h2 class="judul-kecil">Kelas saya</h2>
+  <ul class="daftar-kelas"><?php foreach ($kelas_saya as $i => $k) $baris_kelas($k, $i === 0); ?></ul>
+</div>
+<?php endif; ?>
+<?php if ($kelas_lain): ?>
+<details class="kartu" <?= $kelas_saya ? '' : 'open' ?>>
+  <summary><b><?= $kelas_saya ? 'Kelas lain (' . count($kelas_lain) . ')' : 'Kelas' ?></b> <small class="redup"><?= $kelas_saya ? h(implode(', ', $kelas_lain)) : '' ?></small></summary>
+  <ul class="daftar-kelas"><?php foreach ($kelas_lain as $k) $baris_kelas($k, false); ?></ul>
+  <?php if ($kelas_saya): ?><p class="kecil redup" style="margin:.4rem 0 0">"Kelas saya" diambil dari jadwal mengajar. <a href="?p=jadwal">Atur jadwal →</a></p><?php endif; ?>
+</details>
+<?php endif; ?>
 
 <details class="kartu">
   <summary><b>＋ Kelas baru (kosong)</b></summary>

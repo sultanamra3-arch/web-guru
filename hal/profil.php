@@ -3,6 +3,11 @@ declare(strict_types=1);
 
 $a = satu('SELECT * FROM guru_akun WHERE id = ?', [uid()]);
 $galat = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'huruf') {
+    setelan_simpan('huruf:' . uid(), post('huruf') === 'besar' ? 'besar' : 'normal');
+    pesan('Ukuran huruf disimpan.');
+    ke('?p=profil');
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim((string)post('nama'));
     $baru = (string)($_POST['sandi_baru'] ?? '');
@@ -25,6 +30,15 @@ kepala('Profil', 'lainnya');
 judul_baris('Profil saya', '<a class="tombol" href="?p=lainnya">‹ Lainnya</a>');
 foreach ($galat as $g) echo '<div class="pesan galat">' . h($g) . '</div>';
 ?>
+<form method="post" class="kartu formulir">
+  <?= input_token() ?><input type="hidden" name="aksi" value="huruf">
+  <b>Ukuran huruf</b>
+  <div class="seg-status pilih-huruf" style="margin:.5rem 0 0">
+    <?php $hf = setelan('huruf:' . uid()) === 'besar' ? 'besar' : 'normal'; foreach (['normal' => 'Normal', 'besar' => 'Besar'] as $k => $n): ?>
+    <button name="huruf" value="<?= $k ?>" class="<?= $hf === $k ? 'aktif' : '' ?>"><?= $n ?></button><?php endforeach; ?>
+  </div>
+  <small class="redup">Huruf besar lebih nyaman dibaca di HP atau saat layar ditampilkan di proyektor.</small>
+</form>
 <form method="post" class="formulir">
   <?= input_token() ?>
   <fieldset><legend>Data guru</legend>

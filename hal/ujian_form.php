@@ -71,7 +71,7 @@ judul_baris($u ? 'Pengaturan ujian' : 'Ujian online baru', '<a class="tombol" hr
   <p class="redup" style="margin-top:0">Paket: <b><?= h($paket['judul'] ?? '-') ?></b> · <?= $jumlah ?> soal</p>
   <label>Judul ujian<input name="judul" required value="<?= $v('judul', ($cfg['jenis_ujian'] ?? 'Ulangan') . ' ' . ($cfg['mapel'] ?? '')) ?>"></label>
   <div class="baris2">
-    <label>Kelas<select name="kelas" required><?= pilihan(array_combine($kl, $kl) ?: [], $u['kelas'] ?? '') ?></select></label>
+    <label>Kelas<select name="kelas" required><?= pilihan(array_combine($kl, $kl) ?: [], $u['kelas'] ?? (string)get('kelas')) ?></select></label>
     <label>Mapel<?= pilih_mapel((string)($u['mapel'] ?? ($cfg['mapel'] ?? ''))) ?></label>
   </div>
   <fieldset class="pilih-mode">

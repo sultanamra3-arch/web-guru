@@ -293,6 +293,16 @@
     hitung();
   }
 
+  /* ---------- Tombol "＋ Buat" di menu bawah: lembar pilihan ---------- */
+  var tb = $('#tombol-buat'), lb = $('#lembar-buat');
+  if (tb && lb) {
+    function bukaBuat(b) { lb.hidden = !b; tb.setAttribute('aria-expanded', String(b)); document.documentElement.classList.toggle('tak-gulir', b); }
+    tb.addEventListener('click', function () { bukaBuat(lb.hidden); });
+    lb.addEventListener('click', function (e) { if (e.target === lb || e.target.closest('[data-tutup-buat]')) bukaBuat(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !lb.hidden) bukaBuat(false); });
+    window.addEventListener('pageshow', function () { bukaBuat(false); });
+  }
+
   /* ---------- Salin resi (tombol data-salin, juga yang dibuat belakangan) ---------- */
   document.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('[data-salin]');
@@ -330,9 +340,10 @@
   var ps = $('#pilih-semua-soal');
   if (ps) {
     var cbs = $$('#form-bank input[name="pilih[]"]'), jml = $('#jml-soal');
-    function n() { jml.textContent = cbs.filter(function (c) { return c.checked; }).length; }
+    function n() { var k = cbs.filter(function (c) { return c.checked; }).length; jml.textContent = k; var bar = $('#bar-aksi'); if (bar) bar.hidden = k === 0; }
     ps.addEventListener('change', function () { cbs.forEach(function (c) { c.checked = ps.checked; }); n(); });
     cbs.forEach(function (c) { c.addEventListener('change', n); });
+    n();
   }
   var ts = $('#tipe-soal');
   if (ts) {

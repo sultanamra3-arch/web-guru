@@ -42,7 +42,7 @@ judul_baris('Kuis cepat');
   </fieldset>
   <label>Paket soal <small>(yang dipakai hanya soal pilihan ganda & benar/salah)</small><select name="paket" required><?= pilihan($paket, '', 'id', 'judul') ?></select></label>
   <div class="baris2">
-    <label>Kelas<select name="kelas" required><?= pilihan(array_combine($kl, $kl) ?: [], '') ?></select></label>
+    <label>Kelas<select name="kelas" required><?= pilihan(array_combine($kl, $kl) ?: [], (string)get('kelas')) ?></select></label>
     <label>Waktu per soal<select name="detik"><?= pilihan(['10' => '10 detik', '15' => '15 detik', '20' => '20 detik', '30' => '30 detik', '45' => '45 detik', '60' => '60 detik', '90' => '90 detik'], '20') ?></select></label>
   </div>
   <div class="baris2">

@@ -58,7 +58,7 @@ judul_baris($t ? 'Ubah tugas' : 'Tugas online baru', '<a class="tombol" href="' 
   <?= input_token() ?>
   <label>Judul tugas<input name="judul" required value="<?= $v('judul') ?>" placeholder="mis. Membuat flowchart peminjaman buku"></label>
   <div class="baris2">
-    <label>Kelas<select name="kelas" required><?= pilihan(array_combine($kl, $kl) ?: [], $t['kelas'] ?? '') ?></select></label>
+    <label>Kelas<select name="kelas" required><?= pilihan(array_combine($kl, $kl) ?: [], $t['kelas'] ?? (string)get('kelas')) ?></select></label>
     <label>Mapel<?= pilih_mapel((string)($t['mapel'] ?? '')) ?></label>
   </div>
   <fieldset class="jenis-tugas">

@@ -1,19 +1,46 @@
 <?php
 declare(strict_types=1);
 
+// Menu bawah (v1.44): tombol "Buat" di tengah; Soal masuk ke tab Perangkat
 const MENU = [
     'beranda' => ['Beranda', 'beranda'],
     'kelas' => ['Kelas', 'kelas'],
-    'soal' => ['Soal', 'soal'],
+    'buat' => ['Buat', 'tambah'],
     'perangkat' => ['Perangkat', 'perangkat'],
     'lainnya' => ['Lainnya', 'lainnya'],
 ];
+
+/** Isi lembar "＋ Buat" (judul, ikon, alamat). */
+const MENU_BUAT = [
+    ['Absen', 'absensi', '?p=absensi'], ['Ujian', 'ujian', '?p=ujian'], ['Tugas', 'tugas', '?p=tugas_form'], ['Kuis cepat', 'kuis', '?p=kuis'],
+    ['Soal AI', 'ai', '?p=soal_ai'], ['Modul ajar', 'modul', '?p=dokumen_buat&jenis=modul'], ['Presentasi', 'presentasi', '?p=dokumen_buat&jenis=presentasi'], ['Kisi-kisi', 'kisi', '?p=kisi'],
+];
+
+/** Inisial nama tanpa gelar: "Budi Santoso, S.Pd." → "BS" */
+function inisial(string $nama): string
+{
+    $nama = trim(preg_replace('/,.*$/', '', $nama));
+    $kata = array_values(array_filter(preg_split('/\s+/', $nama), fn($k) => $k !== '' && !preg_match('/\.$/', $k)));
+    $i = '';
+    foreach (array_slice($kata, 0, 2) as $k) $i .= mb_strtoupper(mb_substr($k, 0, 1));
+    return $i ?: 'G';
+}
+
+/** Jumlah hal yang "perlu tindakan" (angka di menu Beranda); disimpan di sesi 60 detik agar ringan. */
+function angka_beranda(): int
+{
+    $c = $_SESSION['angka_beranda'] ?? null;
+    if ($c && $c[0] > time() - 60) return (int)$c[1];
+    $n = count(perlu_tindakan());
+    $_SESSION['angka_beranda'] = [time(), $n];
+    return $n;
+}
 
 function kepala(string $judul, string $aktif = '', bool $polos = false): void
 {
     $u = pengguna();
     ?><!DOCTYPE html>
-<html lang="id">
+<html lang="id"<?= $u && setelan('huruf:' . uid()) === 'besar' ? ' class="huruf-besar"' : '' ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -53,15 +80,28 @@ function kepala(string $judul, string $aktif = '', bool $polos = false): void
 <header class="atas">
   <a class="merek" href="?p=beranda"><img src="aset/logo.png" alt="Logo"> <span><small><?= h((string)k('sekolah', 'SMP Negeri 6 Keritang')) ?></small><b>SiGuru</b></span></a>
   <?php if ($u): ?>
-  <form method="post" action="?p=keluar" class="keluar"><?= input_token() ?><button title="Keluar">Keluar</button></form>
+  <a class="inisial" href="?p=profil" title="<?= h($u['nama']) ?> · profil"><?= h(inisial((string)$u['nama'])) ?></a>
   <?php endif; ?>
 </header>
-<?php if ($u): ?>
+<?php if ($u): $aktif = $aktif === 'soal' ? 'perangkat' : $aktif; $angka = angka_beranda(); ?>
 <nav class="menu">
   <?php foreach (MENU as $p => [$t, $i]): ?>
-  <a href="?p=<?= $p ?>" class="<?= $aktif === $p ? 'aktif' : '' ?>"><span class="ik"><?= ikon($i) ?></span><?= $t ?></a>
+  <?php if ($p === 'buat'): ?>
+  <button type="button" class="menu-buat" id="tombol-buat" aria-haspopup="dialog" aria-controls="lembar-buat"><span class="ik"><?= ikon($i) ?></span><?= $t ?></button>
+  <?php else: ?>
+  <a href="?p=<?= $p ?>" class="<?= $aktif === $p ? 'aktif' : '' ?>"><span class="ik"><?= ikon($i) ?><?= $p === 'beranda' && $angka ? '<b class="angka-menu">' . $angka . '</b>' : '' ?></span><?= $t ?></a>
+  <?php endif; ?>
   <?php endforeach; ?>
 </nav>
+<div class="tirai-buat tak-cetak" id="lembar-buat" hidden role="dialog" aria-label="Buat baru">
+  <div class="lembar">
+    <b>Buat baru</b>
+    <div class="ikon-kisi">
+      <?php foreach (MENU_BUAT as [$t, $i, $url]): ?><a href="<?= h($url) ?>"><span class="ikon-kotak"><?= ikon($i) ?></span><?= h($t) ?></a><?php endforeach; ?>
+    </div>
+    <button type="button" class="lebar" data-tutup-buat>Tutup</button>
+  </div>
+</div>
 <?php endif; ?>
 <?php endif; ?>
 <main>
@@ -211,3 +251,15 @@ function siap_cepat_aturan(): array
     ];
 }
 
+
+/** Baris pilihan di tab Perangkat (Soal ada di sini sejak v1.44). $aktif: 'soal' | jenis dokumen | '' (semua). */
+function tab_perangkat(string $aktif): void
+{
+    $ada_lkpd = (bool)nilai("SELECT 1 FROM guru_dokumen WHERE guru_id = ? AND jenis = 'lkpd' LIMIT 1", [uid()]);
+    $t = ['soal' => ['Soal', '?p=soal']];
+    foreach (JENIS_DOKUMEN as $k => $n) if ($k !== 'lkpd' || $ada_lkpd) $t[$k] = [$k === 'paket' ? 'Paket soal' : $n, '?p=perangkat&jenis=' . $k];
+    $t[''] = ['Semua', '?p=perangkat'];
+    echo '<nav class="tab-geser" aria-label="Jenis perangkat">';
+    foreach ($t as $k => [$n, $u]) echo '<a href="' . h($u) . '" class="' . ($aktif === $k ? 'aktif' : '') . '">' . h($n) . '</a>';
+    echo '</nav>';
+}
