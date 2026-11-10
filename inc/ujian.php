@@ -500,3 +500,36 @@ function ujian_kirim_remedial(array $r): array
     q('UPDATE guru_ujian SET penilaian_id = ? WHERE id = ?', [$pid, $r['id']]);
     return ['ok' => true, 'pid' => $pid, 'n' => $n, 'naik' => $naik];
 }
+
+/**
+ * Kunci lanjut: rahasia acak yang disimpan di HP siswa saat mengerjakan.
+ * Bila sesi (cookie) di HP hilang, kunci ini dipakai untuk menyambung lagi tanpa memilih nama / "Buka ulang".
+ * Di database hanya disimpan hash-nya. Berlaku untuk satu siswa, satu ujian, selama belum dikumpulkan.
+ */
+function ujian_kunci_baru(int $ujian_id, string $kode): string
+{
+    $k = bin2hex(random_bytes(16));
+    q('UPDATE guru_ujian_peserta SET kunci_lanjut = ? WHERE ujian_id = ? AND kode = ?', [hash('sha256', $k), $ujian_id, $kode]);
+    return $k;
+}
+
+/** Peserta yang memiliki kunci lanjut ini (ujian belum dikumpulkan), atau null. */
+function ujian_kunci_cocok(int $ujian_id, string $kunci): ?array
+{
+    if (!preg_match('/^[a-f0-9]{32}$/', $kunci)) return null;
+    $p = satu('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ? AND kunci_lanjut = ? AND selesai IS NULL', [$ujian_id, hash('sha256', $kunci)]);
+    return $p ?: null;
+}
+
+/** Penanda HP siswa (cookie sgu_alat); dibuat baru bila belum ada/hilang. */
+function alat_siswa(): string
+{
+    $c = (string)($_COOKIE['sgu_alat'] ?? '');
+    if (!preg_match('/^[a-f0-9]{32}$/', $c)) {
+        $c = bin2hex(random_bytes(16));
+        setcookie('sgu_alat', $c, ['expires' => time() + 400 * 86400, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax',
+            'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off']);
+        $_COOKIE['sgu_alat'] = $c;
+    }
+    return $c;
+}

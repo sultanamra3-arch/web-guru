@@ -49,6 +49,7 @@ Struktur:
 - AI memakai model gratis (OpenRouter hanya model `:free`).
 - Absensi yang belum diisi **tidak boleh** tampil sebagai "hadir"; hari yang tidak diisi tidak dihitung di rekap.
 - Ujian online: tata tertib sebelum mulai, pengaman bisa ON/OFF, mode latihan, hasil & pembahasan setelah ujian ditutup, tombol bagikan WA (token opsional).
+- Ujian online (v1.37): **kunci lanjut** (`kunci_lanjut` di `guru_ujian_peserta`, hash; kunci asli hanya di HP siswa/localStorage `sgu-kunci-ID`). Bila sesi/cookie di HP hilang, `api_u` menyambung lagi otomatis memakai kunci ini, dan halaman pilih nama tidak meminta token/"Buka ulang" untuk HP yang sama. `api_u` memeriksa tokennya sendiri (dikecualikan dari `cek_token()` di `index.php`). Tombol "Ya, kumpulkan" tidak boleh diam: bila sesi tidak bisa disambung, siswa diarahkan masuk lagi.
 - Kuis cepat: yang salah/tidak menjawab tetap lanjut sampai habis; **jawaban, poin, dan peringkat baru dibuka di akhir**. Mode mandiri: siswa maju sendiri-sendiri, soal & pilihan diacak per siswa.
 - Data contoh di repo hanya nama siswa fiktif.
 

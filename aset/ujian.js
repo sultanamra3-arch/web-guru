@@ -10,7 +10,10 @@
   var soal = D.soal, jw = D.jawaban || {}, rg = D.ragu || {};
   var pos = Math.max(0, Math.min(soal.length - 1, soal.findIndex(function (s) { return true; }) + 0));
   var KUNCI = 'sgu-tunda-' + D.id + '-' + D.nama;
-  var tunda = { jawab: {}, ragu: {} }, mengirim = false, gagal = 0, sisa = D.sisa, selesaiDikirim = false;
+  var tunda = { jawab: {}, ragu: {} }, mengirim = false, gagal = 0, sisa = D.sisa, selesaiDikirim = false, putus = false;
+  // kunci lanjut: dipakai menyambung lagi bila sesi di HP hilang (juga dibaca halaman pilih nama)
+  var KUNCI_LANJUT = 'sgu-kunci-' + D.id;
+  try { if (D.kunci) localStorage.setItem(KUNCI_LANJUT, D.kunci); } catch (e) { /* abaikan */ }
   var HURUF = ['A', 'B', 'C', 'D', 'E'];
 
   // posisi awal = nomor terakhir yang dibuka (disimpan server)
@@ -45,7 +48,7 @@
     mengirim = true;
     if (adaIsi) status('⏳ Menyimpan…', 'proses');
     var fd = new FormData();
-    fd.append('_t', D.token); fd.append('id', D.id); fd.append('nomor', pos);
+    fd.append('_t', D.token); fd.append('id', D.id); fd.append('nomor', pos); fd.append('kunci', D.kunci || '');
     fd.append('jawab', JSON.stringify(paket.jawab)); fd.append('ragu', JSON.stringify(paket.ragu));
     if (aksi) fd.append('aksi', aksi);
     return fetch('?p=api_u', { method: 'POST', body: fd, credentials: 'same-origin' })
@@ -56,15 +59,16 @@
       })
       .then(function (r) {
         mengirim = false; gagal = 0;
+        if (r.token) D.token = r.token; // tersambung lagi memakai kunci lanjut
         if (r.ok && typeof r.sisa === 'number') sisa = r.sisa;
         if (r.selesai) { bersihLokal(); location.reload(); return r; }
         if (r.keluar) {
           // jawaban yang belum terkirim tetap disimpan di HP, dikirim lagi setelah masuk ulang
           Object.keys(paket.jawab).forEach(function (i) { if (!(i in tunda.jawab)) tunda.jawab[i] = paket.jawab[i]; });
           Object.keys(paket.ragu).forEach(function (i) { if (!(i in tunda.ragu)) tunda.ragu[i] = paket.ragu[i]; });
-          simpanLokal(); selesaiDikirim = true;
+          simpanLokal(); putus = true;
           status('⚠ ' + (r.galat || 'Sesi berakhir.'), 'galat');
-          setTimeout(function () { location.href = '?p=u' + (D.kode_ujian ? '&k=' + encodeURIComponent(D.kode_ujian) : ''); }, 3500);
+          setTimeout(masukLagi, 3500);
           return r;
         }
         if (!r.ok) throw new Error('gagal');
@@ -84,6 +88,7 @@
       });
   }
   function bersihLokal() { try { localStorage.removeItem(KUNCI); } catch (e) { /* abaikan */ } }
+  function masukLagi() { simpanLokal(); location.href = '?p=u' + (D.kode_ujian ? '&k=' + encodeURIComponent(D.kode_ujian) : ''); }
 
   function catatJawab(i, v) {
     if (v === '' || v == null) delete jw[i]; else jw[i] = v;
@@ -160,12 +165,16 @@
   $('batal-selesai').onclick = function () { $('tirai-selesai').hidden = true; };
   $('ya-selesai').onclick = function () { kumpulkan(); };
   function kumpulkan() {
+    var b = $('ya-selesai');
+    // sesi tidak bisa disambung lagi: jangan diam, arahkan masuk lagi (jawaban yang belum terkirim ikut dikirim)
+    if (putus) { b.disabled = true; b.textContent = 'Masuk lagi untuk mengumpulkan…'; masukLagi(); return; }
     if (selesaiDikirim) return;
     selesaiDikirim = true;
-    var b = $('ya-selesai'); b.disabled = true; b.textContent = '⏳ Mengirim…';
+    b.disabled = true; b.textContent = '⏳ Mengirim…';
     (function coba() {
       kirim('selesai').then(function (r) {
-        if (r && (r.selesai || r.ok)) { bersihLokal(); location.reload(); return; }
+        if (r && (r.selesai || r.ok)) { bersihLokal(); try { localStorage.removeItem(KUNCI_LANJUT); } catch (e) { /* abaikan */ } location.reload(); return; }
+        if (r && r.keluar) { b.textContent = 'Masuk lagi untuk mengumpulkan…'; return; }
         b.textContent = '⚠ Belum tersambung, mencoba lagi…';
         setTimeout(coba, 3000);
       });
@@ -179,7 +188,7 @@
     var j = Math.floor(sisa / 3600), m = Math.floor(sisa % 3600 / 60), d = sisa % 60;
     elWaktu.textContent = (j ? j + ':' + ('0' + m).slice(-2) : m) + ':' + ('0' + d).slice(-2);
     elWaktu.classList.toggle('mepet', sisa <= 300);
-    if (sisa === 0 && !selesaiDikirim) { $('tirai-selesai').hidden = true; status('⏰ Waktu habis. Jawaban dikumpulkan…', 'galat'); kumpulkan(); }
+    if (sisa === 0 && !selesaiDikirim && !putus) { $('tirai-selesai').hidden = true; status('⏰ Waktu habis. Jawaban dikumpulkan…', 'galat'); kumpulkan(); }
   }
   detik(false);
   setInterval(function () { detik(true); }, 1000);
@@ -190,7 +199,7 @@
   var pernahSembunyi = false;
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'hidden') { pernahSembunyi = true; return; }
-    if (pernahSembunyi && !selesaiDikirim) {
+    if (pernahSembunyi && !selesaiDikirim && !putus) {
       pernahSembunyi = false;
       D.keluar = (D.keluar || 0) + 1;
       if (D.pengaman) {

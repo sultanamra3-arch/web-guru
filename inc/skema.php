@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 9;
+const SKEMA_VERSI = 10;
 
 function pastikan_skema(): void
 {
@@ -275,6 +275,7 @@ function pastikan_skema(): void
     skema_migrasi_5();
     skema_migrasi_8();
     skema_migrasi_9();
+    skema_migrasi_10();
     @file_put_contents($f, date('c'));
 }
 
@@ -340,4 +341,10 @@ function skema_migrasi_9(): void
     foreach ($kolom as $t => $daftar) {
         foreach ($daftar as $k => $def) if (!kolom_ada($t, $k)) db()->exec("ALTER TABLE $t ADD COLUMN $k $def");
     }
+}
+
+/** v10: kunci lanjut ujian (menyambung lagi bila sesi di HP siswa hilang). */
+function skema_migrasi_10(): void
+{
+    if (!kolom_ada('guru_ujian_peserta', 'kunci_lanjut')) db()->exec('ALTER TABLE guru_ujian_peserta ADD COLUMN kunci_lanjut VARCHAR(64) NULL');
 }

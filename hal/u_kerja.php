@@ -107,6 +107,7 @@ $data = [
     'sisa' => max(0, strtotime((string)$p['batas']) - time()),
     'pengaman' => !ujian_latihan($u) && (int)$u['pengaman'] === 1, 'batas_keluar' => (int)$u['batas_keluar'], 'keluar' => (int)$p['keluar'],
     'token' => token(),
+    'kunci' => ujian_kunci_baru($id, (string)$kode),
 ];
 ?>
 <div id="ujian" class="ujian-wadah">

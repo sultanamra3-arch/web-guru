@@ -7,6 +7,7 @@ header('Cache-Control: no-store');
 
 function balas_u(array $d): never
 {
+    if (!empty($GLOBALS['token_baru'])) $d['token'] = $GLOBALS['token_baru'];
     echo json_encode($d, JSON_UNESCAPED_UNICODE);
     exit;
 }
@@ -14,13 +15,35 @@ function balas_u(array $d): never
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') balas_u(['ok' => false]);
 $id = (int)post('id');
 $kode = $_SESSION['ujian'][$id] ?? null;
+$token_ok = !empty($_SESSION['csrf']) && hash_equals((string)$_SESSION['csrf'], (string)post('_t'));
+// Sesi di HP hilang (cookie terhapus / browser ditutup sistem): sambung lagi memakai kunci lanjut dari HP
+$pk = null;
+if ((!$kode || !$token_ok) && (string)post('kunci') !== '') {
+    $pk = ujian_kunci_cocok($id, (string)post('kunci'));
+    if ($pk) {
+        session_regenerate_id(true);
+        $_SESSION['ujian'][$id] = $kode = (string)$pk['kode'];
+        $token_ok = true;
+        $GLOBALS['token_baru'] = token();
+        alat_siswa();
+    }
+}
 session_write_close();
 $u = ujian_ambil($id, false);
-if (!$u || !$kode) balas_u(['ok' => false, 'keluar' => true, 'galat' => 'Sesi berakhir. Pilih namamu lagi untuk melanjutkan — jawabanmu tetap tersimpan.']);
+if (!$u || !$kode || !$token_ok) balas_u(['ok' => false, 'keluar' => true, 'galat' => 'Sesi berakhir. Pilih namamu lagi untuk melanjutkan — jawabanmu tetap tersimpan.']);
 
 db()->beginTransaction();
 $p = satu('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ? AND kode = ? FOR UPDATE', [$id, $kode]);
 $alat = hash('sha256', (string)($_COOKIE['sgu_alat'] ?? ''));
+// cookie penanda HP hilang tetapi kunci lanjut cocok → ini HP yang sama: perbarui penandanya
+if ($p && !$p['selesai'] && (!$p['perangkat'] || !hash_equals((string)$p['perangkat'], $alat))) {
+    $pk = $pk ?: ujian_kunci_cocok($id, (string)post('kunci'));
+    if ($pk && $pk['kode'] === $kode) {
+        $alat = hash('sha256', alat_siswa());
+        q('UPDATE guru_ujian_peserta SET perangkat = ? WHERE ujian_id = ? AND kode = ?', [$alat, $id, $kode]);
+        $p['perangkat'] = $alat;
+    }
+}
 if (!$p || !$p['perangkat'] || !hash_equals((string)$p['perangkat'], $alat)) {
     db()->rollBack();
     balas_u(['ok' => false, 'keluar' => true, 'galat' => ujian_latihan($u) ? 'Latihan ini sekarang dibuka di HP/browser lain.' : 'Nama ini dipakai di HP/browser lain. Minta guru menekan "Buka ulang".']);

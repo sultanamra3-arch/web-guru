@@ -54,7 +54,8 @@ if (pengguna() && !nilai('SELECT aktif FROM guru_akun WHERE id = ?', [uid()])) {
     $_SESSION = [];
     ke('?p=masuk');
 }
-if ($_SERVER['REQUEST_METHOD'] === 'POST') cek_token();
+// api_u memeriksa tokennya sendiri (bisa menyambung ulang dengan kunci lanjut bila sesi di HP siswa hilang)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $p !== 'api_u') cek_token();
 
 try {
     require __DIR__ . '/hal/' . $p . '.php';

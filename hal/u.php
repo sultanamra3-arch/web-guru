@@ -6,18 +6,6 @@ $kode = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', (string)($_REQUEST['k'] ??
 $u = $kode !== '' ? satu('SELECT * FROM guru_ujian WHERE kode = ?', [$kode]) : null;
 $galat = '';
 
-function alat_siswa(): string
-{
-    $c = (string)($_COOKIE['sgu_alat'] ?? '');
-    if (!preg_match('/^[a-f0-9]{32}$/', $c)) {
-        $c = bin2hex(random_bytes(16));
-        setcookie('sgu_alat', $c, ['expires' => time() + 400 * 86400, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax',
-            'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off']);
-        $_COOKIE['sgu_alat'] = $c;
-    }
-    return $c;
-}
-
 function ujian_bisa_masuk(array $u): string
 {
     if ($u['status'] === 'draf') return 'Ujian belum dibuka oleh guru. Tunggu sebentar lalu muat ulang.';
@@ -36,13 +24,16 @@ if ($u && get('ganti') && isset($_SESSION['ujian'][(int)$u['id']])) {
 }
 if ($u && $_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') !== 'mulai') {
     $siswa = (string)post('siswa');
+    // HP yang sama tetapi sesi/cookie-nya hilang: kunci lanjut yang tersimpan di HP membuktikan ini HP yang tadi
+    $pk = $u ? ujian_kunci_cocok((int)$u['id'], (string)post('kunci')) : null;
+    $kunci_ok = $pk && $pk['kode'] === $siswa;
     $_SESSION['coba_token'] = $_SESSION['coba_token'] ?? ['n' => 0, 't' => 0];
     $ct = &$_SESSION['coba_token'];
     $kelas_siswa = array_column(ujian_siswa($u), 'member_name', 'member_id');
     if (($m = ujian_bisa_masuk($u)) !== '') $galat = $m;
     elseif (!isset($kelas_siswa[$siswa])) $galat = 'Pilih namamu dari daftar.';
     elseif (!ujian_latihan($u) && $ct['n'] >= 5 && time() - $ct['t'] < 60) $galat = 'Terlalu sering salah token. Tunggu 1 menit.';
-    elseif (!ujian_latihan($u) && !ujian_token_cocok($u, (string)post('token'))) {
+    elseif (!ujian_latihan($u) && !$kunci_ok && !ujian_token_cocok($u, (string)post('token'))) {
         $ct['n'] = $ct['n'] + 1; $ct['t'] = time();
         $galat = 'Token salah. Lihat token terbaru di papan/layar guru.';
     } else {
@@ -51,7 +42,7 @@ if ($u && $_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') !== 'mulai') {
         $alat_hash = hash('sha256', $alat);
         if ($p && $p['selesai'] && !ujian_latihan($u)) {
             $galat = 'Kamu sudah mengumpulkan ujian ini. Bila ada masalah, hubungi guru.';
-        } elseif ($p && !$p['selesai'] && $p['perangkat'] && !hash_equals((string)$p['perangkat'], $alat_hash) && !ujian_latihan($u)) {
+        } elseif ($p && !$p['selesai'] && $p['perangkat'] && !hash_equals((string)$p['perangkat'], $alat_hash) && !ujian_latihan($u) && !$kunci_ok) {
             $galat = 'Nama ini sedang dipakai di HP/browser lain. Kalau tadi kamu membuka link dari WhatsApp lalu sekarang dari Chrome (atau sebaliknya), buka lagi di aplikasi yang sama seperti tadi. Kalau tetap tidak bisa, minta guru menekan "Buka ulang".';
         } elseif ($p && !$p['selesai'] && $p['mulai'] && ujian_latihan($u)) {
             // latihan: boleh lanjut dari HP/browser mana saja (pindah ke perangkat ini)
@@ -158,6 +149,8 @@ kepala($u ? $u['judul'] : 'Masuk ujian', '', true);
   <?php else: ?>
   <form method="post" class="kartu formulir">
     <?= input_token() ?><input type="hidden" name="k" value="<?= h($u['kode']) ?>">
+    <input type="hidden" name="kunci" id="kunci-lanjut" value="">
+
     <?php if (!empty($u['tindak'])): ?><p class="kecil" style="margin-top:0">📌 Latihan <b><?= h($u['tindak']) ?></b> ini khusus untuk <?= count($siswa) ?> siswa. Kalau namamu tidak ada, tanyakan ke guru.</p><?php endif; ?>
     <label>Nama kamu
       <select name="siswa" required><option value="">— pilih nama —</option>
@@ -165,9 +158,21 @@ kepala($u ? $u['judul'] : 'Masuk ujian', '', true);
       </select></label>
     <?php if (!ujian_latihan($u)): ?>
     <label>Token (4 angka dari guru)<input name="token" class="isian-token" inputmode="numeric" pattern="\d{4}" maxlength="4" autocomplete="off" required></label>
+    <p class="kecil redup" id="info-lanjut" hidden>Sudah mengerjakan di HP ini tadi? Pilih namamu saja, token boleh dikosongkan.</p>
     <?php endif; ?>
     <button class="utama lebar">Lanjut</button>
     <?php if ($hasil_hp && $u['tampil_hasil'] && !ujian_hasil_terbuka($u)): ?><p class="kecil redup">Hasil <?= h(nama_siswa((string)$hasil_hp['kode'])) ?> bisa dilihat di HP ini setelah guru menutup ujian.</p><?php endif; ?>
+  <script>
+    (function () {
+      try {
+        var k = localStorage.getItem('sgu-kunci-<?= (int)$u['id'] ?>') || '';
+        if (!k) return;
+        document.getElementById('kunci-lanjut').value = k;
+        var t = document.querySelector('.isian-token'); if (t) t.required = false;
+        var info = document.getElementById('info-lanjut'); if (info) info.hidden = false;
+      } catch (e) { /* penyimpanan tidak tersedia */ }
+    })();
+    </script>
   </form>
   <?php if ($hasil_hp && ujian_hasil_terbuka($u)): ?><a class="tombol lebar" href="?p=u&amp;k=<?= h($u['kode']) ?>&amp;lihat=1">Lihat hasil <?= h(nama_siswa((string)$hasil_hp['kode'])) ?></a><?php endif; ?>
   <?php endif; ?>
