@@ -1,6 +1,6 @@
-# APK "SiGuru Admin"
+# APK "SiGuru" (dulu "SiGuru Admin")
 
-Sejak versi 1.1 (SiGuru v1.50) APK ini adalah aplikasi **WebView biasa** (folder `aplikasi/`),
+Sejak versi 1.3 (SiGuru v1.52) untuk semua guru, nama di HP "SiGuru", berkas `apk/SiGuru.apk`. Sejak versi 1.1 (SiGuru v1.50) APK ini adalah aplikasi **WebView biasa** (folder `aplikasi/`),
 bukan lagi TWA. Alasan: APK TWA 1.0 dan 1.0.1 terpasang tetapi tidak mau terbuka di HP pengguna.
 
 Ciri:
@@ -18,8 +18,8 @@ Membuat ulang:
 1. Android SDK (platform 35, build-tools 35/36), JDK 17+.
 2. `cd aplikasi && ANDROID_HOME=... ./gradlew assembleRelease`
 3. `zipalign -p -f 4 app/build/outputs/apk/release/app-release-unsigned.apk al.apk`
-4. `apksigner sign --ks siguru-admin.keystore --ks-key-alias siguru --out SiGuru-Admin.apk al.apk`
+4. `apksigner sign --ks siguru-admin.keystore --ks-key-alias siguru --out SiGuru.apk al.apk`
    (keystore + sandi disimpan Pak Sultan — JANGAN di-commit). Naikkan `versionCode` tiap rilis.
-5. Salin ke `apk/SiGuru-Admin.apk`, naikkan VERSI SiGuru.
+5. Salin ke `apk/SiGuru.apk`, naikkan VERSI SiGuru.
 
 `/.well-known/assetlinks.json` di tiap subdomain tidak dibutuhkan lagi oleh APK ini (aman dibiarkan).

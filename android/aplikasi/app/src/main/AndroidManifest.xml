@@ -8,7 +8,7 @@
 
     <application
         android:name=".Aplikasi"
-        android:label="SiGuru Admin"
+        android:label="SiGuru"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="true"
         android:usesCleartextTraffic="false"

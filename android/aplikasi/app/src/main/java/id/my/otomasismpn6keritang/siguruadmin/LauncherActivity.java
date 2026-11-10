@@ -44,7 +44,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 /**
- * SiGuru Admin: membuka SiGuru dan aplikasi sekolah lain langsung di dalam aplikasi
+ * SiGuru: membuka SiGuru dan aplikasi sekolah lain langsung di dalam aplikasi
  * (tanpa Chrome, tanpa bilah alamat, tanpa efek memantul).
  */
 public class LauncherActivity extends Activity {
@@ -106,7 +106,7 @@ public class LauncherActivity extends Activity {
         s.setUseWideViewPort(true);
         s.setTextZoom(100);
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-        s.setUserAgentString(s.getUserAgentString() + " SiGuruAdminApp/1.2");
+        s.setUserAgentString(s.getUserAgentString() + " SiGuruApp/1.3 SiGuruAdminApp");
 
         CookieManager cm = CookieManager.getInstance();
         cm.setAcceptCookie(true);
