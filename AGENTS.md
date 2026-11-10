@@ -26,11 +26,14 @@ Struktur:
    - `inc/inti.php` → `const VERSI = '1.xx';`
    - `sw.js` → `const CACHE = 'siguru-v1.xx';` (angkanya harus sama dengan VERSI)
    Kalau `sw.js` lupa dinaikkan, HP yang memasang aplikasi bisa terus menampilkan halaman lama.
+   (Sejak v1.36 daftar berkas yang disimpan di HP (`ASET` di `sw.js`) otomatis memakai angka versi ini.)
 4. **Perubahan database hanya lewat `inc/skema.php`**: tambah tabel di daftar `CREATE TABLE IF NOT EXISTS`, kolom baru lewat fungsi migrasi (pakai `kolom_ada()`), lalu naikkan `SKEMA_VERSI`. Migrasi berjalan otomatis saat halaman dibuka. Jangan memberi pengguna perintah SQL manual kecuali terpaksa.
 5. Data selalu milik akun yang login: setiap kueri data guru wajib memakai `guru_id = uid()` (atau dicek lewat pemiliknya). Guru tidak boleh melihat/mengubah data guru lain.
 6. Keamanan: pakai `q()` / `satu()` / `semua()` dengan parameter `?` (jangan menempel input ke SQL), keluaran HTML lewat `h()`, formulir POST wajib `input_token()` (CSRF).
 7. Periksa sebelum push: `php -l` untuk file PHP yang diubah, `node --check` untuk JS yang diubah.
 8. Pesan commit dalam Bahasa Indonesia, diawali versi, mis. `v1.27: ...`.
+9. **Halaman disiapkan lebih awal** (v1.36, `siap_cepat_aturan()` di `inc/tampilan.php`, Speculation Rules): tautan `?p=...` di halaman guru dimuat di latar saat jari menyentuh tautan. Karena itu **tautan GET tidak boleh mengubah data**. Kalau terpaksa ada tautan yang mengubah data, mengunduh, atau mencetak, tambahkan atribut `data-tanpa-siap` pada `<a>` atau tambahkan polanya ke daftar `$tolak`.
+10. Huruf Quicksand disimpan sendiri di `aset/huruf/` (jangan kembali memakai Google Fonts).
 
 ## 4. Gaya tampilan
 - Semua teks untuk pengguna dalam Bahasa Indonesia.

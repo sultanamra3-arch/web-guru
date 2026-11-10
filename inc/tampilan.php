@@ -36,13 +36,19 @@ function kepala(string $judul, string $aktif = '', bool $polos = false): void
 <link rel="manifest" href="manifest.webmanifest?v=<?= VERSI ?>">
 <link rel="icon" href="aset/favicon.png?v=3">
 <link rel="apple-touch-icon" href="aset/apple-touch-icon.png?v=3">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
+<link rel="preload" href="aset/huruf/quicksand-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="aset/huruf/quicksand-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="aset/gaya.css?v=<?= VERSI ?>">
 <link rel="stylesheet" href="aset/guru.css?v=<?= VERSI ?>">
+<?php if ($u && !$polos): ?>
+<script type="speculationrules">
+<?= json_encode(siap_cepat_aturan(), JSON_UNESCAPED_SLASHES) ?>
+
+</script>
+<?php endif; ?>
 </head>
 <body class="<?= $polos ? 'polos' : '' ?>">
+<div id="garis-muat" class="garis-muat tak-cetak" aria-hidden="true"></div>
 <?php if (!$polos): ?>
 <header class="atas">
   <a class="merek" href="?p=beranda"><img src="aset/logo.png" alt="Logo"> <span><small><?= h((string)k('sekolah', 'SMP Negeri 6 Keritang')) ?></small><b>SiGuru</b></span></a>
@@ -182,3 +188,26 @@ function pilih_mapel(?string $nilai = '', bool $wajib = true, string $atribut = 
     $o .= '<input class="mapel-lain" placeholder="Tulis nama mapel" value="' . ($ada ? '' : h($nilai)) . '"' . ($ada ? ' hidden' : ' name="mapel"' . ($wajib ? ' required' : '')) . '>';
     return $o . '</span>';
 }
+
+/**
+ * Aturan "siapkan halaman lebih awal" (Speculation Rules, Chrome/Edge di HP & laptop).
+ * Halaman disiapkan saat jari menyentuh tautan (conservative), atau saat kursor diam di atasnya (moderate, laptop).
+ * Tautan yang mengunduh, mencetak, keluar, atau mengubah data TIDAK ikut disiapkan.
+ */
+function siap_cepat_aturan(): array
+{
+    $tolak = [
+        ['href_matches' => '/?*unduh=*'], ['href_matches' => '/?*word=*'], ['href_matches' => '/?*ganti=*'],
+        ['href_matches' => '/?*batal_tertib=*'], ['href_matches' => '/?*kaya=*'], ['href_matches' => '/?*cetak*'], ['href_matches' => '/?*hapus*'],
+        ['href_matches' => '/?p=keluar*'], ['href_matches' => '/?p=cadangan*'], ['href_matches' => '/?p=kuis_main*'],
+        ['href_matches' => '/?p=presentasi*'], ['href_matches' => '/?p=koreksi_lj*'], ['href_matches' => '/?p=gambar*'],
+        ['href_matches' => '/?p=tugas_foto*'], ['href_matches' => '/?p=api_*'],
+        ['selector_matches' => '[target], [download], [data-tanpa-siap], [onclick]'],
+    ];
+    $syarat = ['and' => array_merge([['href_matches' => '/?p=*']], array_map(fn($t) => ['not' => $t], $tolak))];
+    return [
+        'prerender' => [['where' => $syarat, 'eagerness' => 'conservative']],
+        'prefetch' => [['where' => $syarat, 'eagerness' => 'moderate']],
+    ];
+}
+

@@ -1,3 +1,7 @@
+/* Huruf Quicksand disimpan di server sendiri (tidak lagi mengambil dari Google) */
+@font-face{font-family:'Quicksand';font-style:normal;font-weight:500;font-display:swap;src:url(huruf/quicksand-500.woff2) format('woff2')}
+@font-face{font-family:'Quicksand';font-style:normal;font-weight:600;font-display:swap;src:url(huruf/quicksand-600.woff2) format('woff2')}
+@font-face{font-family:'Quicksand';font-style:normal;font-weight:700;font-display:swap;src:url(huruf/quicksand-700.woff2) format('woff2')}
 [hidden]{display:none!important}
 :root{
   /* Palet sama dengan katalog.otomasismpn6keritang.my.id */
@@ -199,3 +203,9 @@ button.emas{background:var(--emas);border-color:var(--emas);color:var(--navy2);m
 kbd{background:#eef1f8;border:1px solid var(--garis);border-bottom-width:2px;border-radius:6px;padding:0 .35rem;font:inherit;font-size:.85em}
 a.bookmarklet{display:inline-block;cursor:grab;padding:.7rem 1.1rem;background:var(--emas);color:var(--navy2);border-color:var(--emas);text-decoration:none}
 #manual{margin-top:.6rem}
+
+/* Garis tipis di atas layar saat halaman sedang dimuat */
+.garis-muat{position:fixed;top:0;left:0;height:3px;width:0;z-index:1000;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,var(--emas),var(--hijau-logo));box-shadow:0 0 6px rgba(242,194,48,.7)}
+.garis-muat.jalan{opacity:1;width:85%;transition:width 8s cubic-bezier(.08,.8,.2,1),opacity .2s}
+@media print{.garis-muat{display:none}}

@@ -2,6 +2,31 @@
   'use strict';
   if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
 
+  /* Garis muat: langsung bergerak saat menu/tautan ditekan atau formulir dikirim */
+  (function () {
+    var g = document.getElementById('garis-muat');
+    if (!g) return;
+    var batas;
+    function mulai() { g.classList.remove('jalan'); void g.offsetWidth; g.classList.add('jalan'); clearTimeout(batas); batas = setTimeout(henti, 12000); }
+    function henti() { g.classList.remove('jalan'); }
+    document.addEventListener('click', function (e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var a = e.target.closest && e.target.closest('a[href]');
+      if (!a || a.target || a.hasAttribute('download')) return;
+      var h = a.getAttribute('href') || '';
+      if (h.charAt(0) === '#' || /^(javascript|mailto|tel|whatsapp|intent):/i.test(h)) return;
+      try { var u = new URL(a.href, location.href); if (u.origin !== location.origin) return; if (/[?&](unduh|word|cetak)=/.test(u.search)) return; } catch (x) { return; }
+      setTimeout(function () { if (!e.defaultPrevented) mulai(); }, 0);
+    });
+    document.addEventListener('submit', function (e) {
+      var f = e.target;
+      if (f.target || /(unduh|cetak)/.test(f.action || '')) return;
+      setTimeout(function () { if (!e.defaultPrevented && !f.hasAttribute('data-ajax')) mulai(); }, 0);
+    });
+    window.addEventListener('pageshow', henti);
+    window.addEventListener('pagehide', function () { setTimeout(henti, 0); });
+  })();
+
   function el(tag, kelas, teks) { var e = document.createElement(tag); if (kelas) e.className = kelas; if (teks != null) e.textContent = teks; return e; }
   function $(s, r) { return (r || document).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
