@@ -6,6 +6,7 @@ bukan lagi TWA. Alasan: APK TWA 1.0 dan 1.0.1 terpasang tetapi tidak mau terbuka
 Ciri:
 - Membuka `https://guru.otomasismpn6keritang.my.id/?p=beranda` langsung di dalam aplikasi — tanpa Chrome, tanpa bilah alamat.
 - Semua alamat `*.otomasismpn6keritang.my.id` dibuka di dalam aplikasi; alamat lain dibuka di aplikasi luar.
+- Tombol "‹ SiGuru" (pojok kiri bawah) disisipkan aplikasi di semua halaman sekolah selain guru.* (bila halaman belum punya `.ke-siguru`/`.ke-siguru-tbh`).
 - Tanpa efek memantul (`OVER_SCROLL_NEVER`), tombol Kembali HP = kembali satu halaman.
 - `window.print()` diarahkan ke layanan cetak Android (bisa "Simpan sebagai PDF").
 - Unggah foto/berkas (kamera & galeri), kamera untuk pemindai (getUserMedia), unduhan lewat DownloadManager.

@@ -64,6 +64,17 @@ public class LauncherActivity extends Activity {
     static final String SISIP_CETAK =
             "window.print=function(){try{SiGuruApp.cetak(document.title||'SiGuru')}catch(e){}};";
 
+    /** Tombol "‹ SiGuru" di semua halaman sekolah selain SiGuru (kecuali bila halaman sudah punya tombolnya). */
+    static final String SISIP_KEMBALI =
+            "(function(){try{if(location.hostname.indexOf('guru.')===0)return;"
+            + "if(document.getElementById('siguru-kembali')||document.querySelector('.ke-siguru,.ke-siguru-tbh'))return;"
+            + "var b=document.body;if(!b)return;var a=document.createElement('a');a.id='siguru-kembali';"
+            + "a.href='" + AWAL + "';a.textContent='\u2039 SiGuru';"
+            + "a.setAttribute('style','position:fixed;left:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));"
+            + "z-index:2147483647;background:#2A2C84;color:#fff;font:600 14px/1 sans-serif;padding:11px 15px;"
+            + "border-radius:999px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25);border:2px solid #F2C230');"
+            + "b.appendChild(a);}catch(e){}})();";
+
     @Override
     protected void onCreate(Bundle simpanan) {
         super.onCreate(simpanan);
@@ -95,7 +106,7 @@ public class LauncherActivity extends Activity {
         s.setUseWideViewPort(true);
         s.setTextZoom(100);
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-        s.setUserAgentString(s.getUserAgentString() + " SiGuruAdminApp/1.1");
+        s.setUserAgentString(s.getUserAgentString() + " SiGuruAdminApp/1.2");
 
         CookieManager cm = CookieManager.getInstance();
         cm.setAcceptCookie(true);
@@ -163,7 +174,7 @@ public class LauncherActivity extends Activity {
 
         @Override
         public void onPageFinished(WebView v, String url) {
-            v.evaluateJavascript(SISIP_CETAK, null);
+            v.evaluateJavascript(SISIP_CETAK + SISIP_KEMBALI, null);
             bar.setVisibility(View.GONE);
             CookieManager.getInstance().flush();
         }
