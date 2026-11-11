@@ -97,4 +97,5 @@ if ($aksi === 'selesai' || $kunci_pengaman) {
     ujian_simpan_hitung($u, $p);
     balas_u(['ok' => true, 'selesai' => true]);
 }
-balas_u(['ok' => true, 'sisa' => max(0, $sisa), 'keluar' => (int)($set['keluar'] ?? $p['keluar'])]);
+// PENTING: jangan memakai nama 'keluar' untuk jumlah keluar halaman — 'keluar' = tanda sesi berakhir di HP siswa (v1.55)
+balas_u(['ok' => true, 'sisa' => max(0, $sisa), 'jml_keluar' => (int)($set['keluar'] ?? $p['keluar'])]);

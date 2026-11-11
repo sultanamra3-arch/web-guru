@@ -62,7 +62,7 @@
         if (r.token) D.token = r.token; // tersambung lagi memakai kunci lanjut
         if (r.ok && typeof r.sisa === 'number') sisa = r.sisa;
         if (r.selesai) { bersihLokal(); location.reload(); return r; }
-        if (r.keluar) {
+        if (r.keluar === true) {
           // jawaban yang belum terkirim tetap disimpan di HP, dikirim lagi setelah masuk ulang
           Object.keys(paket.jawab).forEach(function (i) { if (!(i in tunda.jawab)) tunda.jawab[i] = paket.jawab[i]; });
           Object.keys(paket.ragu).forEach(function (i) { if (!(i in tunda.ragu)) tunda.ragu[i] = paket.ragu[i]; });
@@ -174,7 +174,7 @@
     (function coba() {
       kirim('selesai').then(function (r) {
         if (r && (r.selesai || r.ok)) { bersihLokal(); try { localStorage.removeItem(KUNCI_LANJUT); } catch (e) { /* abaikan */ } location.reload(); return; }
-        if (r && r.keluar) { b.textContent = 'Masuk lagi untuk mengumpulkan…'; return; }
+        if (r && r.keluar === true) { b.textContent = 'Masuk lagi untuk mengumpulkan…'; return; }
         b.textContent = '⚠ Belum tersambung, mencoba lagi…';
         setTimeout(coba, 3000);
       });
@@ -220,7 +220,7 @@
       }
       $('tirai-keluar').hidden = false;
       // jawaban yang belum terkirim ikut dikirim bersama catatan keluar
-      kirim('keluar').then(function (r) { if (r && typeof r.keluar === 'number') D.keluar = r.keluar; });
+      kirim('keluar').then(function (r) { if (r && typeof r.jml_keluar === 'number') D.keluar = r.jml_keluar; });
     }
   });
   $('tutup-tirai').onclick = function () { $('tirai-keluar').hidden = true; };
