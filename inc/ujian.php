@@ -379,7 +379,11 @@ function ujian_kirim_penilaian(array $u, float $kktp, string $jenis = 'Ulangan H
         q('UPDATE guru_ujian SET penilaian_id = ? WHERE id = ?', [$pid, $u['id']]);
     }
     $n = 0;
+    // siswa yang sudah mengerjakan ujian susulan: nilai susulan yang dipakai (jangan ditimpa nilai ujian asal)
+    $susul = array_flip(array_map('strval', array_column(semua("SELECT p.kode FROM guru_ujian_peserta p JOIN guru_ujian s ON s.id = p.ujian_id
+        WHERE s.induk_id = ? AND s.tindak = 'susulan' AND p.selesai IS NOT NULL", [$u['id']]), 'kode')));
     foreach (semua('SELECT * FROM guru_ujian_peserta WHERE ujian_id = ?', [$u['id']]) as $p) {
+        if (isset($susul[(string)$p['kode']]) && ($u['tindak'] ?? '') !== 'susulan') continue;
         $nl = ujian_nilai_peserta($u, $p);
         if ($nl === null) continue;
         q('INSERT INTO guru_nilai (penilaian_id, member_id, nilai, catatan) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE nilai = VALUES(nilai), catatan = VALUES(catatan)',

@@ -139,6 +139,31 @@ if ($tindak):
     <button class="lebar">Buat ujian susulan (soal sama, khusus siswa ini)</button>
   </form>
   <?php endif; ?>
+  <?php // v1.56: susulan juga untuk siswa yang SUDAH ikut tetapi terganggu (mis. tidak sempat mengumpulkan). Disarankan: dikumpulkan otomatis & belum menjawab semua.
+    $n_soal_u = count($soal);
+    $ulang = [];
+    foreach ($peserta as $k => $p) {
+        if (empty($p['selesai']) || in_array((string)$k, $sudah_susul, true) || (($u['tindak'] ?? '') !== '')) continue;
+        $tj = count(array_filter((array)json_decode((string)$p['jawaban'], true), fn($v) => trim((string)$v) !== ''));
+        $ulang[(string)$k] = ['tj' => $tj, 'saran' => ($p['alasan'] ?? '') !== 'siswa' && $tj < $n_soal_u];
+    }
+    uasort($ulang, fn($a, $b) => [$b['saran'], $a['tj']] <=> [$a['saran'], $b['tj']]); ?>
+  <?php if ($ulang): ?>
+  <details class="tindak-blok"<?= array_filter(array_column($ulang, 'saran')) ? ' open' : '' ?>>
+    <summary><b>🕘 Susulan untuk siswa yang sudah ikut</b> <small class="redup">(terganggu / tidak sempat mengumpulkan)</small></summary>
+    <form method="post" style="margin-top:.5rem">
+      <?= input_token() ?><input type="hidden" name="aksi" value="susulan">
+      <p class="kecil redup" style="margin:0 0 .4rem">Yang dicentang otomatis = dikumpulkan sistem (bukan oleh siswa) dan belum menjawab semua soal. Siswa mengerjakan ulang dari awal; <b>nilai susulan menggantikan nilai lama</b> di Penilaian.</p>
+      <?php foreach ($ulang as $k => $x): ?>
+      <label style="display:flex;gap:.55rem;align-items:center;margin:.3rem 0;font-weight:400">
+        <input type="checkbox" name="kode[]" value="<?= h($k) ?>"<?= $x['saran'] ? ' checked' : '' ?> style="width:auto">
+        <span><?= h($nama[$k] ?? $k) ?> <small class="<?= $x['saran'] ? 'teks-merah' : 'redup' ?>">· terjawab <?= $x['tj'] ?>/<?= $n_soal_u ?><?= ($peserta[$k]['alasan'] ?? '') === 'siswa' ? '' : ' · dikumpulkan sistem' ?></small></span>
+      </label>
+      <?php endforeach; ?>
+      <button class="lebar" style="margin-top:.4rem">Buat ujian susulan untuk yang dicentang</button>
+    </form>
+  </details>
+  <?php endif; ?>
   <?php if (!$selesai): ?><p class="redup kecil">Muncul setelah ada siswa yang selesai.</p><?php else: ?>
   <form method="post" class="tindak-blok">
     <?= input_token() ?><input type="hidden" name="aksi" value="remedial">
