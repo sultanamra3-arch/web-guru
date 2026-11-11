@@ -86,6 +86,10 @@ $data = [
     'token' => token(),
     'kunci' => ujian_kunci_baru($id, (string)$kode),
 ];
+// v1.57: resi sudah diberikan sejak mulai mengerjakan (bukti bila HP bermasalah)
+$resi = resi_ujian($id, (string)$kode);
+$resi_wa = resi_teks_wa($resi, ujian_latihan($u) ? 'latihan' : 'ujian', (string)$u['judul'], (string)$u['mapel'], $nama, (string)$u['kelas'], '');
+$data['resi'] = $resi;
 ?>
 <div id="ujian" class="ujian-wadah">
   <header class="ujian-kop">
@@ -93,6 +97,7 @@ $data = [
     <div class="ujian-waktu" id="waktu">--:--</div>
   </header>
   <div class="ujian-status" id="status-simpan"></div>
+  <button type="button" class="ujian-resi" id="buka-resi">🧾 Resi: <b><?= h(resi_teks($resi)) ?></b> <span>· salin / kirim WA</span></button>
   <nav class="ujian-nomor" id="nomor"></nav>
   <div class="ujian-soal" id="soal"></div>
   <footer class="ujian-bawah">
@@ -104,6 +109,19 @@ $data = [
 <div class="ujian-tirai" id="tirai-keluar" hidden>
   <div class="kartu"><h3 id="judul-keluar">⚠ Kamu keluar dari halaman ujian</h3><p id="teks-keluar">Kejadian ini tercatat dan terlihat oleh guru. Tetap di halaman ini sampai selesai.</p>
     <button type="button" class="utama lebar" id="tutup-tirai">Lanjut mengerjakan</button></div>
+</div>
+<div class="ujian-tirai" id="tirai-resi" hidden>
+  <div class="kartu">
+    <h3 style="margin-top:0">🧾 Resi <?= ujian_latihan($u) ? 'latihanmu' : 'ujianmu' ?></h3>
+    <div class="resi-nomor" style="margin:.2rem 0 .5rem"><div><small class="redup">No. resi</small><b><?= h(resi_teks($resi)) ?></b></div></div>
+    <p class="kecil" style="margin:0 0 .6rem">Simpan resi ini. Kalau HP-mu bermasalah (macet, mati, baterai habis), tunjukkan resi ke guru: di sana terlihat berapa jawabanmu yang <b>sudah tersimpan</b>. Nanti nilai &amp; pembahasan juga dilihat lewat resi yang sama.</p>
+    <div class="dua-tombol">
+      <button type="button" data-salin="<?= h($resi_wa) ?>">Salin</button>
+      <a class="tombol" id="resi-wa" href="https://wa.me/?text=<?= h(rawurlencode($resi_wa)) ?>" target="_blank" rel="noopener">Kirim ke WA</a>
+    </div>
+    <p class="kecil redup" id="resi-wa-info" style="margin:.4rem 0 0">Kirim ke WA boleh <b>satu kali</b> tanpa dihitung keluar halaman. Pilih chat dirimu sendiri / orang tua.</p>
+    <button type="button" class="utama lebar" id="tutup-resi" style="margin-top:.7rem">Lanjut ke soal</button>
+  </div>
 </div>
 <div class="ujian-tirai" id="tirai-selesai" hidden>
   <div class="kartu"><h3>Kumpulkan jawaban?</h3><p id="ringkas-selesai"></p>

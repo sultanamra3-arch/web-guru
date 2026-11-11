@@ -147,7 +147,11 @@ function resi_data_ujian(string $r): ?array
     if ($p['mulai']) $d['langkah'][] = ['ok', $lat && (int)$p['percobaan'] > 1 ? 'Mulai mengerjakan (percobaan ke-' . (int)$p['percobaan'] . ')' : 'Mulai mengerjakan', ujian_waktu_teks((string)$p['mulai'])];
     if (!$p['selesai']) {
         $d['status'] = ['Sedang mengerjakan', 'kuning'];
-        $d['langkah'][] = ['tunggu', 'Belum dikumpulkan', 'Siswa sedang mengerjakan lagi (dibuka ulang guru atau latihan diulang).'];
+        $n_soal = count(ujian_soal($u));
+        $n_jawab = count(array_filter(json_decode((string)$p['jawaban'], true) ?: [], fn($v) => trim((string)$v) !== ''));
+        $d['langkah'][] = ['tunggu', 'Sedang mengerjakan · ' . $n_jawab . ' dari ' . $n_soal . ' jawaban tersimpan di server',
+            'Terakhir tersambung ' . ujian_waktu_teks((string)($p['terakhir'] ?: $p['mulai'])) . ($p['batas'] ? ' · batas waktu ' . substr((string)$p['batas'], 11, 5) : '')];
+        $d['langkah'][] = ['kosong', 'Dikumpulkan', ''];
         $d['langkah'][] = ['kosong', 'Nilai keluar', ''];
         return $d;
     }

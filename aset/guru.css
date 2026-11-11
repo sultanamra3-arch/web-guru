@@ -837,3 +837,6 @@ html.apl,html.apl body{overscroll-behavior:none}
 html,body{overscroll-behavior:none}
 .langkah-pasang{padding-left:1.2rem;margin:.3rem 0}
 .langkah-pasang li{margin:.35rem 0}
+/* v1.57 resi di lembar ujian */
+.ujian-resi{display:block;width:100%;text-align:left;background:#EAF6FD;border:0;border-bottom:1px solid var(--garis,#E3E8F2);border-radius:0;color:#1B1D5E;font-size:.8rem;padding:.35rem .9rem;margin:0;font-weight:400;cursor:pointer}
+.ujian-resi b{letter-spacing:.04em}.ujian-resi span{color:var(--redup,#5B6382)}

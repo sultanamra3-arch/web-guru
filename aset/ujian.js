@@ -205,9 +205,11 @@
   setInterval(function () { if (!mengirim) kirim('detak'); }, 30000);
 
   /* ---------- keluar layar ---------- */
-  var pernahSembunyi = false;
+  var pernahSembunyi = false, abaikanSekali = false;
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'hidden') { pernahSembunyi = true; return; }
+    // kembali dari WhatsApp setelah menekan "Kirim ke WA" resi (hanya sekali per ujian): tidak dihitung keluar
+    if (pernahSembunyi && abaikanSekali) { pernahSembunyi = false; abaikanSekali = false; return; }
     if (pernahSembunyi && !selesaiDikirim && !putus) {
       pernahSembunyi = false;
       D.keluar = (D.keluar || 0) + 1;
@@ -224,6 +226,28 @@
     }
   });
   $('tutup-tirai').onclick = function () { $('tirai-keluar').hidden = true; };
+
+  /* ---------- resi (v1.57): muncul sekali saat mulai, bisa dibuka lagi dari baris resi ---------- */
+  var KUNCI_RESI = 'sgu-resi-' + D.id + '-' + (D.resi || ''), sudahWA = false;
+  try { sudahWA = localStorage.getItem(KUNCI_RESI + '-wa') === '1'; } catch (e) { /* abaikan */ }
+  function aturTombolWA() {
+    if (!sudahWA) return;
+    $('resi-wa').hidden = true;
+    $('resi-wa-info').textContent = 'Resi sudah dikirim ke WA. Kirim lagi tidak bisa selama ujian (agar tidak keluar halaman) — pakai Salin atau foto layar ini.';
+  }
+  if ($('tirai-resi')) {
+    aturTombolWA();
+    $('buka-resi').onclick = function () { $('tirai-resi').hidden = false; };
+    $('tutup-resi').onclick = function () { $('tirai-resi').hidden = true; };
+    $('resi-wa').addEventListener('click', function () {
+      abaikanSekali = true; sudahWA = true;
+      try { localStorage.setItem(KUNCI_RESI + '-wa', '1'); } catch (e) { /* abaikan */ }
+      setTimeout(aturTombolWA, 1500);
+    });
+    var sudahLihat = false;
+    try { sudahLihat = localStorage.getItem(KUNCI_RESI) === '1'; localStorage.setItem(KUNCI_RESI, '1'); } catch (e) { /* abaikan */ }
+    if (!sudahLihat) $('tirai-resi').hidden = false;
+  }
   window.addEventListener('online', function () { jadwalKirim(0); });
   window.addEventListener('beforeunload', function (e) { if (Object.keys(tunda.jawab).length) { simpanLokal(); e.preventDefault(); e.returnValue = ''; } });
 
