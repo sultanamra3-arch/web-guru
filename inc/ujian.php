@@ -43,12 +43,39 @@ function ujian_token_cocok(array $u, string $t): bool
     return $t !== '' && (hash_equals(ujian_token($u), $t) || ((int)$u['token_menit'] > 0 && hash_equals(ujian_token($u, -1), $t)));
 }
 
+/**
+ * Poin penilaian paket: poin per soal PG/B-S/isian, poin maksimal per soal uraian, rubrik uraian.
+ * Bawaan: angka yang terakhir dipakai guru (atau PG 1, uraian 5).
+ */
+function paket_poin(array $isi = []): array
+{
+    $pg = (float)($isi['poin_pg'] ?? 0) ?: (float)(setelan('poin_pg:' . uid()) ?: 1);
+    $ur = (float)($isi['poin_uraian'] ?? 0) ?: (float)(setelan('poin_uraian:' . uid()) ?: 5);
+    return ['pg' => max(0.5, min(50, $pg)), 'uraian' => max(0.5, min(100, $ur)), 'rubrik' => trim((string)($isi['rubrik'] ?? ''))];
+}
+
+/** Ingat angka poin terakhir guru sebagai bawaan berikutnya. */
+function paket_poin_ingat(float $pg, float $uraian): void
+{
+    setelan_simpan('poin_pg:' . uid(), (string)$pg);
+    setelan_simpan('poin_uraian:' . uid(), (string)$uraian);
+}
+
+/** Baca angka poin dari formulir (koma boleh), dibatasi wajar. */
+function poin_post(string $nama, float $bawaan, float $maks = 100): float
+{
+    $v = (float)str_replace(',', '.', (string)post($nama, (string)$bawaan));
+    return $v > 0 ? max(0.5, min($maks, round($v * 2) / 2)) : $bawaan;
+}
+
 /** Salin soal dari paket (dibekukan agar perubahan bank soal tidak mengubah ujian yang berjalan). */
-function ujian_soal_dari_paket(int $paket_id, float $poin_uraian): ?array
+function ujian_soal_dari_paket(int $paket_id, float $poin_uraian, ?float $poin_pg = null): ?array
 {
     $d = satu("SELECT * FROM guru_dokumen WHERE id = ? AND guru_id = ? AND jenis = 'paket'", [$paket_id, uid()]);
     if (!$d) return null;
     $cfg = json_decode((string)$d['isi'], true) ?: [];
+    $rubrik = trim((string)($cfg['rubrik'] ?? ''));
+    if ($poin_pg === null) $poin_pg = 1.0;
     $ids = array_values(array_filter(array_map('intval', (array)($cfg['ids'] ?? []))));
     if (!$ids) return [];
     $peta = [];
@@ -76,8 +103,8 @@ function ujian_soal_dari_paket(int $paket_id, float $poin_uraian): ?array
             'opsi' => $opsi,
             'kunci' => $kunci,
             'pembahasan' => (string)$s['pembahasan'],
-            'maks' => $tipe === 'esai' ? $poin_uraian : 1.0,
-        ];
+            'maks' => $tipe === 'esai' ? $poin_uraian : $poin_pg,
+        ] + ($tipe === 'esai' && $rubrik !== '' ? ['rubrik' => $rubrik] : []);
     }
     return $out;
 }
@@ -194,7 +221,8 @@ function ujian_nilai_ai(array $u, array $p): array
         if (($h['rinci'][$i]['status'] ?? '') !== 'perlu') continue;
         $no = (string)($i + 1);
         $daftar[] = ['no' => $no, 'jenis' => $x['tipe'] === 'isian' ? 'isian' : 'esai', 'maks' => $x['maks'],
-            'teks' => 'Soal: ' . $x['teks'] . ' Kunci/pedoman: ' . trim($x['kunci'] . ' ' . $x['pembahasan'])];
+            'teks' => 'Soal: ' . $x['teks'] . ' Kunci/pedoman: ' . trim($x['kunci'] . ' ' . $x['pembahasan'])
+                . (!empty($x['rubrik']) ? ' Rubrik penskoran guru (WAJIB diikuti, skala 0–' . ($x['maks'] + 0) . '): ' . preg_replace('/\s+/', ' ', (string)$x['rubrik']) : '')];
         $jawaban[$no] = (string)($jw[$i] ?? '');
     }
     if (!$daftar) return ['ok' => true, 'dinilai' => 0];
@@ -574,4 +602,28 @@ function ujian_pembahasan_html(array $u, array $p, array $h): string
   </ol>
 <?php
     return (string)ob_get_clean();
+}
+
+/** Kotak isian poin PG/uraian + rubrik untuk formulir paket. */
+function form_poin_paket(array $isi, int $n_obj, int $n_uraian): string
+{
+    $pp = paket_poin($isi);
+    $o = '<fieldset class="poin-ujian" data-obj="' . $n_obj . '" data-uraian="' . $n_uraian . '"><legend>Poin & rubrik penilaian</legend><div class="baris2">';
+    $o .= '<label>Poin per soal PG / B-S / isian<input type="number" name="poin_pg" min="0.5" max="50" step="0.5" inputmode="decimal" value="' . h((string)($pp['pg'] + 0)) . '"></label>';
+    $o .= '<label>Poin maksimal per soal uraian<input type="number" name="poin_uraian" min="0.5" max="100" step="0.5" inputmode="decimal" value="' . h((string)($pp['uraian'] + 0)) . '"></label></div>';
+    $o .= '<p class="kecil total-poin"></p>';
+    $o .= '<label>Rubrik penskoran uraian <small>(opsional; dipakai AI saat menyarankan skor & ikut tercetak di kunci)</small>'
+        . '<textarea name="rubrik" rows="5" placeholder="mis.&#10;7 = jawaban lengkap, tepat, disertai alasan/contoh logis&#10;5–6 = tepat tetapi kurang lengkap&#10;3–4 = sebagian benar&#10;1–2 = kurang tepat, ada usaha&#10;0 = tidak menjawab">' . h($pp['rubrik']) . '</textarea></label>';
+    return $o . '</fieldset>';
+}
+
+/** Simpan poin & rubrik dari formulir ke isi paket. */
+function poin_paket_dari_post(array $isi): array
+{
+    $pp = paket_poin($isi);
+    $isi['poin_pg'] = poin_post('poin_pg', $pp['pg'], 50);
+    $isi['poin_uraian'] = poin_post('poin_uraian', $pp['uraian']);
+    $isi['rubrik'] = mb_substr(trim((string)post('rubrik')), 0, 4000);
+    paket_poin_ingat($isi['poin_pg'], $isi['poin_uraian']);
+    return $isi;
 }

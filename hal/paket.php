@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (trim((string)post('judul')) === ''
         'mapel' => trim((string)post('mapel')), 'kelas' => trim((string)post('kelas')), 'waktu' => trim((string)post('waktu')),
         'jenis_ujian' => trim((string)post('jenis_ujian')), 'petunjuk' => trim((string)post('petunjuk')), 'acak' => post('acak') ? 1 : 0,
     ];
+    $isi = poin_paket_dari_post($isi);
     if (post('acak')) shuffle($isi['ids']);
     q("INSERT INTO guru_dokumen (guru_id, jenis, judul, mapel, kelas, isi, dibuat, diubah) VALUES (?, 'paket', ?, ?, ?, ?, ?, ?)",
         [uid(), mb_substr(trim((string)post('judul')), 0, 250), $isi['mapel'], mb_substr($isi['kelas'], 0, 20), json_encode($isi, JSON_UNESCAPED_UNICODE), sekarang(), sekarang()]);
@@ -49,6 +50,7 @@ judul_baris('Buat paket soal', '<a class="tombol" href="?p=soal">‹ Bank soal</
     <label>Petunjuk<textarea name="petunjuk" rows="3"><?= h((string)($lama['petunjuk'] ?? "Berdoalah sebelum mengerjakan.\nTulis nama dan kelas pada lembar jawaban.\nPilih satu jawaban yang paling tepat untuk soal pilihan ganda.")) ?></textarea></label>
     <label class="centang"><input type="checkbox" name="acak" value="1"<?= !empty($lama['acak']) ? ' checked' : '' ?>> Acak urutan soal</label>
   </fieldset>
+  <?php $n_ur = count(array_filter($soal, fn($s) => $s['tipe'] === 'esai')); echo form_poin_paket($lama, count($soal) - $n_ur, $n_ur); ?>
   <button class="utama lebar">Buat paket & lihat lembar soal</button>
 </form>
 <?php

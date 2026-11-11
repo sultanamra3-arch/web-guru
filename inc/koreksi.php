@@ -71,6 +71,10 @@ function koreksi_kunci_dari_paket(int $paket_id): ?string
     foreach (semua("SELECT * FROM guru_soal WHERE id IN ($tanda) AND guru_id = ?", array_merge($ids, [uid()])) as $s) $soal[(int)$s['id']] = $s;
     $baris = [];
     $no = 0;
+    $pp = paket_poin($cfg);
+    $f = fn($x) => (string)($x + 0);
+    $tg = fn(string $j) => $pp['pg'] == 1 && $j !== 'esai' ? ($j === 'pg' ? '' : "($j) ") : '(' . $j . ', ' . $f($j === 'esai' ? $pp['uraian'] : $pp['pg']) . ' poin) ';
+    $rubrik = $pp['rubrik'] !== '' ? ' Rubrik: ' . preg_replace('/\s+/', ' ', mb_substr($pp['rubrik'], 0, 500)) : '';
     foreach ($ids as $id) {
         if (!isset($soal[$id])) continue;
         $s = $soal[$id];
@@ -79,19 +83,19 @@ function koreksi_kunci_dari_paket(int $paket_id): ?string
         $opsi = json_decode((string)$s['opsi'], true) ?: [];
         switch ($s['tipe']) {
             case 'pg':
-                $baris[] = "$no. " . strtoupper(mb_substr($kunci, 0, 1));
+                $baris[] = "$no. " . $tg('pg') . strtoupper(mb_substr($kunci, 0, 1));
                 break;
             case 'bs':
                 $teks = $opsi[strtoupper($kunci)] ?? $kunci;
-                $baris[] = "$no. (bs) " . (preg_match('/^s/i', (string)$teks) ? 'S' : 'B');
+                $baris[] = "$no. " . $tg('bs') . (preg_match('/^s/i', (string)$teks) ? 'S' : 'B');
                 break;
             case 'isian':
-                $baris[] = "$no. (isian) " . preg_replace('/\s+/', ' ', $kunci);
+                $baris[] = "$no. " . $tg('isian') . preg_replace('/\s+/', ' ', $kunci);
                 break;
             default:
                 $pedoman = trim($kunci . ' ' . trim((string)$s['pembahasan']));
-                $baris[] = "$no. (esai, 10 poin) Soal: " . preg_replace('/\s+/', ' ', mb_substr((string)$s['pertanyaan'], 0, 300))
-                    . ' Pedoman: ' . preg_replace('/\s+/', ' ', mb_substr($pedoman, 0, 600));
+                $baris[] = "$no. " . $tg('esai') . "Soal: " . preg_replace('/\s+/', ' ', mb_substr((string)$s['pertanyaan'], 0, 300))
+                    . ' Pedoman: ' . preg_replace('/\s+/', ' ', mb_substr($pedoman, 0, 600)) . $rubrik;
         }
     }
     return implode("\n", $baris);

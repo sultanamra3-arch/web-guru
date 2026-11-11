@@ -40,14 +40,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($u) {
         $set = implode(', ', array_map(fn($k) => "$k = ?", array_keys($data)));
         q("UPDATE guru_ujian SET $set WHERE id = ?", array_merge(array_values($data), [$u['id']]));
+        if (!$sudah_mulai && !post('segarkan_soal') && (post('poin_pg') !== null || post('poin_uraian') !== null)) {
+            // ubah poin langsung di soal ujian ini (belum ada siswa yang mulai)
+            $snap = ujian_soal($u);
+            foreach ($snap as &$x) $x['maks'] = $x['tipe'] === 'esai' ? poin_post('poin_uraian', (float)$x['maks']) : poin_post('poin_pg', (float)$x['maks'], 50);
+            unset($x);
+            q('UPDATE guru_ujian SET soal = ? WHERE id = ?', [json_encode($snap, JSON_UNESCAPED_UNICODE), $u['id']]);
+            paket_poin_ingat(poin_post('poin_pg', 1, 50), poin_post('poin_uraian', 5));
+        }
         if (!$sudah_mulai && post('segarkan_soal') && $u['paket_id']) {
-            $s = ujian_soal_dari_paket((int)$u['paket_id'], max(1, (float)post('poin_uraian', 5)));
+            $s = ujian_soal_dari_paket((int)$u['paket_id'], poin_post('poin_uraian', 5), poin_post('poin_pg', 1, 50));
+            paket_poin_ingat(poin_post('poin_pg', 1, 50), poin_post('poin_uraian', 5));
             if ($s) q('UPDATE guru_ujian SET soal = ? WHERE id = ?', [json_encode($s, JSON_UNESCAPED_UNICODE), $u['id']]);
         }
         pesan('Pengaturan ujian disimpan.');
         ke('?p=ujian_lihat&id=' . $u['id']);
     }
-    $soal = ujian_soal_dari_paket($paket_id, max(1, (float)post('poin_uraian', 5)));
+    $soal = ujian_soal_dari_paket($paket_id, poin_post('poin_uraian', 5), poin_post('poin_pg', 1, 50));
+    paket_poin_ingat(poin_post('poin_pg', 1, 50), poin_post('poin_uraian', 5));
     if (!$soal) { pesan('Paket soal kosong.', 'galat'); ke('?p=ujian'); }
     $data += ['guru_id' => uid(), 'paket_id' => $paket_id, 'tahun' => tahun_aktif(), 'kode' => ujian_kode_baru(), 'rahasia' => bin2hex(random_bytes(16)),
         'status' => 'draf', 'soal' => json_encode($soal, JSON_UNESCAPED_UNICODE), 'dibuat' => sekarang()];
@@ -60,8 +70,22 @@ $v = fn($k, $d = '') => h((string)($u[$k] ?? $d));
 $tg = fn($k) => !empty($u[$k]) ? substr((string)$u[$k], 0, 10) : '';
 $jm = fn($k) => !empty($u[$k]) ? substr((string)$u[$k], 11, 5) : '';
 $jumlah = $u ? count(ujian_soal($u)) : count((array)($cfg['ids'] ?? []));
-$ada_uraian = $u ? (bool)array_filter(ujian_soal($u), fn($s) => $s['tipe'] === 'esai') : true;
-$poin = $u ? (float)(array_values(array_filter(ujian_soal($u), fn($s) => $s['tipe'] === 'esai'))[0]['maks'] ?? 5) : 5;
+// jumlah soal per jenis & poin (dari ujian yang ada, atau dari paket)
+if ($u) {
+    $tipe_soal = array_column(ujian_soal($u), 'tipe');
+    $snap = ujian_soal($u);
+    $poin = (float)(array_values(array_filter($snap, fn($s) => $s['tipe'] === 'esai'))[0]['maks'] ?? paket_poin($cfg)['uraian']);
+    $poin_pg = (float)(array_values(array_filter($snap, fn($s) => $s['tipe'] !== 'esai'))[0]['maks'] ?? paket_poin($cfg)['pg']);
+    $ada_rubrik = (bool)array_filter($snap, fn($s) => !empty($s['rubrik']));
+} else {
+    $idp = array_values(array_filter(array_map('intval', (array)($cfg['ids'] ?? []))));
+    $tipe_soal = $idp ? array_column(semua('SELECT tipe FROM guru_soal WHERE guru_id = ? AND id IN (' . implode(',', $idp) . ')', [uid()]), 'tipe') : [];
+    $pp = paket_poin($cfg);
+    [$poin, $poin_pg, $ada_rubrik] = [$pp['uraian'], $pp['pg'], $pp['rubrik'] !== ''];
+}
+$n_uraian = count(array_filter($tipe_soal, fn($t) => $t === 'esai'));
+$n_obj = count($tipe_soal) - $n_uraian;
+$ada_uraian = $n_uraian > 0;
 
 kepala($u ? 'Pengaturan ujian' : 'Ujian online baru', 'kelas');
 judul_baris($u ? 'Pengaturan ujian' : 'Ujian online baru', '<a class="tombol" href="' . ($u ? '?p=ujian_lihat&amp;id=' . $u['id'] : '?p=ujian') . '">‹ Kembali</a>');
@@ -87,8 +111,15 @@ judul_baris($u ? 'Pengaturan ujian' : 'Ujian online baru', '<a class="tombol" hr
     <label>Batas akhir (opsional)<span class="tgl-jam"><input type="date" name="selesai_tgl" value="<?= $tg('selesai') ?>"><input type="text" class="jam24" inputmode="numeric" maxlength="5" pattern="([01]?\d|2[0-3])[:.][0-5]\d" placeholder="07:30" autocomplete="off" name="selesai_jam" value="<?= $jm('selesai') ?>" aria-label="jam batas"></span></label>
     <p class="kecil redup" id="info-jadwal" hidden></p>
     <label class="centang"><input type="checkbox" name="tutup_otomatis" value="1" <?= ($u['tutup_otomatis'] ?? 1) ? 'checked' : '' ?>> <span><b>Tutup otomatis</b> saat batas akhir lewat (atau, bila tanpa batas akhir, saat semua siswa sudah mengumpulkan). Nilai langsung masuk ke Penilaian.</span></label>
-  <?php if ($ada_uraian && !$sudah_mulai): ?>
-  <label>Poin per soal uraian (PG/isian = 1 poin)<input type="number" name="poin_uraian" min="1" max="50" step="0.5" value="<?= h((string)$poin) ?>"></label>
+  <?php if (!$sudah_mulai): ?>
+  <fieldset class="poin-ujian" data-obj="<?= $n_obj ?>" data-uraian="<?= $n_uraian ?>"><legend>Poin penilaian</legend>
+    <div class="baris2">
+      <?php if ($n_obj): ?><label>Poin per soal PG / B-S / isian<input type="number" name="poin_pg" min="0.5" max="50" step="0.5" value="<?= h((string)($poin_pg + 0)) ?>" inputmode="decimal"></label><?php endif; ?>
+      <?php if ($ada_uraian): ?><label>Poin maksimal per soal uraian<input type="number" name="poin_uraian" min="0.5" max="100" step="0.5" value="<?= h((string)($poin + 0)) ?>" inputmode="decimal"></label><?php endif; ?>
+    </div>
+    <p class="kecil" id="total-poin"></p>
+    <?php if ($ada_uraian): ?><p class="kecil redup" style="margin:0"><?= $ada_rubrik ? '✓ Rubrik penskoran uraian dari paket ikut dipakai AI saat menyarankan skor.' : 'Belum ada rubrik penskoran uraian. Tambahkan di paket soal → Ubah kop paket.' ?></p><?php endif; ?>
+  </fieldset>
   <?php endif; ?>
   <label class="centang"><input type="checkbox" name="acak_soal" value="1" <?= ($u['acak_soal'] ?? 1) ? 'checked' : '' ?>> Acak urutan soal per siswa</label>
   <label class="centang"><input type="checkbox" name="acak_opsi" value="1" <?= ($u['acak_opsi'] ?? 1) ? 'checked' : '' ?>> Acak urutan pilihan jawaban (A–E)</label>

@@ -418,3 +418,30 @@
     s.addEventListener('change', function () { atur(s); if (s.value === '__lain') s.parentNode.querySelector('.mapel-lain').focus(); });
   });
 })();
+
+/* Poin penilaian: tampilkan skor maksimal (n PG × poin + n uraian × poin) */
+(function () {
+  document.querySelectorAll('.poin-ujian').forEach(function (f) {
+    var nObj = +f.dataset.obj || 0, nUr = +f.dataset.uraian || 0, out = f.querySelector('#total-poin, .total-poin');
+    if (!out) return;
+    function angka(n) { return String(Math.round(n * 100) / 100).replace('.', ','); }
+    function hitung() {
+      var pg = f.querySelector('[name=poin_pg]'), ur = f.querySelector('[name=poin_uraian]');
+      var a = nObj * (pg ? +String(pg.value).replace(',', '.') || 0 : 0), b = nUr * (ur ? +String(ur.value).replace(',', '.') || 0 : 0);
+      var bag = [];
+      if (nObj) bag.push(nObj + ' PG/isian × ' + angka(pg ? +String(pg.value).replace(',', '.') || 0 : 0));
+      if (nUr) bag.push(nUr + ' uraian × ' + angka(ur ? +String(ur.value).replace(',', '.') || 0 : 0));
+      var t = a + b;
+      out.innerHTML = 'Skor maksimal: ' + bag.join(' + ') + ' = <b>' + angka(t) + '</b>' + (t > 0 ? (Math.abs(t - 100) < 0.01 ? ' · nilai = jumlah skor' : ' · nilai = skor ÷ ' + angka(t) + ' × 100') : '');
+    }
+    f.addEventListener('input', hitung); hitung();
+  });
+})();
+
+/* Tempel soal: bentuk soal diganti → tampil/sembunyikan pilihan jawaban */
+document.querySelectorAll('.soal-tempel .st-tipe').forEach(function (s) {
+  s.addEventListener('change', function () {
+    var o = s.closest('.soal-tempel').querySelector('.st-opsi');
+    if (o) o.hidden = !(s.value === 'pg' || s.value === 'bs');
+  });
+});

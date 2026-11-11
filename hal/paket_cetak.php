@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($aksi === 'kop') {
         foreach (['mapel', 'kelas', 'waktu', 'jenis_ujian', 'petunjuk'] as $k) $isi[$k] = trim((string)post($k));
+        $isi = poin_paket_dari_post($isi);
         $judul = mb_substr(trim((string)post('judul')) ?: $d['judul'], 0, 250);
         q('UPDATE guru_dokumen SET judul = ?, mapel = ?, kelas = ?, isi = ?, diubah = ? WHERE id = ?',
             [$judul, $isi['mapel'], mb_substr($isi['kelas'], 0, 20), json_encode($isi, JSON_UNESCAPED_UNICODE), sekarang(), $id]);
@@ -43,6 +44,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $peta = [];
 if ($ids) foreach (semua('SELECT * FROM guru_soal WHERE guru_id = ? AND id IN (' . implode(',', $ids) . ')', [uid()]) as $s) $peta[$s['id']] = $s;
 $soal = array_values(array_filter(array_map(fn($i) => $peta[$i] ?? null, $ids)));
+
+/** Bagian "Pedoman penskoran" di lembar kunci: poin per jenis, skor maksimal, rubrik uraian. */
+function pedoman_skor_html(array $isi, array $soal): string
+{
+    $pp = paket_poin($isi);
+    $n_ur = count(array_filter($soal, fn($s) => $s['tipe'] === 'esai'));
+    $n_obj = count($soal) - $n_ur;
+    $maks = $n_obj * $pp['pg'] + $n_ur * $pp['uraian'];
+    $f = fn($x) => str_replace('.', ',', (string)($x + 0));
+    $o = '<h3 class="bagian-soal">Pedoman Penskoran</h3><ul class="pedoman-skor">';
+    if ($n_obj) $o .= '<li>Pilihan ganda / benar-salah / isian: setiap jawaban benar = <b>' . $f($pp['pg']) . '</b>, salah/kosong = 0. Skor maksimal = ' . $n_obj . ' × ' . $f($pp['pg']) . ' = ' . $f($n_obj * $pp['pg']) . '.</li>';
+    if ($n_ur) $o .= '<li>Uraian: skor 0–<b>' . $f($pp['uraian']) . '</b> per soal. Skor maksimal = ' . $n_ur . ' × ' . $f($pp['uraian']) . ' = ' . $f($n_ur * $pp['uraian']) . '.</li>';
+    $o .= '<li>Nilai = ' . (abs($maks - 100) < 0.01 ? 'jumlah seluruh skor (maksimal 100)' : 'jumlah skor ÷ ' . $f($maks) . ' × 100') . '.</li></ul>';
+    if ($n_ur && $pp['rubrik'] !== '') $o .= '<p><b>Rubrik penskoran uraian (per soal):</b></p><div class="rubrik-cetak">' . nl2br(h($pp['rubrik'])) . '</div>';
+    return $o;
+}
 
 function lembar_soal(array $d, array $isi, array $soal, bool $kunci, bool $word = false): string
 {
@@ -75,6 +92,7 @@ function lembar_soal(array $d, array $isi, array $soal, bool $kunci, bool $word 
       </div>
     </div>
   <?php endforeach; ?>
+  <?php if ($kunci): echo pedoman_skor_html($isi, $soal); endif; ?>
 </div>
 <?php
     return (string)ob_get_clean();
@@ -126,7 +144,7 @@ kepala($d['judul'], 'soal');
 </details>
 
 <details class="kartu tak-cetak">
-  <summary><b>✎ Ubah kop paket</b> <span class="kecil redup">(judul, mapel, kelas, waktu, petunjuk)</span></summary>
+  <summary><b>✎ Ubah kop paket</b> <span class="kecil redup">(judul, mapel, kelas, waktu, petunjuk, poin & rubrik)</span></summary>
   <form method="post" class="formulir" style="margin-top:.6rem">
     <?= input_token() ?><input type="hidden" name="aksi" value="kop">
     <label>Judul paket<input name="judul" required value="<?= h($d['judul']) ?>"></label>
@@ -137,6 +155,7 @@ kepala($d['judul'], 'soal');
       <label>Waktu<input name="waktu" value="<?= h($isi['waktu'] ?? '') ?>"></label>
     </div>
     <label>Petunjuk<textarea name="petunjuk" rows="3"><?= h($isi['petunjuk'] ?? '') ?></textarea></label>
+    <?php $n_ur = count(array_filter($soal, fn($s) => $s['tipe'] === 'esai')); echo form_poin_paket($isi, count($soal) - $n_ur, $n_ur); ?>
     <button class="utama">Simpan kop</button>
   </form>
 </details>

@@ -45,7 +45,7 @@ $mapel_list = q('SELECT DISTINCT mapel FROM guru_soal WHERE guru_id = ? ORDER BY
 $paket = semua("SELECT id, judul, diubah FROM guru_dokumen WHERE guru_id = ? AND jenis = 'paket' ORDER BY diubah DESC", [uid()]);
 
 kepala('Soal', 'perangkat');
-judul_baris('Perangkat ajar', '<a class="tombol kecil" href="?p=soal_manual">＋ Manual</a> <a class="tombol kecil utama" href="?p=soal_ai">' . ikon('ai') . ' Soal AI</a>');
+judul_baris('Perangkat ajar', '<a class="tombol kecil" href="?p=soal_tempel">' . ikon('tempel') . ' Tempel</a> <a class="tombol kecil" href="?p=soal_manual">＋ Manual</a> <a class="tombol kecil utama" href="?p=soal_ai">' . ikon('ai') . ' Soal AI</a>');
 tab_perangkat('soal');
 ?>
 <form class="cari-soal" method="get">

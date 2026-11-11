@@ -9,6 +9,7 @@ require __DIR__ . '/inc/ikon.php';
 require __DIR__ . '/inc/tampilan.php';
 require __DIR__ . '/inc/guru_ai.php';
 require __DIR__ . '/inc/koreksi.php';
+require __DIR__ . '/inc/tempel.php';
 require __DIR__ . '/inc/gambar.php';
 require __DIR__ . '/inc/ujian.php';
 require __DIR__ . '/inc/tugas.php';
@@ -29,7 +30,7 @@ mulai_sesi();
 $halaman = [
     'masuk', 'keluar', 'beranda', 'lainnya', 'akun', 'profil', 'pengaturan_ai',
     'kelas', 'erapor', 'cadangan', 'siswa', 'siswa_tambah', 'siswa_ubah', 'siswa_naik', 'jadwal', 'absensi', 'absensi_rekap', 'penilaian', 'nilai', 'nilai_rekap', 'kelompok', 'resi', 'rekap_cetak', 'kelas_lihat', 'cari', 'ke_pustaka', 'apk', 'koreksi', 'koreksi_lj', 'koreksi_lihat',
-    'soal', 'soal_form', 'soal_manual', 'soal_ai', 'paket', 'paket_cetak', 'kisi',
+    'soal', 'soal_form', 'soal_manual', 'soal_ai', 'soal_tempel', 'paket', 'paket_cetak', 'kisi',
     'perangkat', 'dokumen', 'dokumen_buat', 'dokumen_lihat', 'presentasi',
     'sertifikat', 'sertifikat_form', 'sertifikat_cetak',
     'ujian', 'ujian_form', 'ujian_lihat', 'ujian_hasil', 'ujian_jawaban', 'u', 'u_kerja', 'gambar',

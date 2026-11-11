@@ -13,7 +13,7 @@ const MENU = [
 /** Isi lembar "＋ Buat" (judul, ikon, alamat). */
 const MENU_BUAT = [
     ['Absen', 'absensi', '?p=absensi'], ['Ujian', 'ujian', '?p=ujian'], ['Tugas', 'tugas', '?p=tugas_form'], ['Kuis cepat', 'kuis', '?p=kuis'],
-    ['Soal AI', 'ai', '?p=soal_ai'], ['Modul ajar', 'modul', '?p=dokumen_buat&jenis=modul'], ['Presentasi', 'presentasi', '?p=dokumen_buat&jenis=presentasi'], ['Kisi-kisi', 'kisi', '?p=kisi'],
+    ['Soal AI', 'ai', '?p=soal_ai'], ['Tempel soal', 'tempel', '?p=soal_tempel'], ['Modul ajar', 'modul', '?p=dokumen_buat&jenis=modul'], ['Presentasi', 'presentasi', '?p=dokumen_buat&jenis=presentasi'], ['Kisi-kisi', 'kisi', '?p=kisi'],
 ];
 
 /** Inisial nama tanpa gelar: "Budi Santoso, S.Pd." → "BS" */

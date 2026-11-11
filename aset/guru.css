@@ -840,3 +840,20 @@ html,body{overscroll-behavior:none}
 /* v1.57 resi di lembar ujian */
 .ujian-resi{display:block;width:100%;text-align:left;background:#EAF6FD;border:0;border-bottom:1px solid var(--garis,#E3E8F2);border-radius:0;color:#1B1D5E;font-size:.8rem;padding:.35rem .9rem;margin:0;font-weight:400;cursor:pointer}
 .ujian-resi b{letter-spacing:.04em}.ujian-resi span{color:var(--redup,#5B6382)}
+/* Tempel soal */
+.tanda-teks{color:#1F7A3A;font-size:.82rem;font-weight:700;white-space:nowrap}
+.tanda-ai{background:#FFF4D6;color:#7A5300;font-size:.82rem;font-weight:700;border-radius:.4rem;padding:0 .35rem}
+.tanda-kosong{color:var(--merah);font-size:.82rem;font-weight:700}
+.soal-tempel{padding:.8rem .9rem}
+.soal-tempel.ada-ai{border-left:4px solid #F2C230}
+.st-atas{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.4rem}
+.st-atas .centang{margin:0}
+.st-atas select{width:auto;max-width:55%}
+.st-opsi{display:grid;gap:.3rem;margin:.4rem 0}
+.st-opsi-baris{display:flex;align-items:center;gap:.5rem;margin:0}
+.st-opsi-baris input{flex:1;min-width:0}
+.st-kunci-label>span{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+.gambar-opsi-kecil{max-height:3rem;max-width:5rem}
+.ringkas-tempel{line-height:1.7}
+.pedoman-skor{margin:.3rem 0 .6rem;padding-left:1.2rem}
+.rubrik-cetak{border:1px solid #bbb;padding:.4rem .6rem;margin-bottom:.6rem}
