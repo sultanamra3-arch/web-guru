@@ -75,6 +75,21 @@ public class LauncherActivity extends Activity {
             + "border-radius:999px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25);border:2px solid #F2C230');"
             + "b.appendChild(a);}catch(e){}})();";
 
+    /** Pengganti navigator.share (WebView tidak punya) dan unduhan gambar/berkas buatan halaman (blob:/data:). */
+    static final String SISIP_BAGIKAN =
+            "(function(){if(window.__sgApp)return;window.__sgApp=1;"
+            + "function b64(b){return new Promise(function(ok,no){var r=new FileReader();"
+            + "r.onload=function(){var s=String(r.result);ok(s.slice(s.indexOf(',')+1))};r.onerror=no;r.readAsDataURL(b)})}"
+            + "try{navigator.canShare=function(d){return !!d};"
+            + "navigator.share=function(d){d=d||{};var t=[d.text,d.url].filter(Boolean).join('\\n');"
+            + "var f=d.files&&d.files[0];return (f?b64(f):Promise.resolve('')).then(function(s){"
+            + "SiGuruApp.bagikan(s,f?(f.type||'application/octet-stream'):'',f?(f.name||'berkas'):'',t,d.title||'')})};}catch(e){}"
+            + "document.addEventListener('click',function(e){var a=e.target&&e.target.closest?e.target.closest('a[download]'):null;"
+            + "if(!a)return;var h=a.getAttribute('href')||'';if(!/^(blob:|data:)/.test(h))return;"
+            + "e.preventDefault();e.stopPropagation();var n=a.getAttribute('download')||'berkas';"
+            + "fetch(h).then(function(r){return r.blob()}).then(function(bl){return b64(bl).then(function(s){"
+            + "SiGuruApp.simpan(s,bl.type||'application/octet-stream',n)})}).catch(function(){})},true);})();";
+
     @Override
     protected void onCreate(Bundle simpanan) {
         super.onCreate(simpanan);
@@ -106,7 +121,7 @@ public class LauncherActivity extends Activity {
         s.setUseWideViewPort(true);
         s.setTextZoom(100);
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-        s.setUserAgentString(s.getUserAgentString() + " SiGuruApp/1.3 SiGuruAdminApp");
+        s.setUserAgentString(s.getUserAgentString() + " SiGuruApp/1.4 SiGuruAdminApp");
 
         CookieManager cm = CookieManager.getInstance();
         cm.setAcceptCookie(true);
@@ -169,12 +184,12 @@ public class LauncherActivity extends Activity {
 
         @Override
         public void onPageCommitVisible(WebView v, String url) {
-            v.evaluateJavascript(SISIP_CETAK, null);
+            v.evaluateJavascript(SISIP_CETAK + SISIP_BAGIKAN, null);
         }
 
         @Override
         public void onPageFinished(WebView v, String url) {
-            v.evaluateJavascript(SISIP_CETAK + SISIP_KEMBALI, null);
+            v.evaluateJavascript(SISIP_CETAK + SISIP_BAGIKAN + SISIP_KEMBALI, null);
             bar.setVisibility(View.GONE);
             CookieManager.getInstance().flush();
         }
@@ -396,8 +411,83 @@ public class LauncherActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void bagikan(String b64, String mime, String nama, String teks, String judul) {
+            runOnUiThread(() -> {
+                try {
+                    Intent i = new Intent(Intent.ACTION_SEND);
+                    if (b64 != null && !b64.isEmpty()) {
+                        File f = tulisCache(b64, nama);
+                        Uri u = FileProvider.getUriForFile(LauncherActivity.this, getPackageName() + ".berkas", f);
+                        i.setType(mime == null || mime.isEmpty() ? "application/octet-stream" : mime);
+                        i.putExtra(Intent.EXTRA_STREAM, u);
+                        i.setClipData(android.content.ClipData.newRawUri("", u));
+                        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    } else {
+                        i.setType("text/plain");
+                    }
+                    if (teks != null && !teks.isEmpty()) i.putExtra(Intent.EXTRA_TEXT, teks);
+                    if (judul != null && !judul.isEmpty()) i.putExtra(Intent.EXTRA_SUBJECT, judul);
+                    startActivity(Intent.createChooser(i, "Bagikan lewat"));
+                } catch (Exception e) {
+                    Toast.makeText(LauncherActivity.this, "Gagal membagikan", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void simpan(String b64, String mime, String nama) {
+            runOnUiThread(() -> simpanBerkas(b64, mime, nama));
+        }
+
+        @JavascriptInterface
         public void ulang() {
             runOnUiThread(() -> web.loadUrl(urlGagal));
+        }
+    }
+
+    static String namaAman(String n) {
+        String s = (n == null ? "" : n).replaceAll("[^A-Za-z0-9._ -]", "_").trim();
+        return s.isEmpty() ? "berkas" : s;
+    }
+
+    File tulisCache(String b64, String nama) throws Exception {
+        File dir = new File(getCacheDir(), "bagikan");
+        if (!dir.exists()) dir.mkdirs();
+        File[] lama = dir.listFiles();
+        if (lama != null) for (File x : lama) x.delete();
+        File f = new File(dir, namaAman(nama));
+        try (java.io.FileOutputStream o = new java.io.FileOutputStream(f)) {
+            o.write(android.util.Base64.decode(b64, android.util.Base64.DEFAULT));
+        }
+        return f;
+    }
+
+    void simpanBerkas(String b64, String mime, String nama) {
+        String n = namaAman(nama);
+        if (mime == null || mime.isEmpty()) mime = "application/octet-stream";
+        try {
+            if (Build.VERSION.SDK_INT >= 29) {
+                boolean gambar = mime.startsWith("image/");
+                android.content.ContentValues cv = new android.content.ContentValues();
+                cv.put(MediaStore.MediaColumns.DISPLAY_NAME, n);
+                cv.put(MediaStore.MediaColumns.MIME_TYPE, mime);
+                cv.put(MediaStore.MediaColumns.RELATIVE_PATH,
+                        (gambar ? Environment.DIRECTORY_PICTURES : Environment.DIRECTORY_DOWNLOADS) + "/SiGuru");
+                Uri koleksi = gambar ? MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                        : MediaStore.Downloads.EXTERNAL_CONTENT_URI;
+                Uri u = getContentResolver().insert(koleksi, cv);
+                if (u == null) throw new Exception("insert");
+                try (java.io.OutputStream o = getContentResolver().openOutputStream(u)) {
+                    o.write(android.util.Base64.decode(b64, android.util.Base64.DEFAULT));
+                }
+                Toast.makeText(this, gambar ? "Gambar disimpan di Galeri (folder SiGuru)"
+                        : "Disimpan di folder Download/SiGuru", Toast.LENGTH_LONG).show();
+            } else {
+                // HP lama: tawarkan lewat menu Bagikan (bisa dipilih "Simpan ke ...")
+                new Jembatan().bagikan(b64, mime, n, "", n);
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Gagal menyimpan berkas", Toast.LENGTH_SHORT).show();
         }
     }
 

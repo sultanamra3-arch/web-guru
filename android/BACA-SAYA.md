@@ -9,6 +9,7 @@ Ciri:
 - Tombol "‹ SiGuru" (pojok kiri bawah) disisipkan aplikasi di semua halaman sekolah selain guru.* (bila halaman belum punya `.ke-siguru`/`.ke-siguru-tbh`).
 - **Tidak bisa dicubit-perbesar** (permintaan pengguna 11 Nov; jangan nyalakan `setBuiltInZoomControls`).
 - Tanpa efek memantul (`OVER_SCROLL_NEVER`), tombol Kembali HP = kembali satu halaman.
+- `navigator.share` (gambar+teks) diganti jembatan `SiGuruApp.bagikan` → menu Bagikan Android; tautan unduh `blob:`/`data:` disimpan lewat `SiGuruApp.simpan` (gambar → Galeri/Pictures/SiGuru, lainnya → Download/SiGuru). (APK 1.4)
 - `window.print()` diarahkan ke layanan cetak Android (bisa "Simpan sebagai PDF").
 - Unggah foto/berkas (kamera & galeri), kamera untuk pemindai (getUserMedia), unduhan lewat DownloadManager.
 - Bila aplikasi sempat tertutup sendiri, pesan galatnya tampil saat dibuka lagi (untuk dikirim ke Claude).
