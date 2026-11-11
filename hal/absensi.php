@@ -22,8 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $siswa = array_column(siswa_kelas($kelas), 'member_id');
         if (post('aksi') === 'hapus') {
+            sampah_simpan('absensi', 'Absensi ' . $kelas . ' · ' . tgl($tanggal) . ($mapel !== '' ? ' · ' . $mapel : ''),
+                [sampah_baris('guru_absensi', 'guru_id = ? AND kelas = ? AND tanggal = ? AND mapel = ?', [uid(), $kelas, $tanggal, $mapel])]);
             $n = q('DELETE FROM guru_absensi WHERE guru_id = ? AND kelas = ? AND tanggal = ? AND mapel = ?', [uid(), $kelas, $tanggal, $mapel])->rowCount();
-            pesan('Absensi kelas ' . h($kelas) . ' tanggal ' . h(tgl($tanggal)) . ' dihapus (' . $n . ' siswa). Tanggal ini kembali "belum diisi".');
+            pesan('Absensi kelas ' . h($kelas) . ' tanggal ' . h(tgl($tanggal)) . ' dihapus (' . $n . ' siswa) dan dipindah ke Sampah. Tanggal ini kembali "belum diisi".');
             ke('?' . http_build_query(['p' => 'absensi', 'kelas' => $kelas, 'tanggal' => $tanggal, 'mapel' => $mapel]));
         }
         $st = (array)($_POST['status'] ?? []);
@@ -142,7 +144,7 @@ judul_baris('Absensi siswa', '<a class="tombol" href="?p=absensi_rekap&amp;kelas
   <button class="utama lebar">Simpan absensi (<?= count($siswa) ?> siswa)</button>
 </form>
 <?php if ($ada): ?>
-<form method="post" class="hapus-absen" onsubmit="return confirm('Hapus absensi kelas <?= h($kelas) ?> tanggal <?= h(tgl($tanggal)) ?>? Tanggal ini akan kembali \'belum diisi\' dan tidak dihitung di rekap.')">
+<form method="post" class="hapus-absen" onsubmit="return confirm('Hapus absensi kelas <?= h($kelas) ?> tanggal <?= h(tgl($tanggal)) ?>? Tanggal ini akan kembali \'belum diisi\' dan tidak dihitung di rekap.\nBisa dikembalikan dari Sampah selama 30 hari.')">
   <?= input_token() ?><input type="hidden" name="aksi" value="hapus">
   <input type="hidden" name="kelas" value="<?= h($kelas) ?>"><input type="hidden" name="tanggal" value="<?= h($tanggal) ?>"><input type="hidden" name="mapel" value="<?= h($mapel) ?>">
   <button class="kecil bahaya">Hapus absensi tanggal ini (kalau tidak sengaja tersimpan)</button>

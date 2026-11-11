@@ -14,10 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             q("UPDATE guru_siswa SET status = 'keluar', diubah = ? WHERE kode = ?", [sekarang(), $kode]);
             pesan('Siswa sudah punya absensi/nilai, jadi ditandai "keluar" (riwayat tetap tersimpan).');
         } else {
+            $sb = sampah_baris('guru_siswa', 'kode = ?', [$kode]);
+            sampah_simpan('siswa', (string)($sb['baris'][0]['nama'] ?? $kode) . (isset($ks['kelas']) ? ' · ' . $ks['kelas'] : ''),
+                [$sb, sampah_baris('guru_kelas_siswa', 'kode = ?', [$kode]), sampah_baris('guru_kelompok', 'kode = ?', [$kode])]);
             q('DELETE FROM guru_kelas_siswa WHERE kode = ?', [$kode]);
             q('DELETE FROM guru_kelompok WHERE kode = ?', [$kode]);
             q('DELETE FROM guru_siswa WHERE kode = ?', [$kode]);
-            pesan('Siswa dihapus.');
+            pesan('Siswa dipindah ke Sampah.');
         }
         ke('?p=siswa&kelas=' . rawurlencode((string)($ks['kelas'] ?? '')));
     }
@@ -56,7 +59,7 @@ judul_baris('Ubah siswa', '<a class="tombol" href="?p=siswa&amp;kelas=' . h(rawu
   <label>Status<select name="status"><?= pilihan(['aktif' => 'Aktif', 'keluar' => 'Keluar / pindah', 'lulus' => 'Lulus'], $s['status']) ?></select></label>
   <button class="utama lebar">Simpan</button>
 </form>
-<form method="post" onsubmit="return confirm('Hapus siswa ini? Bila sudah punya nilai/absensi, siswa hanya ditandai keluar.')">
+<form method="post" onsubmit="return confirm('Hapus siswa ini? Bila sudah punya nilai/absensi, siswa hanya ditandai keluar.\nBisa dikembalikan dari Sampah (Lainnya → Sampah) selama 30 hari.')">
   <?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus siswa</button>
 </form>
 <?php

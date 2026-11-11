@@ -14,6 +14,7 @@ function otomatis_jalankan(): void
     if ($baru) {
         @touch($f);
         try { otomatis_tutup(); } catch (Throwable $e) { error_log('[siguru otomatis] ' . $e->getMessage()); }
+        try { sampah_bersihkan(); } catch (Throwable $e) { error_log('[siguru sampah] ' . $e->getMessage()); }
     }
     if (uid()) {
         try { otomatis_nilai(uid()); } catch (Throwable $e) { error_log('[siguru nilai otomatis] ' . $e->getMessage()); }

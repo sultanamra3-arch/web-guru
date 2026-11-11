@@ -403,10 +403,12 @@ function asisten_jalankan(string $nama, array $d): array
                 q("UPDATE guru_siswa SET status = 'keluar', diubah = ? WHERE kode = ?", [sekarang(), $d['kode']]);
                 return ['ok' => true, 'teks' => 'Siswa sudah punya nilai/absensi, jadi ditandai "keluar".'];
             }
+            $sb = sampah_baris('guru_siswa', 'kode = ?', [$d['kode']]);
+            sampah_simpan('siswa', (string)($sb['baris'][0]['nama'] ?? $d['kode']), [$sb, sampah_baris('guru_kelas_siswa', 'kode = ?', [$d['kode']]), sampah_baris('guru_kelompok', 'kode = ?', [$d['kode']])]);
             q('DELETE FROM guru_kelas_siswa WHERE kode = ?', [$d['kode']]);
             q('DELETE FROM guru_kelompok WHERE kode = ?', [$d['kode']]);
             q('DELETE FROM guru_siswa WHERE kode = ?', [$d['kode']]);
-            return ['ok' => true, 'teks' => 'Siswa dihapus.'];
+            return ['ok' => true, 'teks' => 'Siswa dipindah ke Sampah.'];
         case 'tambah_kelas':
             pastikan_kelas($d['nama']);
             return ['ok' => true, 'teks' => 'Kelas ' . $d['nama'] . ' dibuat.', 'tautan' => '?p=siswa&kelas=' . rawurlencode($d['nama'])];
@@ -421,8 +423,9 @@ function asisten_jalankan(string $nama, array $d): array
             return ['ok' => true, 'teks' => 'Nama kelas diganti menjadi ' . $d['baru'] . '.', 'tautan' => '?p=siswa&kelas=' . rawurlencode($d['baru'])];
         case 'hapus_kelas':
             if (siswa_kelas($d['nama'])) return ['ok' => false, 'teks' => 'Kelas masih berisi siswa.'];
+            sampah_simpan('kelas', 'Kelas ' . $d['nama'], [sampah_baris('guru_kelas', 'tahun = ? AND nama = ? AND guru_id = ?', [$tahun, $d['nama'], uid()])]);
             q('DELETE FROM guru_kelas WHERE tahun = ? AND nama = ? AND guru_id = ?', [$tahun, $d['nama'], uid()]);
-            return ['ok' => true, 'teks' => 'Kelas dihapus.'];
+            return ['ok' => true, 'teks' => 'Kelas dipindah ke Sampah.'];
         case 'buat_penilaian':
             q('INSERT INTO guru_penilaian (guru_id, kelas, mapel, judul, jenis, tanggal, kktp, dibuat) VALUES (?,?,?,?,?,?,?,?)',
                 [uid(), $d['kelas'], $d['mapel'], $d['judul'], $d['jenis'], $d['tanggal'], $d['kktp'], sekarang()]);
@@ -435,9 +438,11 @@ function asisten_jalankan(string $nama, array $d): array
             return ['ok' => true, 'teks' => 'Penilaian diperbarui.', 'tautan' => '?p=nilai&id=' . $d['id']];
         case 'hapus_penilaian':
             if (!asisten_penilaian($d['id'])) return ['ok' => false, 'teks' => 'Penilaian tidak ditemukan.'];
+            $pb = sampah_baris('guru_penilaian', 'id = ?', [$d['id']]);
+            sampah_simpan('penilaian', (string)($pb['baris'][0]['judul'] ?? 'Penilaian'), [$pb, sampah_baris('guru_nilai', 'penilaian_id = ?', [$d['id']])]);
             q('DELETE FROM guru_nilai WHERE penilaian_id = ?', [$d['id']]);
             q('DELETE FROM guru_penilaian WHERE id = ?', [$d['id']]);
-            return ['ok' => true, 'teks' => 'Penilaian dihapus.'];
+            return ['ok' => true, 'teks' => 'Penilaian dipindah ke Sampah.'];
         case 'isi_nilai':
             if (!asisten_penilaian($d['id'])) return ['ok' => false, 'teks' => 'Penilaian tidak ditemukan.'];
             db()->beginTransaction();
@@ -473,14 +478,18 @@ function asisten_jalankan(string $nama, array $d): array
             q('UPDATE guru_soal SET ' . implode(', ', array_map(fn($k) => "$k = ?", array_keys($set))) . ' WHERE id = ? AND guru_id = ?', array_merge(array_values($set), [$d['id'], uid()]));
             return ['ok' => true, 'teks' => 'Soal diperbarui.', 'tautan' => '?p=soal_form&id=' . $d['id']];
         case 'hapus_soal':
+            $sb = sampah_baris('guru_soal', 'id = ? AND guru_id = ?', [$d['id'], uid()]);
+            sampah_simpan('soal', mb_substr((string)($sb['baris'][0]['pertanyaan'] ?? 'Soal'), 0, 80), [$sb]);
             q('DELETE FROM guru_soal WHERE id = ? AND guru_id = ?', [$d['id'], uid()]);
-            return ['ok' => true, 'teks' => 'Soal dihapus.'];
+            return ['ok' => true, 'teks' => 'Soal dipindah ke Sampah.'];
         case 'ubah_judul_dokumen':
             q('UPDATE guru_dokumen SET judul = ?, diubah = ? WHERE id = ? AND guru_id = ?', [$d['judul'], sekarang(), $d['id'], uid()]);
             return ['ok' => true, 'teks' => 'Judul diganti.', 'tautan' => '?p=dokumen_lihat&id=' . $d['id']];
         case 'hapus_dokumen':
+            $db = sampah_baris('guru_dokumen', 'id = ? AND guru_id = ?', [$d['id'], uid()]);
+            sampah_simpan(($db['baris'][0]['jenis'] ?? '') === 'paket' ? 'paket' : 'dokumen', (string)($db['baris'][0]['judul'] ?? 'Dokumen'), [$db]);
             q('DELETE FROM guru_dokumen WHERE id = ? AND guru_id = ?', [$d['id'], uid()]);
-            return ['ok' => true, 'teks' => 'Dokumen dihapus.'];
+            return ['ok' => true, 'teks' => 'Dokumen dipindah ke Sampah.'];
     }
     return ['ok' => false, 'teks' => 'Alat tidak dikenal.'];
 }

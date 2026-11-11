@@ -119,8 +119,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($r['ok']) { $isi['baris'] = $r['baris']; pesan('Materi, indikator, dan level diisi ulang oleh AI (' . h($r['oleh']) . ').'); }
         else pesan('AI gagal: ' . h($r['galat']), 'galat');
     } elseif ($aksi === 'hapus') {
+        sampah_simpan('dokumen', 'Kisi-kisi: ' . $d['judul'], [sampah_baris('guru_dokumen', 'id = ?', [$d['id']])]);
         q('DELETE FROM guru_dokumen WHERE id = ?', [$d['id']]);
-        pesan('Kisi-kisi dihapus.');
+        pesan('Kisi-kisi dipindah ke Sampah.');
         ke('?p=kisi');
     }
     q('UPDATE guru_dokumen SET isi = ?, mapel = ?, kelas = ?, diubah = ? WHERE id = ?',
@@ -244,7 +245,7 @@ kepala($d['judul'], 'perangkat');
   <form method="post" onsubmit="var b=this.querySelector('button');b.disabled=true;b.textContent='⏳ AI sedang menyusun…';"><?= input_token() ?><input type="hidden" name="aksi" value="ai"><button class="kecil" <?= ai_siap() ? '' : 'disabled' ?>>✨ Isi ulang dengan AI</button></form>
   <form method="post"><?= input_token() ?><input type="hidden" name="aksi" value="segarkan"><button class="kecil" title="Bila soal di paket diubah/ditambah">↻ Sesuaikan dengan paket</button></form>
   <?php endif; ?>
-  <form method="post" onsubmit="return confirm('Hapus kisi-kisi ini?')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus</button></form>
+  <form method="post" onsubmit="return confirm('Hapus kisi-kisi ini?\nBisa dikembalikan dari Sampah (Lainnya → Sampah) selama 30 hari.')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus</button></form>
 </div>
 <?php
 kaki();

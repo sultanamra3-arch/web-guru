@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 $a = satu('SELECT * FROM guru_akun WHERE id = ?', [uid()]);
 $galat = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['admin_asli'])) {
+    pesan('Profil dan kata sandi guru tidak bisa diubah saat admin masuk sebagai guru ini.', 'galat');
+    ke('?p=profil');
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'huruf') {
     setelan_simpan('huruf:' . uid(), post('huruf') === 'besar' ? 'besar' : 'normal');
     pesan('Ukuran huruf disimpan.');

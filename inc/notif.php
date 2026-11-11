@@ -102,6 +102,7 @@ function notif_kumpulkan(array $g, int $sejak): array
 function notif_sisip_apk(): string
 {
     if (!str_contains((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 'SiGuruApp')) return '';
+    if (!empty($_SESSION['admin_asli'])) return '';   // admin sedang masuk sebagai guru lain: jangan ganti notifikasi HP admin
     $dasar = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'guru.otomasismpn6keritang.my.id') . '/';
     $kunci = uid() ? notif_kunci(uid()) : '';
     if (!uid() && ($_GET['p'] ?? '') !== 'masuk') return '';

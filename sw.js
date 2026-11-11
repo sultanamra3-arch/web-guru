@@ -1,8 +1,8 @@
 /* SiGuru: simpan berkas tampilan di HP; halaman (data) selalu diambil dari server. */
-const CACHE = 'siguru-v1.58';
+const CACHE = 'siguru-v1.59';
 const V = CACHE.replace('siguru-v', '');
 const ASET = [
-  'aset/gaya.css?v=' + V, 'aset/guru.css?v=' + V, 'aset/guru.js?v=' + V,
+  'aset/gaya.css?v=' + V, 'aset/guru.css?v=' + V, 'aset/guru.js?v=' + V, 'aset/dialog.js?v=' + V,
   'aset/huruf/quicksand-500.woff2', 'aset/huruf/quicksand-600.woff2', 'aset/huruf/quicksand-700.woff2',
   'aset/logo.png', 'aset/favicon.png?v=3', 'offline.html'
 ];

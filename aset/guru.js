@@ -287,8 +287,13 @@
       var b = belum();
       if (!b.length) return;
       if (b.length === baris.length) { e.preventDefault(); alert('Belum ada siswa yang dipilih. Pilih S/I/A untuk yang tidak hadir, atau tekan "Sisanya hadir".'); return; }
-      if (confirm(b.length + ' siswa belum dipilih. Tandai mereka HADIR?\n\nOK = tandai hadir lalu simpan\nBatal = periksa lagi')) { sisanyaHadir(); return; }
-      e.preventDefault(); b[0].scrollIntoView({ block: 'center' });
+      e.preventDefault();
+      sgKonfirmasi(b.length + ' siswa belum dipilih. Tandai mereka HADIR?\nPilih "Tandai hadir" untuk menyimpan, atau "Periksa lagi" untuk memilih sendiri.', { ok: 'Tandai hadir & simpan', batal: 'Periksa lagi', bahaya: false })
+        .then(function (ya) {
+          if (!ya) { b[0].scrollIntoView({ block: 'center' }); return; }
+          sisanyaHadir();
+          if (fa.requestSubmit) fa.requestSubmit(); else fa.submit();
+        });
     });
     hitung();
   }
@@ -309,8 +314,8 @@
     if (!b) return;
     var teks = b.dataset.salin, asli = b.textContent;
     function beres() { b.textContent = '✓ Tersalin'; setTimeout(function () { b.textContent = asli; }, 1800); }
-    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(teks).then(beres, function () { window.prompt('Salin teks ini:', teks); });
-    else window.prompt('Salin teks ini:', teks);
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(teks).then(beres, function () { sgSalin(teks); });
+    else sgSalin(teks);
   });
 
   /* ---------- Nilai: tandai di bawah KKTP ---------- */

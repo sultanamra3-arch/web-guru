@@ -9,9 +9,10 @@ $kel = kelompok_kelas($p['kelas']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (post('aksi') === 'hapus') {
+        sampah_simpan('penilaian', $p['judul'] . ' · ' . $p['kelas'], [sampah_baris('guru_penilaian', 'id = ?', [$id]), sampah_baris('guru_nilai', 'penilaian_id = ?', [$id])]);
         q('DELETE FROM guru_nilai WHERE penilaian_id = ?', [$id]);
         q('DELETE FROM guru_penilaian WHERE id = ?', [$id]);
-        pesan('Penilaian dihapus.');
+        pesan('Penilaian dipindah ke Sampah.');
         ke('?p=penilaian');
     }
     if (post('aksi') === 'ubah') {
@@ -125,7 +126,7 @@ judul_baris(h($p['judul']), '<a class="tombol" href="?p=penilaian">‹ Penilaian
   </ul>
   <button class="utama lebar">Simpan nilai</button>
 </form>
-<form method="post" style="margin-top:1rem" onsubmit="return confirm('Hapus penilaian ini beserta semua nilainya?')">
+<form method="post" style="margin-top:1rem" onsubmit="return confirm('Hapus penilaian ini beserta semua nilainya?\nBisa dikembalikan dari Sampah (Lainnya → Sampah) selama 30 hari.')">
   <?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus penilaian</button>
 </form>
 <?php

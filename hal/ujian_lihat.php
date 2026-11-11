@@ -41,16 +41,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
         case 'reset':
+            sampah_simpan('jawaban', 'Jawaban ' . nama_siswa($kode) . ' · ' . $u['judul'], [sampah_baris('guru_ujian_peserta', 'ujian_id = ? AND kode = ?', [$id, $kode])]);
             q('DELETE FROM guru_ujian_peserta WHERE ujian_id = ? AND kode = ?', [$id, $kode]);
             pesan('Jawaban ' . h(nama_siswa($kode)) . ' dihapus; siswa bisa mengulang dari awal.');
             break;
         case 'hapus':
             // jawaban siswa ikut terhapus; nilai yang sudah dikirim ke Penilaian tetap ada
             db()->beginTransaction();
+            sampah_simpan('ujian', $u['judul'] . ' · ' . $u['kelas'], [sampah_baris('guru_ujian', 'id = ? AND guru_id = ?', [$id, uid()]), sampah_baris('guru_ujian_peserta', 'ujian_id = ?', [$id])]);
             q('DELETE FROM guru_ujian_peserta WHERE ujian_id = ?', [$id]);
             q('DELETE FROM guru_ujian WHERE id = ? AND guru_id = ?', [$id, uid()]);
             db()->commit();
-            pesan('Ujian "' . h($u['judul']) . '" dihapus.' . ($u['penilaian_id'] ? ' Nilai yang sudah dikirim ke Penilaian tetap tersimpan.' : ''));
+            pesan('Ujian "' . h($u['judul']) . '" dipindah ke Sampah.' . ($u['penilaian_id'] ? ' Nilai yang sudah dikirim ke Penilaian tetap tersimpan.' : ''));
             ke('?p=ujian');
     }
     ke('?p=ujian_lihat&id=' . $id);
@@ -116,7 +118,7 @@ panel_status(['jenis' => ujian_latihan($u) ? 'latihan' : 'ujian', 'id' => $id, '
   <ul class="daftar pantau" id="pantau"></ul>
 </div>
 <?php $n_peserta = (int)nilai('SELECT COUNT(*) FROM guru_ujian_peserta WHERE ujian_id = ? AND mulai IS NOT NULL', [$id]);
-$tanya = $n_peserta ? "Hapus ujian ini? Jawaban $n_peserta siswa ikut terhapus" . ($u['penilaian_id'] ? ' (nilai yang sudah dikirim ke Penilaian tetap ada).' : '. Kirim dulu nilainya ke Penilaian bila perlu.') : 'Hapus ujian ini?'; ?>
+$tanya = $n_peserta ? "Hapus ujian ini? Jawaban $n_peserta siswa ikut terhapus" . ($u['penilaian_id'] ? ' (nilai yang sudah dikirim ke Penilaian tetap ada).' : '. Kirim dulu nilainya ke Penilaian bila perlu.') : 'Hapus ujian ini?'; $tanya .= "\nBisa dikembalikan dari Sampah selama 30 hari."; ?>
 <form method="post" style="margin-top:1rem" onsubmit="return confirm(<?= h(json_encode($tanya, JSON_UNESCAPED_UNICODE)) ?>)"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">🗑 Hapus ujian</button></form>
 <template id="tpl-aksi">
   <form method="post" class="aksi-pantau">
@@ -124,7 +126,7 @@ $tanya = $n_peserta ? "Hapus ujian ini? Jawaban $n_peserta siswa ikut terhapus" 
     <button name="aksi" value="buka_ulang" class="kecil" title="Izinkan masuk dari HP lain / lanjut lagi">Buka ulang</button>
     <button name="aksi" value="tambah_waktu" class="kecil">+10 menit</button>
     <button name="aksi" value="akhiri" class="kecil" onclick="return confirm('Kumpulkan sekarang?')">Kumpulkan</button>
-    <button name="aksi" value="reset" class="kecil bahaya" onclick="return confirm('Hapus semua jawaban siswa ini dan ulang dari awal?')">Ulang</button>
+    <button name="aksi" value="reset" class="kecil bahaya" onclick="return confirm('Hapus semua jawaban siswa ini dan ulang dari awal?\nBisa dikembalikan dari Sampah (Lainnya → Sampah) selama 30 hari.')">Ulang</button>
   </form>
 </template>
 <?php

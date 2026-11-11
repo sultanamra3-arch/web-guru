@@ -10,6 +10,7 @@ require __DIR__ . '/inc/tampilan.php';
 require __DIR__ . '/inc/guru_ai.php';
 require __DIR__ . '/inc/koreksi.php';
 require __DIR__ . '/inc/tempel.php';
+require __DIR__ . '/inc/sampah.php';
 require __DIR__ . '/inc/gambar.php';
 require __DIR__ . '/inc/ujian.php';
 require __DIR__ . '/inc/tugas.php';
@@ -28,7 +29,7 @@ header('Referrer-Policy: same-origin');
 mulai_sesi();
 
 $halaman = [
-    'masuk', 'keluar', 'beranda', 'lainnya', 'akun', 'profil', 'pengaturan_ai',
+    'masuk', 'keluar', 'beranda', 'lainnya', 'akun', 'profil', 'pengaturan_ai', 'sampah', 'beralih',
     'kelas', 'erapor', 'cadangan', 'siswa', 'siswa_tambah', 'siswa_ubah', 'siswa_naik', 'jadwal', 'absensi', 'absensi_rekap', 'penilaian', 'nilai', 'nilai_rekap', 'kelompok', 'resi', 'rekap_cetak', 'kelas_lihat', 'cari', 'ke_pustaka', 'apk', 'koreksi', 'koreksi_lj', 'koreksi_lihat',
     'soal', 'soal_form', 'soal_manual', 'soal_ai', 'soal_tempel', 'paket', 'paket_cetak', 'kisi',
     'perangkat', 'dokumen', 'dokumen_buat', 'dokumen_lihat', 'presentasi',

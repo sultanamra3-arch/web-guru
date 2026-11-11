@@ -67,6 +67,7 @@ function kepala(string $judul, string $aktif = '', bool $polos = false): void
 <link rel="preload" href="aset/huruf/quicksand-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="aset/gaya.css?v=<?= VERSI ?>">
 <link rel="stylesheet" href="aset/guru.css?v=<?= VERSI ?>">
+<script src="aset/dialog.js?v=<?= VERSI ?>"></script>
 <?php if ($u && !$polos): ?>
 <script type="speculationrules">
 <?= json_encode(siap_cepat_aturan(), JSON_UNESCAPED_SLASHES) ?>
@@ -104,10 +105,20 @@ function kepala(string $judul, string $aktif = '', bool $polos = false): void
 </div>
 <?php endif; ?>
 <?php endif; ?>
+<?php if (!empty($_SESSION['admin_asli']) && !$polos): ?>
+<form method="post" action="?p=beralih" class="pita-beralih tak-cetak"><?= input_token() ?><input type="hidden" name="aksi" value="kembali">
+  <span>Anda masuk sebagai <b><?= h((string)($u['nama'] ?? '')) ?></b></span><button class="kecil">‹ Kembali ke akun admin</button></form>
+<?php endif; ?>
 <main>
 <?php foreach (ambil_pesan() as [$j, $t]): ?>
   <div class="pesan <?= h($j) ?> tak-cetak"><?= $t ?></div>
 <?php endforeach;
+$sb = $_SESSION['sampah_batal'] ?? null;
+unset($_SESSION['sampah_batal']);
+if ($sb && time() - (int)$sb['waktu'] < 180 && uid()): ?>
+  <form method="post" action="?p=sampah" class="pita-batal tak-cetak"><?= input_token() ?><input type="hidden" name="aksi" value="kembalikan"><input type="hidden" name="dari" value="batal"><input type="hidden" name="id" value="<?= (int)$sb['id'] ?>">
+    <span><?= ikon('sampah') ?> <b><?= h(mb_strimwidth((string)$sb['judul'], 0, 60, '…')) ?></b> dipindah ke Sampah.</span><button class="kecil">Batalkan</button></form>
+<?php endif;
 }
 
 function kaki(bool $polos = false): void

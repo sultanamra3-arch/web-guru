@@ -5,7 +5,8 @@ declare(strict_types=1);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (post('aksi') === 'hapus') {
         $k = kuis_ambil((int)post('id'));
-        if ($k) { q('DELETE FROM guru_kuis_peserta WHERE kuis_id = ?', [$k['id']]); q('DELETE FROM guru_kuis WHERE id = ?', [$k['id']]); pesan('Kuis dihapus.'); }
+        if ($k) { sampah_simpan('kuis', $k['judul'], [sampah_baris('guru_kuis', 'id = ?', [$k['id']]), sampah_baris('guru_kuis_peserta', 'kuis_id = ?', [$k['id']])]);
+            q('DELETE FROM guru_kuis_peserta WHERE kuis_id = ?', [$k['id']]); q('DELETE FROM guru_kuis WHERE id = ?', [$k['id']]); pesan('Kuis dipindah ke Sampah.'); }
         ke('?p=kuis');
     }
     $kelas = (string)post('kelas');
@@ -59,7 +60,7 @@ judul_baris('Kuis cepat');
   <?php foreach ($daftar as $k): ?>
   <li class="baris-kuis"><a href="?p=kuis_main&amp;id=<?= (int)$k['id'] ?>"><b><?= h($k['judul']) ?></b>
     <small>Kelas <?= h($k['kelas']) ?> · <?= count(kuis_soal($k)) ?> soal · <?= (int)$k['n'] ?> peserta · <?= kuis_mandiri($k) ? 'mandiri' : 'bersama' ?> · <?= ['lobi' => 'belum mulai', 'soal' => 'berlangsung', 'jawab' => 'berlangsung', 'jalan' => 'berlangsung', 'selesai' => 'selesai'][$k['status']] ?? $k['status'] ?> · <?= h(tgl(substr((string)$k['dibuat'], 0, 10))) ?></small></a>
-    <form method="post" onsubmit="return confirm('Hapus kuis ini?')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><input type="hidden" name="id" value="<?= (int)$k['id'] ?>"><button class="kecil bahaya" aria-label="Hapus">🗑</button></form></li>
+    <form method="post" onsubmit="return confirm('Hapus kuis ini?\nBisa dikembalikan dari Sampah (Lainnya → Sampah) selama 30 hari.')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><input type="hidden" name="id" value="<?= (int)$k['id'] ?>"><button class="kecil bahaya" aria-label="Hapus">🗑</button></form></li>
   <?php endforeach; ?>
 </ul>
 <?php endif; ?>

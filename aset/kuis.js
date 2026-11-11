@@ -49,7 +49,7 @@
         var ring = el('span', 'pg-ringkas', ''); ring.id = 'pg-ringkas';
         atas.append(el('span', 'pg-no', '🏁 Balapan kuis'), ring, w); isi.append(atas);
         var daftar = el('div', 'pg-balap'); daftar.id = 'pg-balap'; isi.append(daftar);
-        btn('■ Akhiri kuis sekarang', '', function () { if (confirm('Akhiri kuis sekarang? Siswa yang belum selesai berhenti di soal terakhir yang dijawabnya.')) aksi('selesai'); });
+        btn('■ Akhiri kuis sekarang', '', function () { sgKonfirmasi('Akhiri kuis sekarang?\nSiswa yang belum selesai berhenti di soal terakhir yang dijawabnya.').then(function (y) { if (y) aksi('selesai'); }); });
       }
       var n = { selesai: 0, jalan: 0, belum: 0 };
       var bl = document.getElementById('pg-balap'); bl.innerHTML = '';
@@ -83,13 +83,13 @@
         qr(q, G.dataset.url, 8); w.append(kiri, q); isi.append(w);
         var nm = el('div', 'pg-nama');
         if (!r.peserta.length) nm.append(el('span', 'redup', 'Menunggu siswa masuk…'));
-        r.peserta.forEach(function (p) { var c = el('button', 'chip', p.nama); c.type = 'button'; c.title = 'Ketuk untuk mengeluarkan'; c.onclick = function () { if (confirm('Keluarkan ' + p.nama + ' dari kuis?')) aksi('keluarkan', { kode: p.kode }); }; nm.append(c); });
+        r.peserta.forEach(function (p) { var c = el('button', 'chip', p.nama); c.type = 'button'; c.title = 'Ketuk untuk mengeluarkan'; c.onclick = function () { sgKonfirmasi('Keluarkan ' + p.nama + ' dari kuis?').then(function (y) { if (y) aksi('keluarkan', { kode: p.kode }); }); }; nm.append(c); });
         isi.append(el('h3', null, r.peserta.length + ' siswa sudah masuk'), nm);
-        btn('▶ Mulai kuis', 'utama besar', function () { if (!r.peserta.length && !confirm('Belum ada siswa yang masuk. Tetap mulai?')) return; aksi('mulai'); });
+        btn('▶ Mulai kuis', 'utama besar', function () { if (r.peserta.length) { aksi('mulai'); return; } sgKonfirmasi('Belum ada siswa yang masuk. Tetap mulai?', { ok: 'Tetap mulai', bahaya: false }).then(function (y) { if (y) aksi('mulai'); }); });
       } else if (siap) {
         var c = el('div', 'pg-siap'); c.append(el('div', 'pg-no', 'Soal ' + (r.nomor + 1) + ' dari ' + r.total), el('div', 'pg-angka', ''));
         c.lastChild.id = 'pg-angka'; isi.append(c);
-        btn('■ Akhiri kuis', '', function () { if (confirm('Akhiri kuis sekarang dan tampilkan hasil?')) aksi('selesai'); });
+        btn('■ Akhiri kuis', '', function () { sgKonfirmasi('Akhiri kuis sekarang dan tampilkan hasil?').then(function (y) { if (y) aksi('selesai'); }); });
       } else if (r.status === 'soal') {
         var s = r.soal || { teks: '', opsi: [] };
         var top = el('div', 'pg-soal-atas'); top.append(el('span', 'pg-no', 'Soal ' + (r.nomor + 1) + ' dari ' + r.total));
@@ -108,7 +108,7 @@
         });
         isi.append(grid);
         btn('Lewati soal ›', '', function () { aksi('berikut'); });
-        btn('■ Akhiri kuis', '', function () { if (confirm('Akhiri kuis sekarang dan tampilkan hasil?')) aksi('selesai'); });
+        btn('■ Akhiri kuis', '', function () { sgKonfirmasi('Akhiri kuis sekarang dan tampilkan hasil?').then(function (y) { if (y) aksi('selesai'); }); });
       } else if (r.status === 'selesai') {
         isi.append(el('h2', 'pg-judul-peringkat', '🏁 Hasil akhir'));
         var pod = el('div', 'pg-podium');
@@ -132,8 +132,8 @@
           det.append(k);
         });
         isi.append(det);
-        btn('💾 Simpan nilai ke Penilaian', 'utama', function () { if (confirm('Simpan nilai (persentase benar) semua peserta ke Penilaian sebagai Asesmen Formatif?')) aksi('simpan_nilai'); });
-        btn('↻ Main lagi', '', function () { if (confirm('Ulang kuis dari awal? Poin semua peserta direset.')) aksi('ulang'); });
+        btn('💾 Simpan nilai ke Penilaian', 'utama', function () { sgKonfirmasi('Simpan nilai ke Penilaian?\nNilai = persentase benar semua peserta, disimpan sebagai Asesmen Formatif.', { ok: 'Simpan nilai' }).then(function (y) { if (y) aksi('simpan_nilai'); }); });
+        btn('↻ Main lagi', '', function () { sgKonfirmasi('Ulang kuis dari awal?\nPoin semua peserta direset.', { ok: 'Ulang kuis' }).then(function (y) { if (y) aksi('ulang'); }); });
       }
     }
     function muat() {

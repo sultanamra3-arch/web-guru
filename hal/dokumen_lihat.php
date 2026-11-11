@@ -7,8 +7,9 @@ if (!$d) ke('?p=perangkat');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (post('aksi') === 'hapus') {
+        sampah_simpan('dokumen', $d['judul'], [sampah_baris('guru_dokumen', 'id = ?', [$id])]);
         q('DELETE FROM guru_dokumen WHERE id = ?', [$id]);
-        pesan('Dokumen dihapus.');
+        pesan('Dokumen dipindah ke Sampah.');
         ke('?p=perangkat');
     }
     $isi = (string)($_POST['isi'] ?? '');
@@ -36,7 +37,7 @@ kepala($d['judul'], 'perangkat');
   <button class="utama" onclick="window.print()">🖨 Cetak / PDF</button>
   <a class="tombol" href="?p=dokumen_lihat&amp;id=<?= $id ?>&amp;word=1">⬇ Word</a>
   <button type="button" onclick="document.getElementById('sunting').toggleAttribute('hidden')">✏️ Ubah teks</button>
-  <form method="post" class="sebaris" onsubmit="return confirm('Hapus dokumen ini?')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus</button></form>
+  <form method="post" class="sebaris" onsubmit="return confirm('Hapus dokumen ini?\nBisa dikembalikan dari Sampah (Lainnya → Sampah) selama 30 hari.')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus</button></form>
 </div>
 <form class="kartu tak-cetak" id="form-revisi" data-token="<?= h(token()) ?>" data-id="<?= $id ?>">
   <label><b>✨ Minta AI merevisi</b>

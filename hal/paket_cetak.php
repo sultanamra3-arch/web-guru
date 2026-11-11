@@ -11,9 +11,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($aksi === 'hapus') {
         $lain = soal_di_paket($id);
         $sendiri = array_values(array_diff($ids, $lain));
+        sampah_simpan('paket', $d['judul'], [sampah_baris('guru_dokumen', 'id = ?', [$id]),
+            post('dengan_soal') && $sendiri ? sampah_baris('guru_soal', 'guru_id = ? AND id IN (' . implode(',', $sendiri) . ')', [uid()]) : ['baris' => []]]);
         if (post('dengan_soal') && $sendiri) q('DELETE FROM guru_soal WHERE guru_id = ? AND id IN (' . implode(',', $sendiri) . ')', [uid()]);
         q('DELETE FROM guru_dokumen WHERE id = ?', [$id]);
-        pesan(post('dengan_soal') ? 'Paket soal dan soal-soalnya dihapus.' : 'Paket soal dihapus. Soal-soalnya kembali tampil di bank soal.');
+        pesan(post('dengan_soal') ? 'Paket soal dan soal-soalnya dipindah ke Sampah.' : 'Paket soal dipindah ke Sampah. Soal-soalnya kembali tampil di bank soal.');
         ke('?p=soal');
     }
     if ($aksi === 'kop') {
@@ -32,11 +34,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             elseif ($aksi === 'turun' && $pos < count($ids) - 1) [$ids[$pos + 1], $ids[$pos]] = [$ids[$pos], $ids[$pos + 1]];
             elseif ($aksi === 'keluarkan' || $aksi === 'hapus_soal') {
                 array_splice($ids, $pos, 1);
+                if ($aksi === 'hapus_soal' && !in_array($sid, soal_di_paket($id), true)) {
+                    $sb = sampah_baris('guru_soal', 'id = ? AND guru_id = ?', [$sid, uid()]);
+                    sampah_simpan('soal', mb_substr((string)($sb['baris'][0]['pertanyaan'] ?? 'Soal'), 0, 80) . ' (dari paket ' . $d['judul'] . ')', [$sb], ['ke_paket' => [$id, $pos]]);
+                }
                 if ($aksi === 'hapus_soal' && !in_array($sid, soal_di_paket($id), true)) q('DELETE FROM guru_soal WHERE id = ? AND guru_id = ?', [$sid, uid()]);
             }
             $isi['ids'] = array_values($ids);
             q('UPDATE guru_dokumen SET isi = ?, diubah = ? WHERE id = ?', [json_encode($isi, JSON_UNESCAPED_UNICODE), sekarang(), $id]);
-            pesan(['keluarkan' => 'Soal dikeluarkan dari paket dan kembali ke bank soal.', 'hapus_soal' => 'Soal dihapus.'][$aksi] ?? 'Urutan soal diubah.');
+            pesan(['keluarkan' => 'Soal dikeluarkan dari paket dan kembali ke bank soal.', 'hapus_soal' => 'Soal dipindah ke Sampah.'][$aksi] ?? 'Urutan soal diubah.');
         }
     }
     ke('?p=paket_cetak&id=' . $id . (in_array($aksi, ['keluarkan', 'hapus_soal', 'naik', 'turun'], true) ? '&ubah=1#ubah-soal' : ''));
@@ -134,7 +140,7 @@ kepala($d['judul'], 'soal');
         <a class="tombol kecil" href="?p=soal_form&amp;id=<?= (int)$s['id'] ?>&amp;paket=<?= $id ?>">Ubah</a>
         <form method="post" class="sebaris"><?= input_token() ?><input type="hidden" name="soal" value="<?= (int)$s['id'] ?>">
           <button name="aksi" value="naik" class="kecil" title="Naikkan" aria-label="Naikkan"<?= $i === 0 ? ' disabled' : '' ?>>↑</button><button name="aksi" value="turun" class="kecil" title="Turunkan" aria-label="Turunkan"<?= $i === count($soal) - 1 ? ' disabled' : '' ?>>↓</button>
-          <button name="aksi" value="hapus_soal" class="kecil bahaya" onclick="return confirm('Hapus soal ini dari paket?')">Hapus</button>
+          <button name="aksi" value="hapus_soal" class="kecil bahaya" onclick="return confirm('Hapus soal ini dari paket?\nBisa dikembalikan dari Sampah (Lainnya → Sampah) selama 30 hari.')">Hapus</button>
         </form>
       </div>
     </li>
@@ -162,7 +168,7 @@ kepala($d['judul'], 'soal');
 
 <details class="kartu tak-cetak">
   <summary><b class="merah">Hapus paket</b></summary>
-  <form method="post" style="margin-top:.6rem" onsubmit="return confirm('Hapus paket ini?')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus">
+  <form method="post" style="margin-top:.6rem" onsubmit="return confirm('Hapus paket ini?\nBisa dikembalikan dari Sampah (Lainnya → Sampah) selama 30 hari.')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus">
     <label class="centang"><input type="checkbox" name="dengan_soal" value="1" checked> Hapus juga soal-soalnya (kalau tidak dicentang, soalnya kembali ke bank soal)</label>
     <button class="kecil bahaya">Hapus paket</button>
   </form>

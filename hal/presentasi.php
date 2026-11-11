@@ -8,8 +8,9 @@ $data = json_decode((string)$d['isi'], true) ?: ['judul' => $d['judul'], 'subjud
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (post('aksi') === 'hapus') {
+        sampah_simpan('dokumen', 'Presentasi: ' . $d['judul'], [sampah_baris('guru_dokumen', 'id = ?', [$id])]);
         q('DELETE FROM guru_dokumen WHERE id = ?', [$id]);
-        pesan('Presentasi dihapus.');
+        pesan('Presentasi dipindah ke Sampah.');
         ke('?p=perangkat');
     }
     $slide = [];
@@ -32,7 +33,7 @@ kepala($d['judul'], 'perangkat');
   <button class="utama" id="mulai-tayang">▶ Tayangkan</button>
   <button id="unduh-pptx">⬇ PowerPoint (.pptx)</button>
   <button type="button" onclick="document.getElementById('sunting').toggleAttribute('hidden')">✏️ Ubah slide</button>
-  <form method="post" class="sebaris" onsubmit="return confirm('Hapus presentasi ini?')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus</button></form>
+  <form method="post" class="sebaris" onsubmit="return confirm('Hapus presentasi ini?\nBisa dikembalikan dari Sampah (Lainnya → Sampah) selama 30 hari.')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus</button></form>
 </div>
 
 <div id="deck" class="deck" data-sekolah="<?= h((string)k('sekolah')) ?>" data-guru="<?= h(pengguna()['nama']) ?>">

@@ -857,3 +857,32 @@ html,body{overscroll-behavior:none}
 .ringkas-tempel{line-height:1.7}
 .pedoman-skor{margin:.3rem 0 .6rem;padding-left:1.2rem}
 .rubrik-cetak{border:1px solid #bbb;padding:.4rem .6rem;margin-bottom:.6rem}
+/* Jendela konfirmasi & pesan SiGuru */
+.sg-dialog-latar{position:fixed;inset:0;z-index:9999;background:rgba(27,29,94,.45);display:flex;align-items:flex-end;justify-content:center;padding:1rem;animation:sgMuncul .12s ease-out}
+.sg-dialog-latar.keluar{opacity:0;transition:opacity .12s}
+.sg-dialog{background:#fff;color:#1A1A2E;border-radius:1.1rem;width:100%;max-width:26rem;padding:1.2rem 1.2rem 1rem;box-shadow:0 12px 40px rgba(27,29,94,.25);margin-bottom:max(.5rem,env(safe-area-inset-bottom));animation:sgNaik .16s ease-out}
+@media (min-width:600px){.sg-dialog-latar{align-items:center}}
+.sg-dialog-judul{font-weight:700;font-size:1.08rem;margin:0 0 .35rem;line-height:1.35;white-space:pre-line}
+.sg-dialog-isi{margin:0 0 .2rem;color:#5B6382;font-size:.95rem;line-height:1.45;white-space:pre-line}
+.sg-dialog-teks{width:100%;margin:.5rem 0 0;font:inherit;font-size:.9rem}
+.sg-dialog-tombol{display:flex;gap:.6rem;margin-top:1rem}
+.sg-dialog-tombol button{flex:1;min-height:2.9rem;font-weight:700;margin:0}
+.sg-dialog-ok.bahaya{background:#C0392B;border-color:#C0392B;color:#fff}
+html.sg-dialog-buka,html.sg-dialog-buka body{overflow:hidden}
+@keyframes sgMuncul{from{opacity:0}to{opacity:1}}
+@keyframes sgNaik{from{transform:translateY(18px);opacity:.6}to{transform:none;opacity:1}}
+/* Sampah & beralih akun */
+.pita-beralih{display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap;background:#F2C230;color:#1B1D5E;padding:.5rem 1rem;font-size:.92rem;position:sticky;top:0;z-index:50}
+.pita-beralih button{background:#1B1D5E;color:#fff;border-color:#1B1D5E}
+.pita-batal{display:flex;align-items:center;justify-content:space-between;gap:.6rem;background:#1B1D5E;color:#fff;border-radius:.8rem;padding:.55rem .6rem .55rem .9rem;margin:0 0 .8rem}
+.pita-batal span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.pita-batal .ikon{width:1rem;height:1rem;vertical-align:-2px}
+.pita-batal button{background:#F2C230;color:#1B1D5E;border:0;flex:none}
+.daftar-sampah li{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between}
+.sampah-isi{display:flex;flex-direction:column;gap:.15rem;min-width:0;flex:1 1 12rem}
+.sampah-isi b{overflow-wrap:anywhere}
+.sampah-isi .lencana{align-self:flex-start}
+.sampah-aksi{display:flex;gap:.4rem;flex-wrap:wrap}
+.sampah-aksi form{margin:0}
+.kosong-sampah{text-align:center;color:#5B6382}
+.kosong-sampah .ikon{width:2.4rem;height:2.4rem;opacity:.5}

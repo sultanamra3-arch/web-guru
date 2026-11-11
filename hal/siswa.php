@@ -36,9 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         pesan('Nama kelas tidak valid atau sudah dipakai.', 'galat');
     } elseif ($aksi === 'hapus_kelas') {
         if (!siswa_kelas($kelas)) {
+            sampah_simpan('kelas', 'Kelas ' . $kelas . ' (' . $tahun . ')', [sampah_baris('guru_kelas', 'tahun = ? AND nama = ? AND guru_id = ?', [$tahun, $kelas, uid()]),
+                sampah_baris('guru_kelas_siswa', 'tahun = ? AND kelas = ? AND kode IN (SELECT kode FROM guru_siswa WHERE guru_id = ?)', [$tahun, $kelas, uid()])]);
             q('DELETE FROM guru_kelas WHERE tahun = ? AND nama = ? AND guru_id = ?', [$tahun, $kelas, uid()]);
             q('DELETE ks FROM guru_kelas_siswa ks JOIN guru_siswa s ON s.kode = ks.kode WHERE ks.tahun = ? AND ks.kelas = ? AND s.guru_id = ?', [$tahun, $kelas, uid()]);
-            pesan('Kelas dihapus.');
+            pesan('Kelas dipindah ke Sampah.');
             ke('?p=kelas');
         }
         pesan('Kelas masih berisi siswa aktif.', 'galat');
@@ -92,7 +94,7 @@ judul_baris('Kelas ' . h($kelas), '<a class="tombol" href="?p=kelas">‹ Kelas</
     <p class="kecil redup">Jadwal, absensi, penilaian, dan ujianmu untuk kelas ini ikut diganti.</p>
   </form>
   <?php if (!$siswa): ?>
-  <form method="post" style="margin-top:.8rem" onsubmit="return confirm('Hapus kelas kosong ini?')">
+  <form method="post" style="margin-top:.8rem" onsubmit="return confirm('Hapus kelas kosong ini?\nBisa dikembalikan dari Sampah (Lainnya → Sampah) selama 30 hari.')">
     <?= input_token() ?><input type="hidden" name="aksi" value="hapus_kelas"><button class="kecil bahaya">Hapus kelas</button>
   </form>
   <?php else: ?><p class="kecil redup" style="margin-top:.8rem">Kelas bisa dihapus bila sudah tidak berisi siswa aktif.</p><?php endif; ?>

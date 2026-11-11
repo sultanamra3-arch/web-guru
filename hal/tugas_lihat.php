@@ -16,7 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'buka': q("UPDATE guru_tugas SET status = 'buka' WHERE id = ?", [$id]); pesan('Tugas dibuka lagi.'); break;
         case 'hapus_kiriman':
             $k = $kirim[(string)post('kode')] ?? null;
-            if ($k) { tugas_hapus_foto(tugas_foto_daftar($k)); q('DELETE FROM guru_tugas_kirim WHERE tugas_id = ? AND kode = ?', [$id, $k['kode']]); pesan('Kiriman ' . h(tugas_nama_kirim($k['kode'])) . ' dihapus; ' . ($kel ? 'kelompok itu' : 'siswa') . ' bisa mengirim ulang.'); }
+            if ($k) { sampah_simpan('kiriman', 'Kiriman ' . tugas_nama_kirim($k['kode']) . ' · ' . $t['judul'], [sampah_baris('guru_tugas_kirim', 'tugas_id = ? AND kode = ?', [$id, $k['kode']])]);
+                q('DELETE FROM guru_tugas_kirim WHERE tugas_id = ? AND kode = ?', [$id, $k['kode']]); pesan('Kiriman ' . h(tugas_nama_kirim($k['kode'])) . ' dihapus; ' . ($kel ? 'kelompok itu' : 'siswa') . ' bisa mengirim ulang.'); }
             break;
         case 'kirim_penilaian':
             $pid = (int)$t['penilaian_id'];
@@ -43,10 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             pesan("$n nilai dikirim ke Penilaian. Foto kiriman akan dihapus otomatis " . TUGAS_HAPUS_FOTO_HARI . ' hari setelah ini (nilai tetap tersimpan).');
             ke('?p=nilai&id=' . $pid);
         case 'hapus':
-            foreach ($kirim as $k) tugas_hapus_foto(tugas_foto_daftar($k));
+            // foto kiriman disimpan sampai sampah dibersihkan (30 hari)
+            sampah_simpan('tugas', $t['judul'] . ' · ' . $t['kelas'], [sampah_baris('guru_tugas', 'id = ? AND guru_id = ?', [$id, uid()]), sampah_baris('guru_tugas_kirim', 'tugas_id = ?', [$id])]);
             q('DELETE FROM guru_tugas_kirim WHERE tugas_id = ?', [$id]);
             q('DELETE FROM guru_tugas WHERE id = ? AND guru_id = ?', [$id, uid()]);
-            pesan('Tugas "' . h($t['judul']) . '" dihapus.' . ($t['penilaian_id'] ? ' Nilai yang sudah dikirim ke Penilaian tetap tersimpan.' : ''));
+            pesan('Tugas "' . h($t['judul']) . '" dipindah ke Sampah.' . ($t['penilaian_id'] ? ' Nilai yang sudah dikirim ke Penilaian tetap tersimpan.' : ''));
             ke('?p=tugas');
     }
     ke('?p=tugas_lihat&id=' . $id);
@@ -139,7 +141,7 @@ panel_status(['jenis' => 'tugas', 'id' => $id, 'judul' => $t['judul'], 'kelas' =
   <p class="kecil redup">Foto kiriman dihapus otomatis <?= TUGAS_HAPUS_FOTO_HARI ?> hari setelah nilai dikirim, supaya hosting tidak penuh. Nilainya tetap tersimpan.</p>
 </form>
 <?php endif; ?>
-<form method="post" style="margin-top:1rem" onsubmit="return confirm('Hapus tugas ini beserta semua foto kiriman siswa?')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">🗑 Hapus tugas</button></form>
+<form method="post" style="margin-top:1rem" onsubmit="return confirm('Hapus tugas ini beserta semua foto kiriman siswa?\nBisa dikembalikan dari Sampah (Lainnya → Sampah) selama 30 hari.')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">🗑 Hapus tugas</button></form>
 <script>
 window.addEventListener('load', function () {
   var q = document.getElementById('qr');

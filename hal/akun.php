@@ -78,6 +78,8 @@ foreach ($galat as $g) echo '<div class="pesan galat">' . h($g) . '</div>';
         <?php if ((int)$a['id'] !== uid()): ?>
         <form method="post" class="sebaris"><?= input_token() ?><input type="hidden" name="aksi" value="aktif"><input type="hidden" name="id" value="<?= (int)$a['id'] ?>">
           <button class="kecil <?= $a['aktif'] ? 'bahaya' : '' ?>"><?= $a['aktif'] ? 'Nonaktifkan' : 'Aktifkan' ?></button></form>
+        <form method="post" action="?p=beralih" class="sebaris"><?= input_token() ?><input type="hidden" name="aksi" value="masuk"><input type="hidden" name="id" value="<?= (int)$a['id'] ?>">
+          <button class="kecil">Masuk sebagai</button></form>
         <?php endif; ?>
       </div>
     </li>

@@ -4,8 +4,10 @@ declare(strict_types=1);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ids = array_map('intval', (array)($_POST['pilih'] ?? []));
     if (post('aksi') === 'hapus' && $ids) {
+        $sb = sampah_baris('guru_soal', 'guru_id = ? AND id IN (' . implode(',', $ids) . ')', [uid()]);
+        sampah_simpan('soal', count($sb['baris']) === 1 ? mb_substr((string)$sb['baris'][0]['pertanyaan'], 0, 80) : count($sb['baris']) . ' soal', [$sb]);
         $n = q('DELETE FROM guru_soal WHERE guru_id = ? AND id IN (' . implode(',', $ids) . ')', [uid()])->rowCount();
-        pesan($n . ' soal dihapus.');
+        pesan($n . ' soal dipindah ke Sampah.');
     } elseif (post('aksi') === 'paket' && $ids) {
         $_SESSION['paket_pilih'] = $ids;
         ke('?p=paket');
@@ -93,7 +95,7 @@ tab_perangkat('soal');
     <b><span id="jml-soal">0</span> dipilih</b>
     <button name="aksi" value="paket" class="kecil utama">Jadikan paket</button>
     <?php if ($paket): ?><select name="paket_id" class="kecil" aria-label="Paket tujuan"><option value="">Ke paket…</option><?= pilihan($paket, '', 'id', 'judul') ?></select><button name="aksi" value="ke_paket" class="kecil">Masukkan</button><?php endif; ?>
-    <button name="aksi" value="hapus" class="kecil bahaya" onclick="return confirm('Hapus soal yang dicentang?')">Hapus</button>
+    <button name="aksi" value="hapus" class="kecil bahaya" onclick="return confirm('Hapus soal yang dicentang?\nBisa dikembalikan dari Sampah (Lainnya → Sampah) selama 30 hari.')">Hapus</button>
   </div>
 </form>
 <?php

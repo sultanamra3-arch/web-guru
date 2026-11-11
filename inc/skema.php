@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 16;
+const SKEMA_VERSI = 17;
 
 function pastikan_skema(): void
 {
@@ -87,6 +87,16 @@ function pastikan_skema(): void
             oleh VARCHAR(200) NULL,
             dibuat DATETIME NULL,
             PRIMARY KEY (penilaian_id, member_id)
+        ) DEFAULT CHARSET=utf8mb4",
+        "CREATE TABLE IF NOT EXISTS guru_sampah (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            guru_id INT NOT NULL,
+            jenis VARCHAR(20) NOT NULL,
+            judul VARCHAR(255) NOT NULL,
+            data LONGTEXT NOT NULL,
+            meta TEXT NULL,
+            dihapus DATETIME NOT NULL,
+            KEY (guru_id, dihapus)
         ) DEFAULT CHARSET=utf8mb4",
         "CREATE TABLE IF NOT EXISTS guru_setelan (
             k VARCHAR(50) NOT NULL PRIMARY KEY,
