@@ -10,6 +10,7 @@ Ciri:
 - **Tidak bisa dicubit-perbesar** (permintaan pengguna 11 Nov; jangan nyalakan `setBuiltInZoomControls`).
 - Tanpa efek memantul (`OVER_SCROLL_NEVER`), tombol Kembali HP = kembali satu halaman.
 - `navigator.share` (gambar+teks) diganti jembatan `SiGuruApp.bagikan` → menu Bagikan Android; tautan unduh `blob:`/`data:` disimpan lewat `SiGuruApp.simpan` (gambar → Galeri/Pictures/SiGuru, lainnya → Download/SiGuru). (APK 1.4)
+- Notifikasi (APK 1.5): `Periksa.java` (JobScheduler tiap ±15 menit) → `?p=api_notif`; kunci diterima lewat `SiGuruApp.notif(kunci, dasar)` dari kaki halaman SiGuru. Ketuk notifikasi → membuka alamatnya (extra `buka`).
 - `window.print()` diarahkan ke layanan cetak Android (bisa "Simpan sebagai PDF").
 - Unggah foto/berkas (kamera & galeri), kamera untuk pemindai (getUserMedia), unduhan lewat DownloadManager.
 - Bila aplikasi sempat tertutup sendiri, pesan galatnya tampil saat dibuka lagi (untuk dikirim ke Claude).

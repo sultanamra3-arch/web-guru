@@ -5,7 +5,7 @@ declare(strict_types=1);
 date_default_timezone_set('Asia/Jakarta');
 mb_internal_encoding('UTF-8');
 
-const VERSI = '1.53';
+const VERSI = '1.54';
 
 $__konfig = __DIR__ . '/../config.php';
 if (!is_file($__konfig)) $__konfig = __DIR__ . '/../config.contoh.php';

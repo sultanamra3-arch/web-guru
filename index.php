@@ -18,6 +18,7 @@ require __DIR__ . '/inc/beranda.php';
 require __DIR__ . '/inc/sekolah.php';
 require __DIR__ . '/inc/kuis.php';
 require __DIR__ . '/inc/asisten.php';
+require __DIR__ . '/inc/notif.php';
 
 header('X-Frame-Options: SAMEORIGIN');
 header('X-Content-Type-Options: nosniff');
@@ -34,9 +35,9 @@ $halaman = [
     'ujian', 'ujian_form', 'ujian_lihat', 'ujian_hasil', 'ujian_jawaban', 'u', 'u_kerja', 'gambar',
     'tugas', 'tugas_form', 'tugas_lihat', 'tugas_nilai', 'tugas_foto', 'api_tugas', 't', 'api_t',
     'kuis', 'kuis_main', 'api_kuis', 'k', 'api_k',
-    'asisten', 'api_ai', 'api_ujian', 'api_u',
+    'asisten', 'api_ai', 'api_ujian', 'api_u', 'api_notif',
 ];
-const HALAMAN_UMUM = ['masuk', 'u', 'u_kerja', 'api_u', 'gambar', 't', 'api_t', 'tugas_foto', 'k', 'api_k', 'resi'];
+const HALAMAN_UMUM = ['masuk', 'u', 'u_kerja', 'api_u', 'gambar', 't', 'api_t', 'tugas_foto', 'k', 'api_k', 'resi', 'api_notif'];
 $p = (string)($_GET['p'] ?? '');
 if (!in_array($p, $halaman, true)) $p = pengguna() ? 'beranda' : 'masuk';
 

@@ -21,9 +21,9 @@ function otomatis_jalankan(): void
 }
 
 /** Tutup ujian (dipakai tombol Tutup guru & penutupan otomatis). */
-function ujian_tutup(array $u): void
+function ujian_tutup(array $u, bool $otomatis = false): void
 {
-    q("UPDATE guru_ujian SET status = 'tutup', nilai_masuk = 0 WHERE id = ?", [$u['id']]);
+    q("UPDATE guru_ujian SET status = 'tutup', nilai_masuk = 0, ditutup = ?, ditutup_otomatis = ? WHERE id = ?", [sekarang(), $otomatis ? 1 : 0, $u['id']]);
     ujian_akhiri_kedaluwarsa($u, true);
 }
 
@@ -34,14 +34,14 @@ function otomatis_tutup(): void
     foreach (semua("SELECT * FROM guru_ujian WHERE status = 'buka' AND tutup_otomatis = 1 AND selesai IS NOT NULL AND selesai <= ?", [$kini]) as $u) {
         ujian_akhiri_kedaluwarsa($u);   // yang waktunya habis dikumpulkan dulu
         $masih = nilai('SELECT 1 FROM guru_ujian_peserta WHERE ujian_id = ? AND mulai IS NOT NULL AND selesai IS NULL LIMIT 1', [$u['id']]);
-        if (!$masih) ujian_tutup($u);   // yang dibuka ulang guru boleh menyelesaikan dulu
+        if (!$masih) ujian_tutup($u, true);   // yang dibuka ulang guru boleh menyelesaikan dulu
     }
     // ujian tanpa batas akhir: tutup bila semua siswa sudah mengumpulkan (latihan tidak, karena boleh diulang)
     foreach (semua("SELECT * FROM guru_ujian WHERE status = 'buka' AND tutup_otomatis = 1 AND selesai IS NULL AND mode <> 'latihan'") as $u) {
         $siswa = array_column(ujian_siswa($u), 'member_id');
         if (!$siswa) continue;
         $selesai = q('SELECT kode FROM guru_ujian_peserta WHERE ujian_id = ? AND selesai IS NOT NULL', [$u['id']])->fetchAll(PDO::FETCH_COLUMN);
-        if (!array_diff($siswa, $selesai)) ujian_tutup($u);
+        if (!array_diff($siswa, $selesai)) ujian_tutup($u, true);
     }
     // tugas dengan batas lewat yang tidak menerima kiriman terlambat
     q("UPDATE guru_tugas SET status = 'tutup' WHERE status = 'buka' AND tutup_otomatis = 1 AND terima_telat = 0 AND batas IS NOT NULL AND batas <= ?", [$kini]);

@@ -51,7 +51,7 @@ public class LauncherActivity extends Activity {
 
     static final String AWAL = "https://guru.otomasismpn6keritang.my.id/?p=beranda";
     static final String DOMAIN = "otomasismpn6keritang.my.id";
-    static final int MINTA_BERKAS = 1, IZIN_KAMERA_WEB = 2, IZIN_KAMERA_FOTO = 3;
+    static final int MINTA_BERKAS = 1, IZIN_KAMERA_WEB = 2, IZIN_KAMERA_FOTO = 3, IZIN_NOTIF = 4;
 
     WebView web;
     ProgressBar bar;
@@ -121,7 +121,7 @@ public class LauncherActivity extends Activity {
         s.setUseWideViewPort(true);
         s.setTextZoom(100);
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-        s.setUserAgentString(s.getUserAgentString() + " SiGuruApp/1.4 SiGuruAdminApp");
+        s.setUserAgentString(s.getUserAgentString() + " SiGuruApp/1.5 SiGuruAdminApp");
 
         CookieManager cm = CookieManager.getInstance();
         cm.setAcceptCookie(true);
@@ -132,7 +132,10 @@ public class LauncherActivity extends Activity {
         web.setWebChromeClient(new Krom());
         web.setDownloadListener((url, ua, cd, mime, panjang) -> unduh(url, ua, cd, mime));
 
-        if (simpanan == null || web.restoreState(simpanan) == null) {
+        String bukaAwal = alamatDariNiat(getIntent());
+        if (bukaAwal != null) {
+            web.loadUrl(bukaAwal);
+        } else if (simpanan == null || web.restoreState(simpanan) == null) {
             web.loadUrl(AWAL);
         }
         tampilkanGalatLama();
@@ -440,6 +443,21 @@ public class LauncherActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void notif(String kunci, String dasar) {
+            runOnUiThread(() -> {
+                String k = kunci == null ? "" : kunci.trim();
+                String d = dasar == null ? "" : dasar.trim();
+                if (!k.isEmpty() && !(d.startsWith("https://") && milikSekolah(Uri.parse(d)))) return;
+                Periksa.atur(LauncherActivity.this, k, d);
+                if (!k.isEmpty() && Build.VERSION.SDK_INT >= 33 && !sudahMintaNotif
+                        && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    sudahMintaNotif = true;
+                    requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, IZIN_NOTIF);
+                }
+            });
+        }
+
+        @JavascriptInterface
         public void ulang() {
             runOnUiThread(() -> web.loadUrl(urlGagal));
         }
@@ -490,6 +508,22 @@ public class LauncherActivity extends Activity {
             Toast.makeText(this, "Gagal menyimpan berkas", Toast.LENGTH_SHORT).show();
         }
     }
+
+    /** Alamat dari notifikasi yang diketuk (hanya alamat sekolah). */
+    static String alamatDariNiat(Intent i) {
+        if (i == null) return null;
+        String u = i.getStringExtra("buka");
+        return (u != null && milikSekolah(Uri.parse(u))) ? u : null;
+    }
+
+    @Override
+    protected void onNewIntent(Intent i) {
+        super.onNewIntent(i);
+        String u = alamatDariNiat(i);
+        if (u != null && web != null) web.loadUrl(u);
+    }
+
+    boolean sudahMintaNotif = false;
 
     // ---------- siklus hidup ----------
 

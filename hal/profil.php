@@ -13,6 +13,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'slims' && adalah_
     pesan('Akun SLiMS untuk SiPustaka disimpan.');
     ke('?p=profil');
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'notif') {
+    $pil = [];
+    foreach (array_keys(NOTIF_JENIS) as $k) $pil[$k] = !empty($_POST['notif'][$k]);
+    setelan_simpan('notif:' . uid(), json_encode($pil));
+    pesan('Pilihan notifikasi disimpan.');
+    ke('?p=profil');
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim((string)post('nama'));
     $baru = (string)($_POST['sandi_baru'] ?? '');
@@ -43,6 +50,17 @@ foreach ($galat as $g) echo '<div class="pesan galat">' . h($g) . '</div>';
     <button name="huruf" value="<?= $k ?>" class="<?= $hf === $k ? 'aktif' : '' ?>"><?= $n ?></button><?php endforeach; ?>
   </div>
   <small class="redup">Huruf besar lebih nyaman dibaca di HP atau saat layar ditampilkan di proyektor.</small>
+</form>
+<form method="post" class="kartu formulir">
+  <?= input_token() ?><input type="hidden" name="aksi" value="notif">
+  <b>Notifikasi di HP</b>
+  <small class="redup" style="display:block;margin:.2rem 0 .5rem">Hanya untuk aplikasi Android SiGuru (<a href="?p=apk">pasang di sini</a>). Diperiksa kira-kira tiap 15 menit.</small>
+  <?php $np = notif_pilihan(uid()); foreach (NOTIF_JENIS as $k => [$nm, $ket]): if ($k === 'pinjam' && !adalah_admin()) continue; ?>
+  <label class="cek" style="display:flex;gap:.6rem;align-items:flex-start;margin:.35rem 0;font-weight:400">
+    <input type="checkbox" name="notif[<?= $k ?>]" value="1"<?= $np[$k] ? ' checked' : '' ?> style="width:auto;margin-top:.25rem">
+    <span><b><?= h($nm) ?></b><br><small class="redup"><?= h($ket) ?></small></span></label>
+  <?php endforeach; ?>
+  <button class="kecil">Simpan</button>
 </form>
 <?php if (adalah_admin()): ?>
 <form method="post" class="kartu formulir">

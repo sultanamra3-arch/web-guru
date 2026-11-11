@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 15;
+const SKEMA_VERSI = 16;
 
 function pastikan_skema(): void
 {
@@ -288,6 +288,7 @@ function pastikan_skema(): void
     skema_migrasi_13();
     skema_migrasi_14();
     skema_migrasi_15();
+    skema_migrasi_16();
     @file_put_contents($f, date('c'));
 }
 
@@ -393,4 +394,11 @@ function skema_migrasi_15(): void
         db()->exec("UPDATE guru_ujian SET nilai_masuk = 1 WHERE status = 'tutup'");
     }
     if (!kolom_ada('guru_tugas', 'tutup_otomatis')) db()->exec('ALTER TABLE guru_tugas ADD COLUMN tutup_otomatis TINYINT NOT NULL DEFAULT 1');
+}
+
+/** v16: kapan ujian ditutup & apakah otomatis (untuk notifikasi APK). */
+function skema_migrasi_16(): void
+{
+    if (!kolom_ada('guru_ujian', 'ditutup')) db()->exec('ALTER TABLE guru_ujian ADD COLUMN ditutup DATETIME NULL');
+    if (!kolom_ada('guru_ujian', 'ditutup_otomatis')) db()->exec('ALTER TABLE guru_ujian ADD COLUMN ditutup_otomatis TINYINT NOT NULL DEFAULT 0');
 }
