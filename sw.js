@@ -1,5 +1,5 @@
 /* SiGuru: simpan berkas tampilan di HP; halaman (data) selalu diambil dari server. */
-const CACHE = 'siguru-v1.62';
+const CACHE = 'siguru-v1.63';
 const V = CACHE.replace('siguru-v', '');
 const ASET = [
   'aset/gaya.css?v=' + V, 'aset/guru.css?v=' + V, 'aset/guru.js?v=' + V, 'aset/dialog.js?v=' + V,

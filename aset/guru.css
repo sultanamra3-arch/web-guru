@@ -891,3 +891,13 @@ html.sg-dialog-buka,html.sg-dialog-buka body{overflow:hidden}
 .tambah-dua .tambah-foto{aspect-ratio:auto;min-height:0}
 .tambah-dua .tambah-foto b{font-size:1.25rem;line-height:1}
 .tambah-dua .tambah-foto span{font-size:.85rem;font-weight:700}
+/* Saran AI tugas: rincian per nomor */
+.saran-tombol{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin-top:.4rem}
+.rincian-ai{list-style:none;margin:.4rem 0;padding:0;display:grid;gap:.2rem;font-size:.86rem}
+.rincian-ai li{padding:.15rem .45rem;border-radius:.4rem;background:#F3F6FB}
+.rincian-ai .r-benar{background:#E3F5E8;color:#1F7A3A}
+.rincian-ai .r-sebagian{background:#FFF4D6;color:#7A5300}
+.rincian-ai .r-salah{background:#FCE8E6;color:#B3261E}
+.rincian-ai .r-kosong{background:#EEF0F5;color:#5B6382}
+.pesan-ai{margin-top:.4rem}
+.pesan-ai textarea{width:100%;margin-top:.3rem}

@@ -54,9 +54,14 @@ judul_baris(h(tugas_nama_kirim($kode)), '<a class="tombol" href="?p=tugas_lihat&
 <?php endif; ?>
 <?php if (trim((string)$k['teks']) !== ''): ?><div class="kartu"><div class="kecil redup">Jawaban / catatan <?= $kn ? 'kelompok' : 'siswa' ?></div><div style="white-space:pre-line"><?= h($k['teks']) ?></div></div><?php endif; ?>
 
-<div class="kartu saran-ai" id="kotak-saran" data-id="<?= $id ?>" data-kode="<?= h($kode) ?>">
-  <?php if ($saran): ?><b>✨ Saran AI: <?= h((string)(float)$saran['nilai']) ?></b><?= !empty($saran['ragu']) ? ' <span class="lencana st-draf">AI ragu</span>' : '' ?><br><small><?= h($saran['catatan']) ?></small>
-  <?php else: ?><button type="button" class="kecil" id="minta-saran" <?= ai_siap() ? '' : 'disabled' ?>>✨ Minta saran nilai dari AI</button> <small class="redup"><?= ai_siap() ? (trim((string)$t['kunci']) !== '' ? 'memakai kunci/rubrik tugas' : 'tanpa kunci: dinilai dari kelengkapan & ketepatan') : 'AI belum aktif' ?></small><?php endif; ?>
+<div class="kartu saran-ai" id="kotak-saran" data-id="<?= $id ?>" data-kode="<?= h($kode) ?>" data-saran="<?= h(json_encode($saran ?: null, JSON_UNESCAPED_UNICODE)) ?>">
+  <div id="isi-saran"></div>
+  <div class="saran-tombol">
+    <button type="button" class="kecil" id="minta-saran" <?= ai_siap() ? '' : 'disabled' ?>><?= $saran ? '↻ Nilai ulang dengan AI' : '✨ Minta saran nilai dari AI' ?></button>
+    <small class="redup"><?= ai_siap() ? (trim((string)$t['kunci']) !== '' ? 'memakai kunci/rubrik tugas' : 'tanpa kunci: dinilai dari kelengkapan & ketepatan') : 'AI belum aktif' ?></small>
+  </div>
+  <details class="pesan-ai"<?= $saran ? '' : ' hidden' ?>><summary class="kecil">Beri pesan ke AI sebelum menilai ulang (opsional)</summary>
+    <textarea id="pesan-ai" rows="2" placeholder="mis. Nomor 3 sebenarnya sudah benar · Jawaban ada di foto 2 · Nilai lebih longgar untuk kerapian"></textarea></details>
   <span class="kecil redup" id="status-saran"></span>
 </div>
 
@@ -75,18 +80,42 @@ judul_baris(h(tugas_nama_kirim($kode)), '<a class="tombol" href="?p=tugas_lihat&
 </div>
 <script>
 (function () {
-  var b = document.getElementById('minta-saran');
-  if (!b) return;
+  var b = document.getElementById('minta-saran'), k = document.getElementById('kotak-saran');
+  if (!b || !k) return;
+  var isi = document.getElementById('isi-saran'), st = document.getElementById('status-saran'), pesan = document.getElementById('pesan-ai');
+  var TANDA = { benar: '✓', sebagian: '½', salah: '✗', kosong: '–' };
+  function tampil(r) {
+    isi.innerHTML = '';
+    if (!r) return;
+    var j = document.createElement('div'); j.innerHTML = '<b>✨ Saran AI: ' + (+r.nilai) + '</b>' + (r.ragu ? ' <span class="lencana st-draf">AI ragu</span>' : '');
+    isi.appendChild(j);
+    if (r.rincian && r.rincian.length) {
+      var ul = document.createElement('ul'); ul.className = 'rincian-ai';
+      r.rincian.forEach(function (x) {
+        var li = document.createElement('li'); li.className = 'r-' + x.status;
+        li.textContent = (x.no ? x.no + '. ' : '') + (TANDA[x.status] || '') + ' ' + (x.jawaban || '(kosong)');
+        ul.appendChild(li);
+      });
+      isi.appendChild(ul);
+    }
+    var c = document.createElement('small'); c.textContent = r.catatan || ''; isi.appendChild(c);
+  }
+  try { tampil(JSON.parse(k.dataset.saran || 'null')); } catch (e) {}
   b.onclick = function () {
-    var k = document.getElementById('kotak-saran'), st = document.getElementById('status-saran');
-    b.disabled = true; st.textContent = '⏳ AI sedang membaca tugas (±20 detik)…';
+    var ulang = !!isi.textContent;
+    b.disabled = true; st.textContent = '⏳ AI sedang membaca tugas (±20–40 detik)…';
     var fd = new FormData(); fd.append('_t', document.querySelector('input[name=_t]').value); fd.append('aksi', 'saran'); fd.append('id', k.dataset.id); fd.append('kode', k.dataset.kode);
+    if (pesan && pesan.value.trim()) fd.append('pesan', pesan.value.trim());
     fetch('?p=api_tugas', { method: 'POST', body: fd, credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (r) {
-      if (!r.ok) { st.textContent = '⚠ ' + (r.galat || 'gagal'); b.disabled = false; return; }
-      k.innerHTML = '<b>✨ Saran AI: ' + r.nilai + '</b>' + (r.ragu ? ' <span class="lencana st-draf">AI ragu</span>' : '') + '<br><small></small>';
-      k.querySelector('small').textContent = r.catatan;
+      b.disabled = false;
+      if (!r.ok) { st.textContent = '⚠ ' + (r.galat || 'gagal'); return; }
+      st.textContent = ulang ? '✓ Sudah dinilai ulang — nilai & komentar di bawah diganti dengan saran baru.' : '';
+      tampil(r);
+      b.textContent = '↻ Nilai ulang dengan AI';
+      var d = k.querySelector('.pesan-ai'); if (d) d.hidden = false;
       var n = document.getElementById('isi-nilai'), c = document.getElementById('isi-komentar');
-      if (!n.value) n.value = r.nilai; if (!c.value) c.value = r.catatan;
+      if (ulang || !n.value) n.value = r.nilai;
+      if (ulang || !c.value) c.value = r.catatan;
     }).catch(function () { st.textContent = '⚠ Gagal tersambung'; b.disabled = false; });
   };
 })();

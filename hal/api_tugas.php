@@ -15,7 +15,7 @@ if (post('aksi') === 'saran') {
     if (!$k) { echo json_encode(['ok' => false, 'galat' => 'Kiriman tidak ditemukan.']); exit; }
     session_write_close();
     set_time_limit(180);
-    $r = ai_nilai_tugas($t, $k);
+    $r = ai_nilai_tugas($t, $k, trim((string)post('pesan')));
     if ($r['ok']) q('UPDATE guru_tugas_kirim SET saran_ai = ? WHERE tugas_id = ? AND kode = ?', [json_encode($r, JSON_UNESCAPED_UNICODE), $t['id'], $k['kode']]);
     echo json_encode($r, JSON_UNESCAPED_UNICODE);
     exit;

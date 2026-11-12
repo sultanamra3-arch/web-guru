@@ -162,7 +162,7 @@ function komentar_aturan(int $guru_id, string $nama): string
     return $o . "- Bila foto buram/tidak terbaca atau soal belum semua dijawab, katakan dengan bahasa yang sama gayanya dan minta dikirim ulang/dilengkapi.\n";
 }
 
-function ai_nilai_tugas(array $t, array $k): array
+function ai_nilai_tugas(array $t, array $k, string $pesan_guru = ''): array
 {
     $foto = [];
     foreach (array_slice(tugas_foto_daftar($k), 0, 5) as $f) {
@@ -178,16 +178,30 @@ function ai_nilai_tugas(array $t, array $k): array
         . (trim((string)$t['kunci']) !== '' ? "Kunci/rubrik dari guru: " . mb_substr((string)$t['kunci'], 0, 3000) . "\n" : "Tidak ada kunci; nilai berdasarkan kelengkapan, ketepatan, dan kerapian sesuai petunjuk.\n")
         . ($teks !== '' ? "Jawaban teks siswa: " . mb_substr($teks, 0, 3000) . "\n" : '')
         . ($foto ? count($foto) . " foto hasil kerja siswa terlampir.\n" : '')
+        . "CARA MEMBACA JAWABAN SISWA:\n"
+        . "- Siswa sering MENYALIN PERTANYAANNYA juga: pertanyaan dulu lalu jawaban, jawaban di bawah/di samping pertanyaan, diawali \"Jawab:\", \"Jwb\", \"J:\", \"=\", panah, tanda kurung, atau ditulis berselang-seling. Pisahkan mana teks pertanyaan yang disalin dan mana jawabannya. Teks pertanyaan yang disalin BUKAN jawaban dan tidak diberi nilai.\n"
+        . "- Cocokkan jawaban ke nomor soal (lihat petunjuk tugas di atas). Bila nomor tidak ditulis, cocokkan dari isi/urutan.\n"
+        . "- Nomor yang hanya berisi salinan pertanyaan tanpa jawaban = kosong.\n"
+        . "- Tulisan tangan miring/kurang rapi tetap dibaca sebaik mungkin; jangan menganggap kosong hanya karena sulit dibaca — tandai ragu bila benar-benar tidak terbaca.\n"
         . "Bila foto tidak terbaca atau bukan tugas yang diminta, beri nilai 0 dan jelaskan di catatan.\n"
+        . ($pesan_guru !== '' ? "PESAN DARI GURU untuk penilaian ulang ini (WAJIB diikuti): " . mb_substr($pesan_guru, 0, 800) . "\n" : '')
         . komentar_aturan((int)$t['guru_id'], tugas_kelompok($t) ? '' : nama_siswa((string)$k['kode']))
         . (tugas_kelompok($t) ? "- Ini tugas KELOMPOK: sapa \"kelompok " . (int)substr((string)$k['kode'], 1) . "\" atau \"kalian\".\n" : '')
-        . 'Balas HANYA JSON: {"nilai": 80, "catatan": "...", "ragu": false}';
+        . 'Balas HANYA JSON. Isi "rincian" dulu (satu per nomor soal: ringkasan jawaban siswa ≤12 kata, status benar/sebagian/salah/kosong), baru nilai & catatan: '
+        . '{"rincian":[{"no":1,"jawaban":"...","status":"benar"}],"nilai": 80, "catatan": "...", "ragu": false}';
     $isi = $foto ? array_merge([['type' => 'text', 'text' => $perintah]], ai_bagian_foto($foto, 5)) : $perintah;
     $r = ai_minta([['role' => 'user', 'content' => $isi]], ['gambar' => (bool)$foto, 'maks_token' => 4000, 'waktu' => 120, 'suhu' => 0.2]);
     if (!$r['ok']) return $r;
     $j = ai_ambil_json((string)$r['pesan']['content']);
     if (!is_array($j) || !isset($j['nilai'])) return ['ok' => false, 'galat' => 'AI membalas dengan format yang tidak dikenali.', 'rincian' => [$r['oleh']]];
-    return ['ok' => true, 'nilai' => max(0, min(100, (float)$j['nilai'])), 'catatan' => mb_substr(trim((string)($j['catatan'] ?? '')), 0, 700),
+    $rincian = [];
+    foreach ((array)($j['rincian'] ?? []) as $x) {
+        if (!is_array($x)) continue;
+        $st = strtolower(trim((string)($x['status'] ?? '')));
+        $rincian[] = ['no' => mb_substr(trim((string)($x['no'] ?? '')), 0, 6), 'jawaban' => mb_substr(trim((string)($x['jawaban'] ?? '')), 0, 160),
+            'status' => in_array($st, ['benar', 'sebagian', 'salah', 'kosong'], true) ? $st : 'sebagian'];
+    }
+    return ['ok' => true, 'nilai' => max(0, min(100, (float)$j['nilai'])), 'catatan' => mb_substr(trim((string)($j['catatan'] ?? '')), 0, 700), 'rincian' => array_slice($rincian, 0, 40),
         'ragu' => !empty($j['ragu']), 'oleh' => $r['oleh']];
 }
 
