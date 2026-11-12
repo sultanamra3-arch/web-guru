@@ -5,7 +5,7 @@ declare(strict_types=1);
 date_default_timezone_set('Asia/Jakarta');
 mb_internal_encoding('UTF-8');
 
-const VERSI = '1.60';
+const VERSI = '1.61';
 
 $__konfig = __DIR__ . '/../config.php';
 if (!is_file($__konfig)) $__konfig = __DIR__ . '/../config.contoh.php';
@@ -55,10 +55,10 @@ function konfig_db(): array
     throw new RuntimeException('Format konfigurasi SLiMS tidak dikenali. Isi bagian "db" di config.php.');
 }
 
-function db(): PDO
+function db(bool $baru = false): PDO
 {
     static $pdo = null;
-    if ($pdo) return $pdo;
+    if ($pdo && !$baru) return $pdo;
     $c = konfig_db();
     $dsn = 'mysql:host=' . $c['host'] . ';port=' . (int)($c['port'] ?: 3306)
         . ';dbname=' . $c['database'] . ';charset=utf8mb4';
@@ -67,13 +67,29 @@ function db(): PDO
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false,
     ]);
+    // permintaan AI bisa lama (puluhan detik): jangan sampai koneksi diputus server di tengah jalan
+    try { $pdo->exec('SET SESSION wait_timeout = 600'); } catch (Throwable $e) {}
     return $pdo;
+}
+
+/** Koneksi database terputus ("MySQL server has gone away" / "Lost connection")? */
+function db_putus(Throwable $e): bool
+{
+    $kode = $e instanceof PDOException ? (int)($e->errorInfo[1] ?? 0) : 0;
+    return in_array($kode, [2006, 2013], true) || preg_match('/gone away|Lost connection|server closed/i', $e->getMessage()) === 1;
 }
 
 function q(string $sql, array $p = []): PDOStatement
 {
-    $s = db()->prepare($sql);
-    $s->execute($p);
+    try {
+        $s = db()->prepare($sql);
+        $s->execute($p);
+    } catch (PDOException $e) {
+        // sambung ulang sekali bila koneksi terputus (mis. setelah menunggu AI); tidak di tengah transaksi
+        if (!db_putus($e) || db()->inTransaction()) throw $e;
+        $s = db(true)->prepare($sql);
+        $s->execute($p);
+    }
     return $s;
 }
 
