@@ -50,11 +50,13 @@
     });
     wadah.lastElementChild.hidden = foto.length >= maks;
   }
-  ambil.addEventListener('change', function () {
-    var b = Array.prototype.slice.call(ambil.files, 0, maks - foto.length); ambil.value = '';
+  function pilihFoto() {
+    var inp = this, b = Array.prototype.slice.call(inp.files, 0, maks - foto.length); inp.value = '';
     st.textContent = b.length ? '⏳ Menyiapkan foto…' : '';
     Promise.all(b.map(kecilkan)).then(function (f) { foto = foto.concat(f); gambar(); st.textContent = ''; }).catch(function (e) { st.textContent = '⚠ ' + e.message; });
-  });
+  }
+  ambil.addEventListener('change', pilihFoto);
+  if ($('ambil-kamera')) $('ambil-kamera').addEventListener('change', pilihFoto);
   var token = (document.querySelector('input[name=_t]') || {}).value || K.dataset.t;
   tombol.addEventListener('click', function () {
     var teks = $('teks-tugas').value.trim();

@@ -886,3 +886,8 @@ html.sg-dialog-buka,html.sg-dialog-buka body{overflow:hidden}
 .sampah-aksi form{margin:0}
 .kosong-sampah{text-align:center;color:#5B6382}
 .kosong-sampah .ikon{width:2.4rem;height:2.4rem;opacity:.5}
+/* Tugas siswa: dua pilihan tambah foto (Kamera / Galeri) dalam satu petak */
+.tambah-dua{display:grid;grid-template-rows:1fr 1fr;gap:.35rem;aspect-ratio:3/4}
+.tambah-dua .tambah-foto{aspect-ratio:auto;min-height:0}
+.tambah-dua .tambah-foto b{font-size:1.25rem;line-height:1}
+.tambah-dua .tambah-foto span{font-size:.85rem;font-weight:700}

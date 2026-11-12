@@ -120,9 +120,12 @@ kepala($t ? $t['judul'] : 'Tugas online', '', true);
     <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem"><b style="font-size:1.1rem"><?= h($nama_ada[$saya]) ?></b>
       <a class="kecil" href="?p=t&amp;k=<?= h($t['kode']) ?>&amp;ganti=1"><?= $kel_n ? 'bukan saya' : 'kirim untuk nama lain' ?></a></div>
     <div class="foto-pilih" id="foto-pilih">
-      <label class="tambah-foto"><input type="file" accept="image/*" multiple hidden id="ambil-foto"><b>＋</b><span>Foto</span></label>
+      <div class="tambah-dua">
+        <label class="tambah-foto"><input type="file" accept="image/*" capture="environment" hidden id="ambil-kamera"><b>📷</b><span>Kamera</span></label>
+        <label class="tambah-foto"><input type="file" accept="image/*" multiple hidden id="ambil-foto"><b>🖼️</b><span>Galeri</span></label>
+      </div>
     </div>
-    <small class="redup">📷 Kamera atau galeri · maks. <?= (int)$t['maks_foto'] ?> foto · otomatis dikecilkan</small>
+    <small class="redup">Foto langsung (Kamera) atau pilih dari Galeri · maks. <?= (int)$t['maks_foto'] ?> foto · otomatis dikecilkan</small>
     <label class="formulir" style="display:block;margin-top:.6rem">Jawaban / catatan (opsional)<textarea id="teks-tugas" rows="3" placeholder="Tulis jawaban atau catatan untuk guru"><?= $kel_n && $k ? h((string)$k['teks']) : '' ?></textarea></label>
     <button type="button" class="utama lebar" id="tombol-kirim" style="margin-top:.6rem">📤 <?= $k && $k['dikirim'] ? ($kel_n ? 'Simpan kiriman kelompok' : 'Kirim ulang') : ($kel_n ? 'Kirim tugas kelompok' : 'Kirim tugas') ?></button>
     <p class="kecil redup" id="status-kirim" style="margin:.4rem 0 0"></p>
