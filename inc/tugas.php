@@ -124,6 +124,44 @@ function alat_perangkat(): string
 }
 
 /** Saran nilai dari AI untuk satu kiriman (membaca foto + teks, memakai petunjuk & kunci/rubrik guru). */
+const KOMENTAR_GAYA = ['lucu' => 'Lucu', 'hangat' => 'Hangat', 'singkat' => 'Singkat', 'tegas' => 'Tegas'];
+const SAPAAN_GURU = ['' => '(tanpa menyebut diri)', 'Bapak' => 'Bapak', 'Ibu' => 'Ibu', 'Cikgu' => 'Cikgu', 'Pak Guru' => 'Pak Guru', 'Bu Guru' => 'Bu Guru'];
+
+/** Aturan menulis komentar AI untuk siswa, sesuai gaya & sapaan yang dipilih guru di Profil. */
+function komentar_aturan(int $guru_id, string $nama): string
+{
+    $gaya = setelan('komentar_gaya:' . $guru_id) ?: 'hangat';
+    if (!isset(KOMENTAR_GAYA[$gaya])) $gaya = 'hangat';
+    $sapa = (string)(setelan('sapaan:' . $guru_id) ?: '');
+    $depan = trim(explode(' ', trim(preg_replace('/^(muhammad|muhammad|m\.|moh\.?|nur)\s+/i', '', $nama)))[0] ?? '');
+    $depan = $depan !== '' ? mb_convert_case(mb_strtolower($depan), MB_CASE_TITLE) : '';
+    $o = "KOMENTAR (\"catatan\") ditulis seperti guru yang berbicara langsung kepada muridnya, bukan laporan:\n"
+        . ($depan !== '' ? "- Sapa siswa dengan nama panggilannya: \"$depan\" (boleh di awal kalimat).\n" : '')
+        . ($sapa !== '' ? "- Guru menyebut dirinya \"$sapa\" (mis. \"$sapa senang membacanya\"). Jangan memakai kata \"saya\".\n" : "- Jangan menyebut diri guru (tanpa \"saya\"/\"Bapak\"/\"Ibu\").\n")
+        . "- Sebut ISI jawaban siswa yang spesifik (nomor soal atau gagasannya), bukan kalimat umum.\n"
+        . "- Beri SATU saran perbaikan yang jelas dan bisa langsung dilakukan.\n"
+        . "- Nada menyesuaikan nilai: tinggi → puji dengan tulus; sedang → akui yang baik lalu dorong; rendah → semangati, jangan menghakimi atau membuat malu.\n"
+        . "- Hindari kata-kata kaku seperti \"secara keseluruhan\", \"namun demikian\", \"perlu ditingkatkan lagi\", \"sudah cukup baik\". Bahasa Indonesia sehari-hari yang sopan.\n";
+    switch ($gaya) {
+        case 'lucu':
+            $pantun = random_int(1, 4) === 1;
+            $o .= "- GAYA LUCU: jenaka dan hangat seperti guru yang disukai murid. Boleh perumpamaan lucu bernuansa Melayu Riau (sampan, dayung, pantai, Hang Tuah, durian, sagu, dll.) dan 1–2 emoji.\n"
+                . "- Lucu yang MENYEMANGATI: jangan menyindir, mengejek, membandingkan dengan teman, atau membahas fisik/keluarga siswa.\n"
+                . ($pantun ? "- Kali ini SERTAKAN satu pantun pendek 4 baris (sampiran a-b-a-b, isi tentang jawabannya), lalu satu kalimat saran.\n" : "- Kali ini jangan memakai pantun.\n")
+                . "- Panjang 2–3 kalimat pendek, MAKSIMAL 45 kata" . ($pantun ? ' di luar pantun; pantun diletakkan paling akhir' : '') . ".\n";
+            break;
+        case 'singkat':
+            $o .= "- GAYA SINGKAT: tepat SATU kalimat pendek (maks. 20 kata), tetap menyebut isi jawaban & saran. Tanpa emoji, tanpa lelucon.\n";
+            break;
+        case 'tegas':
+            $o .= "- GAYA TEGAS: lugas dan jelas, langsung ke poin (apa yang benar, apa yang harus diperbaiki), tetap sopan. Tanpa emoji, tanpa lelucon, tanpa perumpamaan. 2 kalimat, maksimal 35 kata.\n";
+            break;
+        default:
+            $o .= "- GAYA HANGAT: ramah dan menyemangati, boleh 1 emoji. 2–3 kalimat, maksimal 40 kata. Tanpa pantun dan tanpa lelucon.\n";
+    }
+    return $o . "- Bila foto buram/tidak terbaca atau soal belum semua dijawab, katakan dengan bahasa yang sama gayanya dan minta dikirim ulang/dilengkapi.\n";
+}
+
 function ai_nilai_tugas(array $t, array $k): array
 {
     $foto = [];
@@ -140,14 +178,16 @@ function ai_nilai_tugas(array $t, array $k): array
         . (trim((string)$t['kunci']) !== '' ? "Kunci/rubrik dari guru: " . mb_substr((string)$t['kunci'], 0, 3000) . "\n" : "Tidak ada kunci; nilai berdasarkan kelengkapan, ketepatan, dan kerapian sesuai petunjuk.\n")
         . ($teks !== '' ? "Jawaban teks siswa: " . mb_substr($teks, 0, 3000) . "\n" : '')
         . ($foto ? count($foto) . " foto hasil kerja siswa terlampir.\n" : '')
-        . "Bila foto tidak terbaca atau bukan tugas yang diminta, beri nilai 0 dan jelaskan. Catatan ditujukan ke siswa, ramah, maksimal 2 kalimat, sebutkan yang sudah baik dan yang perlu diperbaiki.\n"
+        . "Bila foto tidak terbaca atau bukan tugas yang diminta, beri nilai 0 dan jelaskan di catatan.\n"
+        . komentar_aturan((int)$t['guru_id'], tugas_kelompok($t) ? '' : nama_siswa((string)$k['kode']))
+        . (tugas_kelompok($t) ? "- Ini tugas KELOMPOK: sapa \"kelompok " . (int)substr((string)$k['kode'], 1) . "\" atau \"kalian\".\n" : '')
         . 'Balas HANYA JSON: {"nilai": 80, "catatan": "...", "ragu": false}';
     $isi = $foto ? array_merge([['type' => 'text', 'text' => $perintah]], ai_bagian_foto($foto, 5)) : $perintah;
     $r = ai_minta([['role' => 'user', 'content' => $isi]], ['gambar' => (bool)$foto, 'maks_token' => 4000, 'waktu' => 120, 'suhu' => 0.2]);
     if (!$r['ok']) return $r;
     $j = ai_ambil_json((string)$r['pesan']['content']);
     if (!is_array($j) || !isset($j['nilai'])) return ['ok' => false, 'galat' => 'AI membalas dengan format yang tidak dikenali.', 'rincian' => [$r['oleh']]];
-    return ['ok' => true, 'nilai' => max(0, min(100, (float)$j['nilai'])), 'catatan' => mb_substr(trim((string)($j['catatan'] ?? '')), 0, 400),
+    return ['ok' => true, 'nilai' => max(0, min(100, (float)$j['nilai'])), 'catatan' => mb_substr(trim((string)($j['catatan'] ?? '')), 0, 700),
         'ragu' => !empty($j['ragu']), 'oleh' => $r['oleh']];
 }
 

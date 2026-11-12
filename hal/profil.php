@@ -7,6 +7,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['admin_asli'])) {
     pesan('Profil dan kata sandi guru tidak bisa diubah saat admin masuk sebagai guru ini.', 'galat');
     ke('?p=profil');
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'komentar') {
+    if (isset(KOMENTAR_GAYA[(string)post('gaya')])) setelan_simpan('komentar_gaya:' . uid(), (string)post('gaya'));
+    if (array_key_exists((string)post('sapaan'), SAPAAN_GURU)) setelan_simpan('sapaan:' . uid(), (string)post('sapaan'));
+    pesan('Gaya komentar disimpan.');
+    ke('?p=profil');
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('aksi') === 'huruf') {
     setelan_simpan('huruf:' . uid(), post('huruf') === 'besar' ? 'besar' : 'normal');
     pesan('Ukuran huruf disimpan.');
@@ -54,6 +60,17 @@ foreach ($galat as $g) echo '<div class="pesan galat">' . h($g) . '</div>';
     <button name="huruf" value="<?= $k ?>" class="<?= $hf === $k ? 'aktif' : '' ?>"><?= $n ?></button><?php endforeach; ?>
   </div>
   <small class="redup">Huruf besar lebih nyaman dibaca di HP atau saat layar ditampilkan di proyektor.</small>
+</form>
+<form method="post" class="kartu formulir">
+  <?= input_token() ?><input type="hidden" name="aksi" value="komentar">
+  <b>Gaya komentar AI untuk siswa</b>
+  <small class="redup">Dipakai saat meminta saran nilai tugas dari AI. Komentar tetap bisa diubah sebelum disimpan.</small>
+  <div class="baris2">
+    <label>Gaya<select name="gaya"><?= pilihan(KOMENTAR_GAYA, setelan('komentar_gaya:' . uid()) ?: 'hangat') ?></select></label>
+    <label>Siswa memanggil saya<select name="sapaan"><?= pilihan(SAPAAN_GURU, (string)(setelan('sapaan:' . uid()) ?: '')) ?></select></label>
+  </div>
+  <small class="redup">Lucu = jenaka bernuansa Melayu, sesekali pantun · Hangat = ramah menyemangati · Singkat = satu kalimat · Tegas = lugas tanpa emoji</small>
+  <button class="utama">Simpan gaya komentar</button>
 </form>
 <form method="post" class="kartu formulir">
   <?= input_token() ?><input type="hidden" name="aksi" value="notif">
