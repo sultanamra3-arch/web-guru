@@ -284,3 +284,21 @@ function tugas_status_kumpul(array $t): array
     }
     return $o;
 }
+
+/** v1.67: daftar penerima kiriman (kode => nama) untuk guru yang mengunggahkan tugas: siswa kelas, atau kelompok. */
+function tugas_daftar_unggah(array $t): array
+{
+    $d = [];
+    if (tugas_kelompok($t)) {
+        foreach (tugas_daftar_kelompok($t) as $n) $d['K' . $n] = 'Kelompok ' . $n . ' (' . implode(', ', tugas_anggota($t, $n)) . ')';
+    } else {
+        foreach (siswa_kelas((string)$t['kelas'], (string)($t['tahun'] ?: tahun_aktif((int)$t['guru_id'])), (int)$t['guru_id']) as $s) $d[(string)$s['member_id']] = (string)$s['member_name'];
+    }
+    return $d;
+}
+
+/** Kiriman ini diunggah guru (bukan dari HP siswa). */
+function tugas_dari_guru(?array $k): bool
+{
+    return $k && ($k['perangkat'] ?? '') === 'guru';
+}

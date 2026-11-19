@@ -94,6 +94,7 @@ judul_baris('Tugas: ' . h($t['judul']), '<a class="tombol" href="?p=tugas">‹ T
   <div class="token-tombol">
     <button type="button" class="utama kecil" id="tombol-bagikan">📤 Bagikan</button>
     <button type="button" class="kecil" id="tombol-status">📋 Status ke WA</button>
+    <a class="tombol kecil" href="?p=tugas_unggah&amp;id=<?= $id ?>"><?= ikon('kamera') ?> Unggahkan tugas siswa</a>
     <a class="tombol kecil" href="?p=tugas_form&amp;id=<?= $id ?>">⚙ Ubah tugas</a>
     <a class="tombol kecil" href="?p=rekap_cetak&amp;jenis=tugas&amp;id=<?= $id ?>"><?= ikon('cetak') ?> Rekap kelas (PDF)</a>
     <form method="post" class="sebaris"><?= input_token() ?><?php if ($t['status'] === 'buka'): ?><button name="aksi" value="tutup" class="kecil">■ Tutup</button><?php else: ?><button name="aksi" value="buka" class="kecil">▶ Buka lagi</button><?php endif; ?></form>
@@ -122,11 +123,13 @@ panel_status(['jenis' => 'tugas', 'id' => $id, 'judul' => $t['judul'], 'kelas' =
         <?php elseif ($k['status'] === 'perbaiki'): ?> <span class="lencana st-draf">↩ diminta perbaiki</span>
         <?php elseif ($k['telat']): ?> <span class="lencana st-draf">⏰ terlambat</span>
         <?php else: ?> <span class="lencana st-buka">✓ terkirim</span><?php endif; ?>
-        <?php if ($sudah): ?><br><small class="redup"><?= h(ujian_waktu_teks($k['dikirim'])) ?> · <?= count(tugas_foto_daftar($k)) ?> foto<?= trim((string)$k['teks']) !== '' ? ' · ada teks' : '' ?><?= (int)$k['kali'] > 1 ? ' · kirim ke-' . (int)$k['kali'] : '' ?><?= $kel && $k['oleh'] ? ' · oleh ' . h(nama_siswa((string)$k['oleh'])) : '' ?></small><?php endif; ?>
+        <?php if ($sudah): ?><br><small class="redup"><?= h(ujian_waktu_teks($k['dikirim'])) ?> · <?= count(tugas_foto_daftar($k)) ?> foto<?= trim((string)$k['teks']) !== '' ? ' · ada teks' : '' ?><?= (int)$k['kali'] > 1 ? ' · kirim ke-' . (int)$k['kali'] : '' ?><?= $kel && $k['oleh'] ? ' · oleh ' . h(nama_siswa((string)$k['oleh'])) : '' ?><?= tugas_dari_guru($k) ? ' · diunggah guru' : '' ?></small><?php endif; ?>
       </div>
       <?php if ($sudah): $rs = resi_tugas($id, (string)$kd); ?>
         <?= resi_tombol_salin($rs, resi_teks_wa($rs, $kel ? 'tugas kelompok' : 'tugas', (string)$t['judul'], (string)$t['mapel'], $kel && isset($anggota[$kd]) ? $nm . ' (' . implode(', ', $anggota[$kd]) . ')' : $nm, (string)$t['kelas'], ujian_waktu_teks((string)$k['dikirim']))) ?>
         <a class="<?= $k['nilai'] !== null ? 'nilai-tugas' : 'tombol kecil' ?>" href="?p=tugas_nilai&amp;id=<?= $id ?>&amp;kode=<?= h(rawurlencode($kd)) ?>"><?= $k['nilai'] !== null ? h(rtrim(rtrim((string)$k['nilai'], '0'), '.')) : 'Nilai' ?></a>
+      <?php else: ?>
+        <a class="tombol kecil" href="?p=tugas_unggah&amp;id=<?= $id ?>&amp;kode=<?= h(rawurlencode((string)$kd)) ?>" title="Unggahkan tugas <?= h($nm) ?>"><?= ikon('kamera') ?> Unggahkan</a>
       <?php endif; ?>
     </li>
   <?php endforeach; ?>

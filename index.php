@@ -35,7 +35,7 @@ $halaman = [
     'perangkat', 'dokumen', 'dokumen_buat', 'dokumen_lihat', 'presentasi',
     'sertifikat', 'sertifikat_form', 'sertifikat_cetak',
     'ujian', 'ujian_form', 'ujian_lihat', 'ujian_hasil', 'ujian_jawaban', 'u', 'u_kerja', 'gambar',
-    'tugas', 'tugas_form', 'tugas_lihat', 'tugas_nilai', 'tugas_foto', 'api_tugas', 't', 'api_t',
+    'tugas', 'tugas_form', 'tugas_lihat', 'tugas_nilai', 'tugas_unggah', 'tugas_foto', 'api_tugas', 't', 'api_t',
     'kuis', 'kuis_main', 'api_kuis', 'k', 'api_k',
     'asisten', 'api_ai', 'api_ujian', 'api_u', 'api_notif',
 ];

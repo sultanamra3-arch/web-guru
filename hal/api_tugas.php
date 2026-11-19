@@ -20,4 +20,31 @@ if (post('aksi') === 'saran') {
     echo json_encode($r, JSON_UNESCAPED_UNICODE);
     exit;
 }
+if (post('aksi') === 'unggah') {
+    // v1.67: guru mengunggahkan foto tugas atas nama siswa/kelompok (mis. buku dikumpulkan langsung)
+    $balas = function (array $d): never { echo json_encode($d, JSON_UNESCAPED_UNICODE); exit; };
+    $kode = (string)post('kode');
+    $daftar = tugas_daftar_unggah($t);
+    if (!isset($daftar[$kode])) $balas(['ok' => false, 'galat' => 'Siswa tidak ada di kelas ini.']);
+    $k = satu('SELECT * FROM guru_tugas_kirim WHERE tugas_id = ? AND kode = ?', [$t['id'], $kode]);
+    if ($k && $k['status'] === 'dinilai') $balas(['ok' => false, 'galat' => 'Tugas ini sudah dinilai.']);
+    session_write_close();
+    $foto = array_slice((array)json_decode((string)post('foto', '[]'), true), 0, (int)$t['maks_foto']);
+    $teks = mb_substr(trim((string)post('teks')), 0, 5000);
+    if (!$foto) $balas(['ok' => false, 'galat' => 'Tambahkan minimal 1 foto.']);
+    $simpan = [];
+    foreach ($foto as $f) {
+        $n = tugas_foto_simpan((string)$f);
+        if (!$n) { tugas_hapus_foto($simpan); $balas(['ok' => false, 'galat' => 'Ada foto yang tidak bisa dibaca. Coba ambil ulang.']); }
+        $simpan[] = $n;
+    }
+    if ($k) tugas_hapus_foto(tugas_foto_daftar($k));
+    $telat = post('telat') ? 1 : 0;
+    q("INSERT INTO guru_tugas_kirim (tugas_id, kode, perangkat, foto, teks, dikirim, telat, kali, status, oleh) VALUES (?,?,'guru',?,?,?,?,1,'kirim',NULL)
+       ON DUPLICATE KEY UPDATE perangkat = 'guru', foto = VALUES(foto), teks = VALUES(teks), dikirim = VALUES(dikirim), telat = VALUES(telat),
+       kali = kali + 1, status = 'kirim', saran_ai = NULL, oleh = NULL",
+        [$t['id'], $kode, json_encode($simpan), $teks, sekarang(), $telat]);
+    resi_tugas((int)$t['id'], $kode);
+    $balas(['ok' => true, 'jam' => date('H.i'), 'telat' => (bool)$telat]);
+}
 echo json_encode(['ok' => false, 'galat' => 'Aksi tidak dikenal']);

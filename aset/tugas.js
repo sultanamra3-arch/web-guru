@@ -69,15 +69,16 @@
       banner('kirim', '↑', 'Sedang mengirim…', jml + ' foto' + (coba > 1 ? ' · percobaan ke-' + coba : '') + ' · jangan tutup halaman ini', 0);
       st.textContent = '';
       var fd = new FormData(); fd.append('_t', token); fd.append('id', K.dataset.id); fd.append('foto', JSON.stringify(foto)); fd.append('teks', teks); fd.append('lama', JSON.stringify(lamaDipakai()));
+      if (K.dataset.aksi) { fd.append('aksi', K.dataset.aksi); fd.append('kode', K.dataset.siswa); fd.append('telat', $('telat-tugas') && $('telat-tugas').checked ? '1' : ''); }
       var x = new XMLHttpRequest();
-      x.open('POST', '?p=api_t'); x.withCredentials = true;
+      x.open('POST', K.dataset.api || '?p=api_t'); x.withCredentials = true;
       x.upload.onprogress = function (e) { if (e.lengthComputable) maju(Math.min(95, Math.round(e.loaded / e.total * 95))); };
       x.onload = function () {
         var r; try { r = JSON.parse(x.responseText); } catch (e) { return gagalSinyal(); }
         if (!r.ok) { banner('belum', '!', 'Belum terkirim', r.galat || 'Gagal mengirim.'); tombol.disabled = false; return; }
         maju(100);
-        banner('ok', '✓', 'Tugas sudah terkirim', 'Diterima guru pukul ' + r.jam + (r.telat ? ' · terlambat' : '') + ' · ' + jml + ' foto');
-        setTimeout(function () { location.href = '?p=t&k=' + K.dataset.kode; }, 1500);
+        banner('ok', '✓', K.dataset.aksi ? 'Tersimpan' : 'Tugas sudah terkirim', (K.dataset.aksi ? 'Pukul ' : 'Diterima guru pukul ') + r.jam + (r.telat ? ' · terlambat' : '') + ' · ' + jml + ' foto');
+        setTimeout(function () { location.href = K.dataset.lanjut || '?p=t&k=' + K.dataset.kode; }, K.dataset.lanjut ? 600 : 1500);
       };
       x.onerror = x.ontimeout = gagalSinyal;
       x.send(fd);
