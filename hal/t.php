@@ -87,28 +87,49 @@ kepala($t ? $t['judul'] : 'Tugas online', '', true);
     <small><?= implode(', ', array_map(fn($kd, $nm) => $kd === $saya ? '<b>' . h($nm) . '</b>' : h($nm), array_keys($anggota), $anggota)) ?></small>
   </div>
   <?php endif; ?>
-  <?php if ($k && $k['dikirim']): ?>
-    <?php if ($hp_sama): ?>
-      <?php if ($k['status'] === 'dinilai'): ?>
-        <div class="kartu nilai-kartu"><div class="kecil redup"><?= $kel_n ? 'Nilai kelompokmu' : 'Nilai tugasmu' ?></div><div class="nilai-siswa"><?= h(rtrim(rtrim((string)$k['nilai'], '0'), '.')) ?></div>
-          <?php if (trim((string)$k['komentar']) !== ''): ?><div class="pembahasan-siswa" style="text-align:left"><b>Komentar guru:</b> <?= nl2br(h($k['komentar'])) ?></div><?php endif; ?></div>
-      <?php elseif ($k['status'] === 'perbaiki'): ?>
-        <div class="pesan galat"><b>↩ Guru meminta <?= $kel_n ? 'kelompokmu' : 'kamu' ?> memperbaiki tugas.</b><?= trim((string)$k['komentar']) !== '' ? '<br>' . nl2br(h($k['komentar'])) : '' ?><br>Kirim ulang di bawah.</div>
-      <?php endif; ?>
-      <div class="pesan" style="background:#dff3e4;color:#1d6b33">✅ Terkirim <?= h(ujian_waktu_teks($k['dikirim'])) ?><?= $pengirim ? ' oleh <b>' . h($pengirim) . '</b>' : '' ?> · <?= count($foto_lama) ?> foto<?= $k['telat'] ? ' · <b>terlambat</b>' : '' ?><?= $k['status'] === 'kirim' ? '. Menunggu dinilai guru.' : '' ?></div>
-      <?php if ($kel_n && trim((string)$k['teks']) !== ''): ?><div class="kartu kecil" style="white-space:pre-line"><span class="redup">Catatan kelompok:</span> <?= h($k['teks']) ?></div><?php endif; ?>
-      <?php $resi = resi_tugas($tid, (string)$k['kode']);
-        echo resi_kotak($resi, resi_teks_wa($resi, $kel_n ? 'tugas kelompok' : 'tugas', (string)$t['judul'], (string)$t['mapel'],
-            $kel_n ? 'Kelompok ' . $kel_n . ' (' . implode(', ', $anggota) . ')' : $nama_ada[$saya], (string)$t['kelas'], ujian_waktu_teks((string)$k['dikirim']))); ?>
-      <?php if ($foto_lama && !($kel_n && $bisa === '')): ?><div class="foto-tugas kecil-foto"><?php foreach ($foto_lama as $f): ?><img src="<?= h(tugas_foto_url($tid, $f)) ?>" alt="" loading="lazy"><?php endforeach; ?></div><?php endif; ?>
-    <?php else: ?>
-      <div class="pesan">Tugas atas nama <b><?= h($nama_ada[$saya]) ?></b> sudah dikirim dari HP lain (<?= h(ujian_waktu_teks($k['dikirim'])) ?>). Mengirim lagi akan <b>menggantikan</b> kiriman itu.</div>
+  <?php $sudah = $k && $k['dikirim']; $atas = $kel_n ? 'Kelompok ' . $kel_n : $nama_ada[$saya]; ?>
+  <?php if ($sudah && $hp_sama): ?>
+    <?php if ($k['status'] === 'dinilai'): ?>
+      <div class="kartu nilai-kartu"><div class="kecil redup"><?= $kel_n ? 'Nilai kelompokmu' : 'Nilai tugasmu' ?></div><div class="nilai-siswa"><?= h(rtrim(rtrim((string)$k['nilai'], '0'), '.')) ?></div>
+        <?php if (trim((string)$k['komentar']) !== ''): ?><div class="pembahasan-siswa" style="text-align:left"><b>Komentar guru:</b> <?= nl2br(h($k['komentar'])) ?></div><?php endif; ?></div>
     <?php endif; ?>
+    <?php if ($k['status'] === 'perbaiki'): ?>
+      <div class="status-besar belum" id="status-besar"><div class="st-ikon">!</div><div class="st-isi"><b>Perlu diperbaiki</b>
+        <span>Guru meminta <?= $kel_n ? 'kelompokmu' : 'kamu' ?> memperbaiki tugas. Kirim ulang di bawah.</span>
+        <?php if (trim((string)$k['komentar']) !== ''): ?><span class="st-komentar"><?= nl2br(h($k['komentar'])) ?></span><?php endif; ?></div></div>
+    <?php else: ?>
+      <div class="status-besar ok" id="status-besar"><div class="st-ikon">✓</div><div class="st-isi"><b>Tugas sudah terkirim</b>
+        <span>Diterima guru · <?= h(ujian_waktu_teks($k['dikirim'])) ?><?= $k['telat'] ? ' · <b>terlambat</b>' : '' ?></span>
+        <span><?= count($foto_lama) ?> foto · <?= $pengirim ? 'dikirim oleh <b>' . h($pengirim) . '</b>' : 'atas nama <b>' . h($atas) . '</b>' ?></span></div></div>
+    <?php endif; ?>
+    <?php if ($kel_n && trim((string)$k['teks']) !== ''): ?><div class="kartu kecil" style="white-space:pre-line"><span class="redup">Catatan kelompok:</span> <?= h($k['teks']) ?></div><?php endif; ?>
+    <?php $resi = resi_tugas($tid, (string)$k['kode']);
+      echo resi_kotak($resi, resi_teks_wa($resi, $kel_n ? 'tugas kelompok' : 'tugas', (string)$t['judul'], (string)$t['mapel'],
+          $kel_n ? 'Kelompok ' . $kel_n . ' (' . implode(', ', $anggota) . ')' : $nama_ada[$saya], (string)$t['kelas'], ujian_waktu_teks((string)$k['dikirim']))); ?>
+    <?php $sts = (string)$k['status']; $diperiksa = in_array($sts, ['dinilai', 'perbaiki'], true); ?>
+    <div class="kartu alur-status"><b>Status tugas</b>
+      <div class="alur-langkah selesai"><i></i><div><b>Terkirim</b><small><?= h(ujian_waktu_teks($k['dikirim'])) ?></small></div></div>
+      <div class="alur-langkah <?= $diperiksa ? 'selesai' : 'sekarang' ?>"><i></i><div><b><?= $diperiksa ? 'Sudah diperiksa guru' : 'Menunggu diperiksa guru' ?></b><?= $diperiksa ? '' : '<small>Status berubah sendiri</small>' ?></div></div>
+      <div class="alur-langkah <?= $sts === 'dinilai' ? 'selesai' : ($sts === 'perbaiki' ? 'sekarang' : '') ?>"><i></i><div><b><?= $sts === 'perbaiki' ? 'Diminta memperbaiki' : 'Sudah dinilai' ?></b></div></div>
+    </div>
+    <?php if ($foto_lama && !($kel_n && $bisa === '')): ?><div class="foto-tugas kecil-foto"><?php foreach ($foto_lama as $f): ?><img src="<?= h(tugas_foto_url($tid, $f)) ?>" alt="" loading="lazy"><?php endforeach; ?></div><?php endif; ?>
+  <?php elseif ($sudah): ?>
+    <div class="status-besar ok" id="status-besar"><div class="st-ikon">✓</div><div class="st-isi"><b>Sudah terkirim dari HP lain</b>
+      <span>Atas nama <b><?= h($nama_ada[$saya]) ?></b> · <?= h(ujian_waktu_teks($k['dikirim'])) ?></span></div></div>
   <?php endif; ?>
 
   <?php if ($bisa !== ''): ?>
     <?php if (!($k && $k['status'] === 'dinilai')): ?><div class="pesan"><?= h($bisa) ?></div><?php endif; ?>
   <?php else: ?>
+  <?php $lipat = $sudah && $k['status'] !== 'perbaiki'; ?>
+  <?php if (!$sudah): ?>
+  <div class="status-besar belum" id="status-besar"><div class="st-ikon">!</div><div class="st-isi"><b>Belum terkirim</b>
+    <span>Tugasmu belum sampai ke guru. Tambahkan foto, lalu tekan <b><?= $kel_n ? 'Kirim tugas kelompok' : 'Kirim tugas' ?></b>.</span></div></div>
+  <?php endif; ?>
+  <?php if ($lipat): ?>
+  <details class="ganti-jawaban"><summary><?= $hp_sama ? ($kel_n ? 'Tambah atau ganti foto kelompok' : 'Ada yang salah? Ganti jawaban') : 'Kirim lagi dari HP ini' ?> ›</summary>
+  <?php if (!$hp_sama): ?><p class="kecil" style="margin:.2rem 0 .6rem">Mengirim lagi akan <b>menggantikan</b> kiriman dari HP lain.</p><?php endif; ?>
+  <?php endif; ?>
   <div class="kartu" id="kirim-tugas" data-t="<?= h(token()) ?>" data-id="<?= $tid ?>" data-maks="<?= (int)$t['maks_foto'] ?>" data-wajib="<?= (int)($t['wajib_foto'] ?? 1) ?>" data-kode="<?= h($t['kode']) ?>">
     <?php if ($kel_n && $foto_lama): ?>
     <small class="redup">Foto yang sudah dikirim kelompokmu — hilangkan centang untuk membuang</small>
@@ -127,9 +148,11 @@ kepala($t ? $t['judul'] : 'Tugas online', '', true);
     </div>
     <small class="redup">Foto langsung (Kamera) atau pilih dari Galeri · <?= ($t['wajib_foto'] ?? 1) ? '<b>wajib minimal 1 foto</b> · ' : '' ?>maks. <?= (int)$t['maks_foto'] ?> foto · otomatis dikecilkan</small>
     <label class="formulir" style="display:block;margin-top:.6rem">Jawaban / catatan (opsional)<textarea id="teks-tugas" rows="3" placeholder="Tulis jawaban atau catatan untuk guru"><?= $kel_n && $k ? h((string)$k['teks']) : '' ?></textarea></label>
-    <button type="button" class="utama lebar" id="tombol-kirim" style="margin-top:.6rem">📤 <?= $k && $k['dikirim'] ? ($kel_n ? 'Simpan kiriman kelompok' : 'Kirim ulang') : ($kel_n ? 'Kirim tugas kelompok' : 'Kirim tugas') ?></button>
+    <button type="button" class="utama lebar" id="tombol-kirim" style="margin-top:.6rem">📤 <?= $k && $k['dikirim'] ? ($kel_n ? 'Simpan kiriman kelompok' : 'Kirim ulang (ganti jawaban)') : ($kel_n ? 'Kirim tugas kelompok' : 'Kirim tugas') ?></button>
     <p class="kecil redup" id="status-kirim" style="margin:.4rem 0 0"></p>
   </div>
+  <?php if ($lipat): ?></details>
+  <p class="kecil redup" style="text-align:center;margin-top:.4rem">Tidak perlu mengirim lagi, kecuali ingin mengganti jawaban.</p><?php endif; ?>
   <?php endif; ?>
   <?php endif; ?>
   <?php endif; ?>

@@ -209,3 +209,31 @@ a.bookmarklet{display:inline-block;cursor:grab;padding:.7rem 1.1rem;background:v
   background:linear-gradient(90deg,var(--emas),var(--hijau-logo));box-shadow:0 0 6px rgba(242,194,48,.7)}
 .garis-muat.jalan{opacity:1;width:85%;transition:width 8s cubic-bezier(.08,.8,.2,1),opacity .2s}
 @media print{.garis-muat{display:none}}
+/* v1.66 status kirim tugas siswa: belum (oranye) · kirim (biru) · ok (hijau) */
+.status-besar{display:flex;gap:.8rem;align-items:center;border-radius:16px;padding:.9rem 1rem;margin:0 0 1rem;border:2px solid}
+.status-besar .st-ikon{flex:none;width:3rem;height:3rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;color:#fff}
+.status-besar .st-isi{flex:1;min-width:0}
+.status-besar .st-isi>b{display:block;font-size:1.2rem;line-height:1.25}
+.status-besar .st-isi>span{display:block;font-size:.88rem;margin-top:.15rem;line-height:1.4;color:var(--teks)}
+.status-besar .st-komentar{background:#fff;border-radius:8px;padding:.4rem .6rem;margin-top:.4rem}
+.status-besar.belum{background:#FFF4E0;border-color:#F2A93B}.status-besar.belum .st-ikon{background:#F2A93B}.status-besar.belum .st-isi>b{color:#A35F00}
+.status-besar.kirim{background:#E8EAFC;border-color:#5B5FD6}.status-besar.kirim .st-ikon{background:#5B5FD6;animation:st-naik 1s ease-in-out infinite alternate}.status-besar.kirim .st-isi>b{color:var(--navy)}
+.status-besar.ok{background:#E3F7EA;border-color:var(--hijau-logo)}.status-besar.ok .st-ikon{background:var(--hijau-logo)}.status-besar.ok .st-isi>b{color:#1D6B33}
+.st-prog{height:10px;background:#D8DAF3;border-radius:6px;overflow:hidden;margin-top:.5rem}
+.st-prog i{display:block;height:100%;width:0;background:#5B5FD6;transition:width .3s}
+@keyframes st-naik{to{transform:translateY(-3px)}}
+.alur-status>b{display:block;margin-bottom:.6rem}
+.alur-langkah{display:flex;gap:.6rem;position:relative;padding-bottom:.8rem}
+.alur-langkah:last-child{padding-bottom:0}
+.alur-langkah>i{flex:none;width:1.3rem;height:1.3rem;border-radius:50%;border:2px solid #C3C5DC;background:#fff;position:relative;z-index:1;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:.75rem;color:#fff;font-weight:800}
+.alur-langkah:not(:last-child)::after{content:"";position:absolute;left:calc(.65rem - 1px);top:1.3rem;bottom:0;width:2px;background:#D3D5E6}
+.alur-langkah.selesai>i{background:var(--hijau-logo);border-color:var(--hijau-logo)}
+.alur-langkah.selesai>i::before{content:"✓"}
+.alur-langkah.selesai:not(:last-child)::after{background:var(--hijau-logo)}
+.alur-langkah.sekarang>i{border-color:#F2A93B;background:#FFF4E0}
+.alur-langkah b{display:block;font-size:.95rem}
+.alur-langkah small{color:var(--redup)}
+.alur-langkah:not(.selesai):not(.sekarang) b{color:var(--redup);font-weight:600}
+details.ganti-jawaban>summary{list-style:none;cursor:pointer;text-align:center;font-weight:700;color:var(--navy);background:#fff;border:1.5px solid #C9CBE0;border-radius:12px;padding:.75rem;margin-bottom:.4rem}
+details.ganti-jawaban>summary::-webkit-details-marker{display:none}
+details.ganti-jawaban[open]>summary{margin-bottom:.8rem}

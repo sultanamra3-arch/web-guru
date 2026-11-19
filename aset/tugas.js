@@ -63,20 +63,39 @@
     if (!foto.length && !lamaDipakai().length && K.dataset.wajib === '1') { st.textContent = '⚠ Tambahkan foto tugasmu dulu (minimal 1 foto).'; return; }
     if (!foto.length && !teks && !lamaDipakai().length) { st.textContent = '⚠ Tambahkan foto atau tulis jawaban dulu.'; return; }
     tombol.disabled = true;
-    var coba = 0;
+    var coba = 0, jml = foto.length + lamaDipakai().length;
     (function kirim() {
       coba++;
-      st.textContent = '⏳ Mengirim' + (coba > 1 ? ' (percobaan ' + coba + ')' : '') + '… jangan tutup halaman ini.';
+      banner('kirim', '↑', 'Sedang mengirim…', jml + ' foto' + (coba > 1 ? ' · percobaan ke-' + coba : '') + ' · jangan tutup halaman ini', 0);
+      st.textContent = '';
       var fd = new FormData(); fd.append('_t', token); fd.append('id', K.dataset.id); fd.append('foto', JSON.stringify(foto)); fd.append('teks', teks); fd.append('lama', JSON.stringify(lamaDipakai()));
-      fetch('?p=api_t', { method: 'POST', body: fd, credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (r) {
-        if (!r.ok) { st.textContent = '⚠ ' + (r.galat || 'Gagal mengirim.'); tombol.disabled = false; return; }
-        st.textContent = '✅ Terkirim pukul ' + r.jam + (r.telat ? ' (terlambat)' : '') + '.';
-        setTimeout(function () { location.href = '?p=t&k=' + K.dataset.kode; }, 900);
-      }).catch(function () {
-        if (coba < 6) { st.textContent = '⚠ Sinyal bermasalah, mencoba lagi…'; setTimeout(kirim, Math.min(15000, 2500 * coba)); }
-        else { st.textContent = '⚠ Belum terkirim. Periksa sinyal lalu tekan Kirim lagi (foto masih tersimpan di halaman ini).'; tombol.disabled = false; }
-      });
+      var x = new XMLHttpRequest();
+      x.open('POST', '?p=api_t'); x.withCredentials = true;
+      x.upload.onprogress = function (e) { if (e.lengthComputable) maju(Math.min(95, Math.round(e.loaded / e.total * 95))); };
+      x.onload = function () {
+        var r; try { r = JSON.parse(x.responseText); } catch (e) { return gagalSinyal(); }
+        if (!r.ok) { banner('belum', '!', 'Belum terkirim', r.galat || 'Gagal mengirim.'); tombol.disabled = false; return; }
+        maju(100);
+        banner('ok', '✓', 'Tugas sudah terkirim', 'Diterima guru pukul ' + r.jam + (r.telat ? ' · terlambat' : '') + ' · ' + jml + ' foto');
+        setTimeout(function () { location.href = '?p=t&k=' + K.dataset.kode; }, 1500);
+      };
+      x.onerror = x.ontimeout = gagalSinyal;
+      x.send(fd);
+      function gagalSinyal() {
+        if (coba < 6) { banner('kirim', '↑', 'Sinyal bermasalah…', 'Mencoba mengirim lagi otomatis · jangan tutup halaman ini', 0); setTimeout(kirim, Math.min(15000, 2500 * coba)); }
+        else { banner('belum', '!', 'Belum terkirim', 'Periksa sinyal lalu tekan tombol kirim lagi. Foto masih tersimpan di halaman ini.'); tombol.disabled = false; }
+      }
     })();
   });
+  // banner status besar di atas: belum (oranye) · kirim (biru) · ok (hijau)
+  function banner(jenis, ikon, judul, ket, prog) {
+    var b = $('status-besar');
+    if (!b) { b = document.createElement('div'); b.id = 'status-besar'; var dt = K.closest('details'); (dt || K).parentNode.insertBefore(b, dt || K); }
+    b.className = 'status-besar ' + jenis;
+    b.innerHTML = '<div class="st-ikon"></div><div class="st-isi"><b></b><span></span>' + (prog !== undefined ? '<div class="st-prog"><i></i></div>' : '') + '</div>';
+    b.querySelector('.st-ikon').textContent = ikon; b.querySelector('b').textContent = judul; b.querySelector('span').textContent = ket;
+    b.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  function maju(n) { var i = document.querySelector('#status-besar .st-prog i'); if (i) i.style.width = n + '%'; }
   if (lama.length) aturMaks();
 })();
