@@ -30,8 +30,10 @@
     if (sertakan() && tok) b.push('Token: *' + tok + '*' + (menit > 0 ? ' (berlaku s.d. ' + jamBerlaku() + ')' : ''));
     if (latihan) b.push('Latihan: tanpa token, boleh diulang 💪');
     if (tugas) b.push('Foto tugasmu lalu kirim lewat link di atas ya 📷');
-    if (kuis) { b.push('', 'Siapkan HP, masuk sekarang, lalu lihat layar guru. Jawab cepat & tepat untuk poin terbanyak! 🏆'); return b.join('\n'); }
-    b.push('', d.tertib === '1' ? 'Baca tata tertib dulu, kerjakan dengan jujur ya 🙏' : 'Kerjakan dengan jujur ya 🙏');
+    if (kuis) b.push('', 'Siapkan HP, masuk sekarang, lalu lihat layar guru. Jawab cepat & tepat untuk poin terbanyak! 🏆');
+    else b.push('', d.tertib === '1' ? 'Baca tata tertib dulu, kerjakan dengan jujur ya 🙏' : 'Kerjakan dengan jujur ya 🙏');
+    // v1.64: video tutorial untuk siswa yang belum tahu caranya
+    if (d.video) b.push('', '▶ Belum tahu caranya? Tonton dulu (±2 menit):', d.video);
     return b.join('\n');
   }
   function muatGambar(src) { return new Promise(function (ok) { if (!src) return ok(null); var i = new Image(); i.onload = function () { ok(i); }; i.onerror = function () { ok(null); }; i.src = src; }); }
@@ -163,6 +165,7 @@
       b.push('');
       if (d.batas) b.push('⏰ Batas: ' + d.batas);
       b.push((tugas ? 'Kirim lewat: ' : 'Kerjakan di: ') + d.url, 'Kode ' + nama.toLowerCase() + ': *' + d.kode + '*');
+      if (d.video) b.push('', '▶ Belum tahu caranya? Tonton: ' + d.video);
     }
     return b.join('\n');
   }

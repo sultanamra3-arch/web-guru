@@ -177,6 +177,7 @@ kepala($u ? $u['judul'] : 'Masuk ujian', '', true);
   <?php if ($hasil_hp && ujian_hasil_terbuka($u)): ?><a class="tombol lebar" href="?p=u&amp;k=<?= h($u['kode']) ?>&amp;lihat=1">Lihat hasil <?= h(nama_siswa((string)$hasil_hp['kode'])) ?></a><?php endif; ?>
   <?php endif; ?>
   <?php endif; ?>
+  <?= tombol_tutorial('ujian') ?>
 </div>
 <?php
 kaki(true);

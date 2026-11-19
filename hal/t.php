@@ -133,6 +133,7 @@ kepala($t ? $t['judul'] : 'Tugas online', '', true);
   <?php endif; ?>
   <?php endif; ?>
   <?php endif; ?>
+  <?= tombol_tutorial('tugas') ?>
 </div>
 <?php
 if ($t && $saya) $GLOBALS['skrip_tambahan'][] = 'aset/tugas.js';

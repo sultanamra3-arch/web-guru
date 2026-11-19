@@ -62,6 +62,7 @@ endif; ?>
     <button class="utama lebar">Masuk kuis</button>
   </form>
   <?php endif; ?>
+  <?= tombol_tutorial('kuis') ?>
 </div>
 <?php
 kaki(true);

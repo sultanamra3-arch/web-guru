@@ -165,6 +165,7 @@ function panel_bagikan(array $d): void
     $attr = '';
     foreach ($d as $k => $v) $attr .= ' data-' . $k . '="' . h((string)$v) . '"';
     $attr .= ' data-sekolah="' . h((string)k('sekolah', '')) . '"';
+    $attr .= ' data-video="' . h(video_tutorial($jenis)) . '"';
     $nama = ['ujian' => 'ujian', 'latihan' => 'latihan', 'tugas' => 'tugas', 'kuis' => 'kuis'][$jenis] ?? 'ujian';
     ?>
 <div class="kartu panel-bagikan" id="panel-bagikan" hidden<?= $attr ?>>
@@ -203,6 +204,7 @@ function panel_status(array $d): void
     $d['guru'] = (string)($saya['nama'] ?? '');
     if (trim((string)($d['mapel'] ?? '')) === '') $d['mapel'] = trim((string)($saya['mapel'] ?? ''));
     $d['api'] = $d['jenis'] === 'tugas' ? '?p=api_tugas' : '?p=api_ujian';
+    $d['video'] = video_tutorial((string)$d['jenis']);
     $attr = '';
     foreach ($d as $k => $v) $attr .= ' data-' . $k . '="' . h((string)$v) . '"';
     ?>
@@ -274,4 +276,29 @@ function tab_perangkat(string $aktif): void
     echo '<nav class="tab-geser" aria-label="Jenis perangkat">';
     foreach ($t as $k => [$n, $u]) echo '<a href="' . h($u) . '" class="' . ($aktif === $k ? 'aktif' : '') . '">' . h($n) . '</a>';
     echo '</nav>';
+}
+
+/** Video tutorial untuk siswa (YouTube). Bisa diganti / dimatikan lewat config.php: 'video_ujian' => '' (kosong = tombol tidak tampil). */
+const VIDEO_TUTORIAL = [
+    'ujian' => ['https://youtube.com/shorts/FqO_SIPQAsg', 'Cara mengerjakan ujian'],
+    'tugas' => ['https://youtube.com/shorts/ognEjCN41to', 'Cara mengirim tugas'],
+    'kuis'  => ['https://youtube.com/shorts/rW1SS3yFor0', 'Cara ikut kuis'],
+];
+
+/** Tombol "Cara mengerjakan" di halaman masuk siswa (jangan dipasang di halaman saat mengerjakan ujian/kuis). */
+function video_tutorial(string $jenis): string
+{
+    if ($jenis === 'latihan') $jenis = 'ujian';
+    if (!isset(VIDEO_TUTORIAL[$jenis])) return '';
+    $url = trim((string)k('video_' . $jenis, VIDEO_TUTORIAL[$jenis][0]));
+    return preg_match('~^https://~', $url) ? $url : '';
+}
+
+function tombol_tutorial(string $jenis): string
+{
+    $url = video_tutorial($jenis);
+    if ($url === '') return '';
+    $teks = VIDEO_TUTORIAL[$jenis][1];
+    return '<a class="tombol-tutorial" href="' . h($url) . '" target="_blank" rel="noopener" data-tanpa-siap>'
+        . ikon('video') . '<span><b>' . h($teks) . '</b><small>Tonton video tutorial (±2 menit)</small></span></a>';
 }
