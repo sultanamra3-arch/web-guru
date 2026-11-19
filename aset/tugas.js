@@ -60,6 +60,7 @@
   var token = (document.querySelector('input[name=_t]') || {}).value || K.dataset.t;
   tombol.addEventListener('click', function () {
     var teks = $('teks-tugas').value.trim();
+    if (!foto.length && !lamaDipakai().length && K.dataset.wajib === '1') { st.textContent = '⚠ Tambahkan foto tugasmu dulu (minimal 1 foto).'; return; }
     if (!foto.length && !teks && !lamaDipakai().length) { st.textContent = '⚠ Tambahkan foto atau tulis jawaban dulu.'; return; }
     tombol.disabled = true;
     var coba = 0;

@@ -24,6 +24,7 @@ $lama = tugas_kelompok($t) ? array_values(array_intersect($lama_ada, (array)json
 $lama = array_slice($lama, 0, (int)$t['maks_foto']);
 $foto = array_slice((array)json_decode((string)post('foto', '[]'), true), 0, max(0, (int)$t['maks_foto'] - count($lama)));
 $teks = mb_substr(trim((string)post('teks')), 0, 5000);
+if (!$foto && !$lama && (int)($t['wajib_foto'] ?? 1)) balas_t(['ok' => false, 'galat' => 'Tambahkan foto tugasmu dulu (minimal 1 foto).']);
 if (!$foto && !$lama && $teks === '') balas_t(['ok' => false, 'galat' => 'Tambahkan foto atau tulis jawaban dulu.']);
 $simpan = [];
 foreach ($foto as $f) {

@@ -53,7 +53,7 @@ function tugas_tata_tertib(array $t): array
             . ($t['terima_telat'] ? 'Yang lewat batas tetap diterima tapi <b>ditandai terlambat</b>.' : 'Setelah lewat batas, tugas <b>tidak bisa dikirim lagi</b>.');
     }
     if (tugas_kelompok($t)) $poin[] = 'Ini <b>tugas kelompok</b>: cukup <b>satu anggota</b> yang mengirim. Anggota lain bisa melihat, menambah foto, atau mengirim ulang.';
-    $poin[] = 'Foto paling banyak <b>' . (int)$t['maks_foto'] . '</b> lembar; foto otomatis dikecilkan agar hemat kuota.';
+    $poin[] = (($t['wajib_foto'] ?? 1) ? '<b>Wajib melampirkan foto</b> tugasmu (minimal 1). ' : '') . 'Foto paling banyak <b>' . (int)$t['maks_foto'] . '</b> lembar; foto otomatis dikecilkan agar hemat kuota.';
     $poin[] = 'Kamu boleh mengirim ulang sebelum batas waktu; kiriman terakhir yang dinilai.';
     return $poin;
 }

@@ -109,7 +109,7 @@ kepala($t ? $t['judul'] : 'Tugas online', '', true);
   <?php if ($bisa !== ''): ?>
     <?php if (!($k && $k['status'] === 'dinilai')): ?><div class="pesan"><?= h($bisa) ?></div><?php endif; ?>
   <?php else: ?>
-  <div class="kartu" id="kirim-tugas" data-t="<?= h(token()) ?>" data-id="<?= $tid ?>" data-maks="<?= (int)$t['maks_foto'] ?>" data-kode="<?= h($t['kode']) ?>">
+  <div class="kartu" id="kirim-tugas" data-t="<?= h(token()) ?>" data-id="<?= $tid ?>" data-maks="<?= (int)$t['maks_foto'] ?>" data-wajib="<?= (int)($t['wajib_foto'] ?? 1) ?>" data-kode="<?= h($t['kode']) ?>">
     <?php if ($kel_n && $foto_lama): ?>
     <small class="redup">Foto yang sudah dikirim kelompokmu — hilangkan centang untuk membuang</small>
     <div class="foto-pilih foto-lama">
@@ -125,7 +125,7 @@ kepala($t ? $t['judul'] : 'Tugas online', '', true);
         <label class="tambah-foto"><input type="file" accept="image/*" multiple hidden id="ambil-foto"><b>🖼️</b><span>Galeri</span></label>
       </div>
     </div>
-    <small class="redup">Foto langsung (Kamera) atau pilih dari Galeri · maks. <?= (int)$t['maks_foto'] ?> foto · otomatis dikecilkan</small>
+    <small class="redup">Foto langsung (Kamera) atau pilih dari Galeri · <?= ($t['wajib_foto'] ?? 1) ? '<b>wajib minimal 1 foto</b> · ' : '' ?>maks. <?= (int)$t['maks_foto'] ?> foto · otomatis dikecilkan</small>
     <label class="formulir" style="display:block;margin-top:.6rem">Jawaban / catatan (opsional)<textarea id="teks-tugas" rows="3" placeholder="Tulis jawaban atau catatan untuk guru"><?= $kel_n && $k ? h((string)$k['teks']) : '' ?></textarea></label>
     <button type="button" class="utama lebar" id="tombol-kirim" style="margin-top:.6rem">📤 <?= $k && $k['dikirim'] ? ($kel_n ? 'Simpan kiriman kelompok' : 'Kirim ulang') : ($kel_n ? 'Kirim tugas kelompok' : 'Kirim tugas') ?></button>
     <p class="kecil redup" id="status-kirim" style="margin:.4rem 0 0"></p>

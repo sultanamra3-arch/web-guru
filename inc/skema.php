@@ -2,7 +2,7 @@
 /* Tabel SiGuru (dibuat otomatis saat pertama dijalankan; tabel SLiMS tidak diubah). */
 declare(strict_types=1);
 
-const SKEMA_VERSI = 17;
+const SKEMA_VERSI = 18;
 
 function pastikan_skema(): void
 {
@@ -299,6 +299,7 @@ function pastikan_skema(): void
     skema_migrasi_14();
     skema_migrasi_15();
     skema_migrasi_16();
+    skema_migrasi_18();
     @file_put_contents($f, date('c'));
 }
 
@@ -411,4 +412,10 @@ function skema_migrasi_16(): void
 {
     if (!kolom_ada('guru_ujian', 'ditutup')) db()->exec('ALTER TABLE guru_ujian ADD COLUMN ditutup DATETIME NULL');
     if (!kolom_ada('guru_ujian', 'ditutup_otomatis')) db()->exec('ALTER TABLE guru_ujian ADD COLUMN ditutup_otomatis TINYINT NOT NULL DEFAULT 0');
+}
+
+/** v18 (SiGuru v1.65): tugas wajib melampirkan foto (bawaan aktif; guru bisa mematikan untuk tugas yang dijawab dengan mengetik). */
+function skema_migrasi_18(): void
+{
+    if (!kolom_ada('guru_tugas', 'wajib_foto')) db()->exec('ALTER TABLE guru_tugas ADD COLUMN wajib_foto TINYINT NOT NULL DEFAULT 1');
 }
