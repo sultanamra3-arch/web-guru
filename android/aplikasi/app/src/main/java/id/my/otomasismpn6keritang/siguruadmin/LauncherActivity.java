@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -60,6 +62,9 @@ public class LauncherActivity extends Activity {
     Uri fotoUri;
     PermissionRequest tungguIzin;
     String urlGagal = AWAL;
+    /** APK 1.6: layar "Sinyal sedang hujan" sedang tampil → buka ulang otomatis saat internet kembali. */
+    volatile boolean layarGalat = false;
+    ConnectivityManager.NetworkCallback pantauJaringan;
 
     static final String SISIP_CETAK =
             "window.print=function(){try{SiGuruApp.cetak(document.title||'SiGuru')}catch(e){}};";
@@ -121,7 +126,7 @@ public class LauncherActivity extends Activity {
         s.setUseWideViewPort(true);
         s.setTextZoom(100);
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-        s.setUserAgentString(s.getUserAgentString() + " SiGuruApp/1.5 SiGuruAdminApp");
+        s.setUserAgentString(s.getUserAgentString() + " SiGuruApp/1.6 SiGuruAdminApp");
 
         CookieManager cm = CookieManager.getInstance();
         cm.setAcceptCookie(true);
@@ -139,6 +144,22 @@ public class LauncherActivity extends Activity {
             web.loadUrl(AWAL);
         }
         tampilkanGalatLama();
+        pantauInternet();
+    }
+
+    /** APK 1.6: saat internet kembali dan layar "Sinyal sedang hujan" tampil → buka lagi halaman yang gagal. */
+    void pantauInternet() {
+        try {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+            pantauJaringan = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network n) {
+                    if (!layarGalat || web == null) return;
+                    web.postDelayed(() -> { if (layarGalat && web != null) { layarGalat = false; web.loadUrl(urlGagal); } }, 1200);
+                }
+            };
+            cm.registerDefaultNetworkCallback(pantauJaringan);
+        } catch (Exception x) { pantauJaringan = null; }
     }
 
     // ---------- navigasi ----------
@@ -201,16 +222,29 @@ public class LauncherActivity extends Activity {
         public void onReceivedError(WebView v, WebResourceRequest r, WebResourceError e) {
             if (!r.isForMainFrame()) return;
             urlGagal = r.getUrl().toString();
-            String html = "<!doctype html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'>"
+            layarGalat = true;
+            String sebab = e.getDescription() == null ? "" : e.getDescription().toString().replace("<", "");
+            // APK 1.6: TUAH berpayung (gambar disimpan di dalam APK), buka ulang otomatis saat internet kembali
+            String html = "<!doctype html><html lang='id'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
                     + "<style>body{font-family:sans-serif;margin:0;display:flex;align-items:center;justify-content:center;"
                     + "min-height:100vh;background:#EAF6FD;color:#1A1A2E;text-align:center;overscroll-behavior:none}"
-                    + ".k{background:#fff;border-radius:16px;padding:28px 22px;margin:20px;max-width:360px;"
-                    + "box-shadow:0 2px 10px rgba(0,0,0,.08)}h2{color:#2A2C84;margin:0 0 8px}"
-                    + "p{color:#5B6382;line-height:1.5}button{background:#2A2C84;color:#fff;border:0;border-radius:12px;"
-                    + "padding:12px 28px;font-size:16px;margin-top:8px}</style></head><body><div class='k'>"
-                    + "<h2>Tidak tersambung</h2><p>Periksa internet HP, lalu tekan Coba lagi.</p>"
-                    + "<button onclick='SiGuruApp.ulang()'>Coba lagi</button></div></body></html>";
-            v.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
+                    + ".k{background:#fff;border-radius:18px;padding:18px 22px 24px;margin:20px;max-width:360px;"
+                    + "box-shadow:0 2px 10px rgba(0,0,0,.08)}h2{color:#2A2C84;margin:4px 0 8px}"
+                    + ".t{position:relative;width:170px;margin:0 auto;transform-origin:50% 100%;animation:g 3.2s ease-in-out infinite}"
+                    + ".t img{display:block;width:100%;height:auto}"
+                    + ".h{position:absolute;inset:0 0 10% 0;overflow:hidden}.h b{position:absolute;top:-10%;width:2px;height:9%;border-radius:2px;"
+                    + "background:linear-gradient(#A0C4E8,rgba(160,196,232,0));animation:j 1.1s linear infinite}"
+                    + ".h b:nth-child(1){left:6%;animation-delay:.1s}.h b:nth-child(2){left:18%;animation-delay:.6s}.h b:nth-child(3){left:70%;animation-delay:.3s}"
+                    + ".h b:nth-child(4){left:80%;animation-delay:.8s}.h b:nth-child(5){left:90%;animation-delay:.45s}"
+                    + "@keyframes g{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}@keyframes j{to{transform:translateY(1100%)}}"
+                    + "p{color:#5B6382;line-height:1.5;margin:0 0 6px}small{display:block;color:#9AA3BA;font-size:11px;margin-top:14px}"
+                    + "button{background:#2A2C84;color:#fff;border:0;border-radius:12px;padding:12px 28px;font-size:16px;margin-top:10px}"
+                    + "@media (prefers-reduced-motion:reduce){.t,.h b{animation:none}}</style></head><body><div class='k'>"
+                    + "<div class='t'><img src='tuah-payung.webp' alt='TUAH'><i class='h'><b></b><b></b><b></b><b></b><b></b></i></div>"
+                    + "<h2>Sinyal sedang hujan</h2><p>Internet HP belum tersambung ke SiGuru.</p>"
+                    + "<p>TUAH akan membuka SiGuru sendiri begitu internet kembali.</p>"
+                    + "<button onclick='SiGuruApp.ulang()'>Coba lagi</button><small>" + sebab + "</small></div></body></html>";
+            v.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "utf-8", null);
         }
     }
 
@@ -459,7 +493,7 @@ public class LauncherActivity extends Activity {
 
         @JavascriptInterface
         public void ulang() {
-            runOnUiThread(() -> web.loadUrl(urlGagal));
+            runOnUiThread(() -> { layarGalat = false; web.loadUrl(urlGagal); });
         }
     }
 
@@ -554,6 +588,7 @@ public class LauncherActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        try { if (pantauJaringan != null) ((ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE)).unregisterNetworkCallback(pantauJaringan); } catch (Exception x) { /* abaikan */ }
         if (web != null) {
             web.stopLoading();
             web.destroy();
