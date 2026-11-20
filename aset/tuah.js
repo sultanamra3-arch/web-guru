@@ -1,6 +1,6 @@
 /* SiGuru v1.75 · TUAH, maskot SiGuru (Harimau Sumatera bertanjak, berseragam sekolah, bersamping songket).
    Gambar: aset/tuah/*.webp (dari desain Pak Sultan, dipotong per bagian); gerak di guru.css (bagian "v1.75 TUAH").
-   - <div class="tuah" data-tuah="sapa|tunjuk|jempol|baca|tulis|nilai|selesai|tidur|payung|tertib|pembuka"></div> → diisi otomatis.
+   - <div class="tuah" data-tuah="sapa|tunjuk|jempol|baca|tulis|nilai|selesai|tidur|payung|tertib|pembuka|jalan|pikir"></div> → diisi otomatis.
    - sgTuah(pose) → teks HTML; sgTuahDayung() → TUAH untuk layar memuat.
    - sgAI.mulai({gaya:'baca'|'tulis'|'nilai', judul, langkah:[3 teks], detik}) → kartu "TUAH sedang bekerja" untuk proses AI.
    - <form data-ai="tulis" data-ai-judul="…" data-ai-langkah="a|b|c" data-ai-detik="40"> → kartu muncul saat formulir dikirim. */
@@ -8,30 +8,34 @@
   'use strict';
   var D = typeof document !== 'undefined' ? document : null;
   var G = typeof window !== 'undefined' ? window : self;
-  var V = '175';
+  var V = '177';
   /* w,h = ukuran gambar dasar; p = bagian yang bergerak (posisi % dari gambar dasar, ox/oy = titik putar %) */
-  var DATA = {"sapa":{"w":201,"h":307,"p":[{"n":"lengan","x":0.0,"y":34.55,"w":30.56,"ox":90.9,"oy":85.2}]},"kosong":{"w":236,"h":308,"p":[{"n":"lengan","x":67.11,"y":38.03,"w":20.0,"ox":0.0,"oy":78.8},{"n":"b1","x":79.74,"y":8.65,"w":9.47,"ox":50.0,"oy":50.0},{"n":"b2","x":73.16,"y":17.1,"w":6.84,"ox":50.0,"oy":50.0},{"n":"b3","x":91.84,"y":46.08,"w":8.16,"ox":50.0,"oy":50.0}]},"jempol":{"w":271,"h":308,"p":[{"n":"lengan","x":1.83,"y":39.31,"w":18.99,"ox":69.9,"oy":87.0},{"n":"b1","x":0.92,"y":27.42,"w":10.76,"ox":83.0,"oy":93.9}]},"selesai":{"w":197,"h":291,"p":[{"n":"b1","x":3.14,"y":22.81,"w":13.21,"ox":50.0,"oy":50.0},{"n":"b2","x":12.58,"y":32.84,"w":8.81,"ox":50.0,"oy":50.0},{"n":"b3","x":91.19,"y":32.84,"w":8.81,"ox":50.0,"oy":50.0},{"n":"b4","x":83.65,"y":42.86,"w":11.32,"ox":50.0,"oy":50.0}]},"ai":{"w":285,"h":305,"p":[]},"tertib":{"w":296,"h":306,"p":[]},"payung":{"w":296,"h":317,"p":[]},"pembuka":{"w":311,"h":299,"p":[]}};
-  /* nama pose lama → gambar */
-  var ALIAS = { sapa: 'sapa', tunjuk: 'kosong', kosong: 'kosong', jempol: 'jempol', baca: 'ai', tulis: 'ai', nilai: 'ai', ai: 'ai',
-    selesai: 'selesai', tidur: 'selesai', payung: 'payung', tertib: 'tertib', pembuka: 'pembuka' };
+  var DATA = {"sapa":{"w":201,"h":307,"p":[{"n":"lengan","x":0.0,"y":34.55,"w":30.56,"ox":90.9,"oy":85.2}]},"kosong":{"w":236,"h":308,"p":[{"n":"lengan","x":67.11,"y":38.03,"w":20.0,"ox":0.0,"oy":78.8},{"n":"b1","x":79.74,"y":8.65,"w":9.47,"ox":50.0,"oy":50.0},{"n":"b2","x":73.16,"y":17.1,"w":6.84,"ox":50.0,"oy":50.0},{"n":"b3","x":91.84,"y":46.08,"w":8.16,"ox":50.0,"oy":50.0}]},"jempol":{"w":271,"h":308,"p":[{"n":"lengan","x":1.83,"y":39.31,"w":18.99,"ox":69.9,"oy":87.0},{"n":"b1","x":0.92,"y":27.42,"w":10.76,"ox":83.0,"oy":93.9}]},"selesai":{"w":197,"h":291,"p":[{"n":"b1","x":3.14,"y":22.81,"w":13.21,"ox":50.0,"oy":50.0},{"n":"b2","x":12.58,"y":32.84,"w":8.81,"ox":50.0,"oy":50.0},{"n":"b3","x":91.19,"y":32.84,"w":8.81,"ox":50.0,"oy":50.0},{"n":"b4","x":83.65,"y":42.86,"w":11.32,"ox":50.0,"oy":50.0}]},"ai":{"w":285,"h":305,"p":[]},"tertib":{"w":296,"h":306,"p":[]},"payung":{"w":296,"h":317,"p":[]},"pembuka":{"w":311,"h":299,"p":[]},"jalan":{"w":319,"h":434,"p":[{"n":"lengan","x":76.85,"y":45.0,"w":23.15,"ox":5.9,"oy":80.5},{"n":"lengan2","x":19.46,"y":53.14,"w":16.93,"ox":75.9,"oy":17.0}]},"nilai":{"w":342,"h":435,"p":[{"n":"kertas","x":66.12,"y":32.05,"w":33.88,"ox":7.0,"oy":74.6}]},"tidur":{"w":309,"h":379,"p":[]},"baca":{"w":262,"h":427,"p":[]},"tulis":{"w":275,"h":424,"p":[]},"pikir":{"w":221,"h":435,"p":[]}};
+  /* nama pose → gambar */
+  var ALIAS = { sapa: 'sapa', tunjuk: 'kosong', kosong: 'kosong', jempol: 'jempol', ai: 'ai', baca: 'baca', tulis: 'tulis', nilai: 'nilai',
+    selesai: 'selesai', tidur: 'tidur', payung: 'payung', tertib: 'tertib', pembuka: 'pembuka', jalan: 'jalan', pikir: 'pikir' };
   var TAMBAH = {
     ai: '<i class="tg-pindai"></i>',
-    payung: '<i class="tg-hujan"><b></b><b></b><b></b><b></b><b></b><b></b><b></b></i>'
+    payung: '<i class="tg-hujan"><b></b><b></b><b></b><b></b><b></b><b></b><b></b></i>',
+    tidur: '<i class="tg-zzz">z<b>z</b><b>z</b></i>',
+    baca: '<i class="tg-huruf"><b>a</b><b>b</b><b>c</b><b>1</b><b>2</b></i>',
+    tulis: '<i class="tg-gores"><b></b><b></b><b></b></i>',
+    pikir: '<i class="tg-tanya">?</i>'
   };
   function src(n) { return 'aset/tuah/' + n + '.webp?v=' + V; }
   function sgTuah(pose, kelas) {
     var n = ALIAS[pose] || 'sapa', d = DATA[n];
-    var h = '<span class="tuah-gb tg-' + n + (pose === 'tidur' ? ' tg-tidur' : '') + (kelas ? ' ' + kelas : '') + '" style="aspect-ratio:' + d.w + '/' + d.h + '" role="img" aria-label="TUAH, maskot SiGuru">' +
+    var h = '<span class="tuah-gb tg-' + n + (kelas ? ' ' + kelas : '') + '" style="aspect-ratio:' + d.w + '/' + d.h + '" role="img" aria-label="TUAH, maskot SiGuru">' +
       '<img class="tg-dasar" src="' + src(n) + '" alt="" draggable="false" decoding="async">';
     d.p.forEach(function (p) {
       h += '<img class="tg-p tg-' + p.n + '" src="' + src(n + '-' + p.n) + '" alt="" draggable="false" decoding="async" style="left:' + p.x + '%;top:' + p.y + '%;width:' + p.w + '%;transform-origin:' + p.ox + '% ' + p.oy + '%">';
     });
-    return h + (TAMBAH[n] || '') + (pose === 'tidur' ? '<i class="tg-zzz">z<b>z</b><b>z</b></i>' : '') + '</span>';
+    return h + (TAMBAH[n] || '') + '</span>';
   }
   /* daftar berkas gambar (disimpan service worker agar tetap tampil tanpa sinyal) */
   var BERKAS = [];
   Object.keys(DATA).forEach(function (n) { BERKAS.push(src(n)); DATA[n].p.forEach(function (p) { BERKAS.push(src(n + '-' + p.n)); }); });
-  function sgTuahDayung() { return sgTuah('sapa', 'tuah-dayung'); }
+  function sgTuahDayung() { return sgTuah('jalan', 'tuah-dayung'); }
   G.sgTuahBerkas = BERKAS;
   G.sgTuah = sgTuah;
   G.sgTuahDayung = sgTuahDayung;

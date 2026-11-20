@@ -83,7 +83,7 @@
     foto.forEach(function (f) { var im = document.createElement('img'); im.src = f; im.className = 'foto-chat'; g.append(im); });
     chat.append(g);
     var tunggu = el('div', 'gelembung ai menunggu', 'Sedang memeriksa data…');
-    if (window.sgTuah) { tunggu.innerHTML = '<span class="tuah-chat">' + sgTuah('baca') + '</span><span>TUAH sedang memeriksa data…</span>'; tunggu.classList.add('ada-tuah'); }
+    if (window.sgTuah) { tunggu.innerHTML = '<span class="tuah-chat">' + sgTuah('pikir') + '</span><span>TUAH sedang memeriksa data…</span>'; tunggu.classList.add('ada-tuah'); }
     chat.append(tunggu); gulir();
     var kirimFoto = foto; foto = []; gambarFoto(); teks.value = ''; teks.style.height = 'auto'; tombol.disabled = true;
     kirim({ aksi: 'chat', pesan: isi, foto: kirimFoto }).then(function (r) {
