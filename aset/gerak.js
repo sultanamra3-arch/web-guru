@@ -37,6 +37,36 @@
       RIAU.map(function (p, i) { return '<g style="--d:' + (i * 1.2) + 's">' + p + '</g>'; }).join('') + '</svg>';
   }
 
+  /* ---------- 0. Tanpa sinyal: jangan tinggalkan halaman bila tujuan belum tersimpan di HP (v1.72) ----------
+     Mencegah layar "Tidak tersambung" milik APK. Tautan ke halaman yang sudah tersimpan tetap dibuka. */
+  D.addEventListener('click', function (e) {
+    if (navigator.onLine !== false || !tombolBiasa(e)) return;
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a || a.target || a.hasAttribute('download')) return;
+    var h = a.getAttribute('href') || '';
+    if (h.charAt(0) === '#' || /^(javascript|mailto|tel|whatsapp|intent|blob|data):/i.test(h)) return;
+    var u;
+    try { u = new URL(a.href, location.href); } catch (x) { return; }
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var pesan = function () {
+      (window.sgPesan || alert)(u.origin !== location.origin
+        ? 'Tanpa sinyal.\nAplikasi ini perlu internet. Coba lagi setelah tersambung.'
+        : 'Tanpa sinyal.\nHalaman ini belum tersimpan di HP. Buka sekali saat ada sinyal agar bisa dilihat tanpa sinyal.');
+    };
+    if (u.origin !== location.origin || !window.caches || !navigator.serviceWorker || !navigator.serviceWorker.controller) { pesan(); return; }
+    var q = u.searchParams, cari = caches.open('siguru-halaman').then(function (c) {
+      return c.match(u.href).then(function (r) {
+        if (r || q.get('p') !== 'absensi') return r;
+        // absen: salinan kelas yang sama dari tanggal lain juga boleh (tanggal disesuaikan di HP)
+        return c.keys().then(function (k) {
+          return k.some(function (x) { var v = new URL(x.url).searchParams; return v.get('p') === 'absensi' && q.get('kelas') && v.get('kelas') === q.get('kelas'); });
+        });
+      });
+    });
+    cari.then(function (ada) { if (ada) location.href = u.href; else pesan(); }, pesan);
+  }, true);
+
   /* ---------- 1. Loading: garis khas sekolah hidup + lingkaran kecil bila > 0,3 detik ---------- */
   var LABEL = { beranda: 'beranda', kelas: 'kelas', kelas_lihat: 'kelas', absensi: 'absen', absensi_rekap: 'rekap absen',
     ujian: 'ujian', ujian_lihat: 'ujian', ujian_hasil: 'hasil ujian', ujian_form: 'ujian', tugas: 'tugas', tugas_lihat: 'tugas',

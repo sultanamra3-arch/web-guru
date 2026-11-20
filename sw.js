@@ -1,7 +1,7 @@
 /* SiGuru: simpan berkas tampilan di HP; halaman diambil dari server (data terbaru).
    v1.68: halaman guru yang pernah dibuka disimpan di HP → tetap bisa dilihat tanpa sinyal;
           layar pembuka (logo → ikon Riau) saat aplikasi baru dibuka. */
-const CACHE = 'siguru-v1.71';
+const CACHE = 'siguru-v1.72';
 const HALAMAN = 'siguru-halaman';
 const V = CACHE.replace('siguru-v', '');
 const ASET = [
@@ -51,6 +51,7 @@ self.addEventListener('fetch', e => {
   const p = url.searchParams.get('p') || (/\/(u|t|k|r)\/?$/.test(url.pathname) ? 'siswa' : 'beranda');
   const siswa = p === 'siswa' || HAL_SISWA.includes(p);
   e.respondWith((async () => {
+   try {
     // keluar / masuk / beralih akun: hapus halaman yang tersimpan (milik akun sebelumnya)
     if (p === 'keluar' || p === 'masuk' || p === 'beralih') await caches.delete(HALAMAN);
     const jalan = ambilHalaman(e, url, p, siswa);
@@ -59,9 +60,28 @@ self.addEventListener('fetch', e => {
       e.waitUntil(jalan.catch(() => {}));
       return denganPembuka(jalan);
     }
-    return jalan;
+    return await jalan;
+   } catch (x) {
+    return halamanOffline();
+   }
   })());
 });
+
+/** Layar "Tanpa sinyal" milik SiGuru; tidak bergantung pada berkas tersimpan (v1.72). */
+async function halamanOffline() {
+  const ada = await caches.match('offline.html').catch(() => null);
+  if (ada) return ada;
+  return new Response('<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>SiGuru · Tanpa sinyal</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F6F8FC;' +
+    'font-family:Quicksand,system-ui,sans-serif;color:#1A1A2E;overscroll-behavior:none}.k{background:#fff;border:1px solid #E3E8F2;border-radius:16px;' +
+    'padding:24px 20px;margin:16px;max-width:360px;text-align:center}h1{color:#2A2C84;font-size:1.3rem}p{color:#5B6382;line-height:1.5}' +
+    'button{font:inherit;font-weight:700;background:#2A2C84;color:#fff;border:0;border-radius:12px;padding:12px 24px;margin:4px}' +
+    'button.b{background:#fff;color:#2A2C84;border:1px solid #E3E8F2}</style></head><body><div class="k"><h1>Tanpa sinyal</h1>' +
+    '<p>Halaman ini belum tersimpan di HP. Halaman yang pernah dibuka saat ada sinyal tetap bisa dilihat.</p>' +
+    '<button onclick="location.reload()">Coba lagi</button><button class="b" onclick="history.back()">‹ Kembali</button></div>' +
+    '<script>addEventListener("online",function(){location.reload()})</script></body></html>',
+    { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+}
 
 /** Aplikasi baru dibuka (belum ada jendela SiGuru lain) → tampilkan layar pembuka. */
 async function bukaPertama(e) {
@@ -86,7 +106,7 @@ async function ambilHalaman(e, url, p, siswa) {
     return res;
   } catch (x) {
     if (simpanan) return simpanan;
-    return (await caches.match('offline.html')) || Response.error();
+    return halamanOffline();
   }
 }
 
