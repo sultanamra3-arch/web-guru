@@ -1005,9 +1005,11 @@ main.sg-dari-kiri>*{animation:sg-masuk-kiri-k .42s cubic-bezier(.2,0,0,1)}
 /* Pindah aplikasi: ikon SiGuru → ikon tujuan → layar navy */
 .sg-pindah{position:fixed;inset:0;z-index:200;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;overflow:hidden;animation:sg-muncul .2s ease-out}
 .sg-pindah-lingkar{position:relative;width:150px;height:150px}
-/* v1.69: lebih tenang — cincin berputar pelan & rata, urutan 2,4 detik */
-.sg-pindah .sg-cincin{animation:sg-putar 2.4s linear infinite}
-.sg-pindah .sg-cincin .ekor{animation-duration:2.4s}
+/* v1.73: cincin tidak lagi berputar/memanjang-memendek (terlihat berkedip di APK);
+   garis emas mengisi lingkaran dengan tenang sampai aplikasi tujuan dibuka */
+.sg-pindah .sg-cincin{animation:none;transform:rotate(-90deg);will-change:auto}
+.sg-pindah .sg-cincin .ekor{stroke-dasharray:1 2;stroke-dashoffset:1.01;animation:sg-isi-cincin 2.2s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes sg-isi-cincin{to{stroke-dashoffset:0}}
 .sg-pindah svg.asal,.sg-pindah svg.tuju{position:absolute;left:25%;top:25%;width:50%;height:50%}
 .sg-pindah svg.asal path{animation:sg-asal 2.4s cubic-bezier(.65,0,.35,1) forwards}
 .sg-pindah svg.tuju path{animation:sg-tuju 2.4s cubic-bezier(.65,0,.35,1) forwards}
