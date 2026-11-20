@@ -77,8 +77,8 @@
         var r; try { r = JSON.parse(x.responseText); } catch (e) { return gagalSinyal(); }
         if (!r.ok) { banner('belum', '!', 'Belum terkirim', r.galat || 'Gagal mengirim.'); tombol.disabled = false; return; }
         maju(100);
-        banner('ok', '✓', K.dataset.aksi ? 'Tersimpan' : 'Tugas sudah terkirim', (K.dataset.aksi ? 'Pukul ' : 'Diterima guru pukul ') + r.jam + (r.telat ? ' · terlambat' : '') + ' · ' + jml + ' foto');
-        setTimeout(function () { location.href = K.dataset.lanjut || '?p=t&k=' + K.dataset.kode; }, K.dataset.lanjut ? 600 : 1500);
+        setTimeout(function () { banner('ok', '✓', K.dataset.aksi ? 'Tersimpan' : 'Tugas sudah terkirim', (K.dataset.aksi ? 'Pukul ' : 'Diterima guru pukul ') + r.jam + (r.telat ? ' · terlambat' : '') + ' · ' + jml + ' foto'); }, 350);
+        setTimeout(function () { location.href = K.dataset.lanjut || '?p=t&k=' + K.dataset.kode; }, K.dataset.lanjut ? 950 : 1850);
       };
       x.onerror = x.ontimeout = gagalSinyal;
       x.send(fd);
@@ -94,9 +94,17 @@
     if (!b) { b = document.createElement('div'); b.id = 'status-besar'; var dt = K.closest('details'); (dt || K).parentNode.insertBefore(b, dt || K); }
     b.className = 'status-besar ' + jenis;
     b.innerHTML = '<div class="st-ikon"></div><div class="st-isi"><b></b><span></span>' + (prog !== undefined ? '<div class="st-prog"><i></i></div>' : '') + '</div>';
-    b.querySelector('.st-ikon').textContent = ikon; b.querySelector('b').textContent = judul; b.querySelector('span').textContent = ket;
+    var ik = b.querySelector('.st-ikon');
+    // v1.68: cincin emas terisi sesuai kemajuan unggah · centang hijau tergambar saat selesai
+    if (jenis === 'kirim') ik.innerHTML = '<svg class="st-cincin" viewBox="0 0 48 48" aria-hidden="true"><circle class="jl" cx="24" cy="24" r="21"/><circle class="isi" cx="24" cy="24" r="21" pathLength="1" style="stroke-dashoffset:' + (1.01 * (1 - (prog || 0) / 100)) + '"/></svg><span>↑</span>';
+    else if (jenis === 'ok') ik.innerHTML = '<svg class="st-centang" viewBox="0 0 48 48" aria-hidden="true"><path pathLength="1" d="M14 25 L21 32 L35 17"/></svg>';
+    else ik.textContent = ikon;
+    b.querySelector('b').textContent = judul; b.querySelector('span').textContent = ket;
     b.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
-  function maju(n) { var i = document.querySelector('#status-besar .st-prog i'); if (i) i.style.width = n + '%'; }
+  function maju(n) {
+    var i = document.querySelector('#status-besar .st-prog i'); if (i) i.style.width = n + '%';
+    var c = document.querySelector('#status-besar .st-cincin .isi'); if (c) c.style.strokeDashoffset = String(1.01 * (1 - n / 100));
+  }
   if (lama.length) aturMaks();
 })();

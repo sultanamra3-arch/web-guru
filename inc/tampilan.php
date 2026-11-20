@@ -57,7 +57,8 @@ function kepala(string $judul, string $aktif = '', bool $polos = false): void
 </script>
 <meta name="theme-color" content="#2A2C84">
 <meta name="robots" content="noindex, nofollow">
-<title><?= h($judul) ?> · SiGuru</title>
+<?php if ($u): ?><meta name="sg-akun" content="<?= (int)uid() ?>">
+<?php endif; ?><title><?= h($judul) ?> · SiGuru</title>
 <meta name="application-name" content="SiGuru">
 <meta name="apple-mobile-web-app-title" content="SiGuru">
 <link rel="manifest" href="manifest.webmanifest?v=<?= VERSI ?>">
@@ -76,23 +77,28 @@ function kepala(string $judul, string $aktif = '', bool $polos = false): void
 <?php endif; ?>
 </head>
 <body class="<?= $polos ? 'polos' : '' ?>">
-<div id="garis-muat" class="garis-muat tak-cetak" aria-hidden="true"></div>
 <?php if (!$polos): ?>
 <header class="atas">
   <a class="merek" href="?p=beranda"><img src="aset/logo.png" alt="Logo"> <span><small><?= h((string)k('sekolah', 'SMP Negeri 6 Keritang')) ?></small><b>SiGuru</b></span></a>
   <?php if ($u): ?>
-  <a class="inisial" href="?p=profil" title="<?= h($u['nama']) ?> · profil"><?= h(inisial((string)$u['nama'])) ?></a>
+  <div class="atas-kanan">
+    <span class="status-jaringan" aria-live="polite" title="Tersambung ke server"><i></i><b>Online</b></span>
+    <a class="inisial" href="?p=profil" title="<?= h($u['nama']) ?> · profil"><?= h(inisial((string)$u['nama'])) ?></a>
+  </div>
   <?php endif; ?>
 </header>
-<?php if ($u): $aktif = $aktif === 'soal' ? 'perangkat' : $aktif; $angka = angka_beranda(); ?>
-<nav class="menu">
-  <?php foreach (MENU as $p => [$t, $i]): ?>
+<?php if ($u): $aktif = $aktif === 'soal' ? 'perangkat' : $aktif; $angka = angka_beranda();
+  // v1.68: bola emas di tab aktif (posisi 10/30/50/70/90% dari lebar menu)
+  $no_aktif = array_search($aktif, array_keys(MENU), true); ?>
+<nav class="menu<?= $no_aktif !== false ? ' ada-bola' : '' ?>"<?= $no_aktif !== false ? ' data-aktif="' . $no_aktif . '" style="--bx:' . (10 + 20 * $no_aktif) . '%"' : '' ?>>
+  <span class="bola" aria-hidden="true"></span>
+  <?php $n = 0; foreach (MENU as $p => [$t, $i]): ?>
   <?php if ($p === 'buat'): ?>
   <button type="button" class="menu-buat" id="tombol-buat" aria-haspopup="dialog" aria-controls="lembar-buat"><span class="ik"><?= ikon($i) ?></span><?= $t ?></button>
   <?php else: ?>
-  <a href="?p=<?= $p ?>" class="<?= $aktif === $p ? 'aktif' : '' ?>"><span class="ik"><?= ikon($i) ?><?= $p === 'beranda' && $angka ? '<b class="angka-menu">' . $angka . '</b>' : '' ?></span><?= $t ?></a>
+  <a href="?p=<?= $p ?>" data-i="<?= $n ?>" class="<?= $aktif === $p ? 'aktif' : '' ?>"<?= $aktif === $p ? ' aria-current="page"' : '' ?>><span class="ik"><?= ikon($i) ?><?= $p === 'beranda' && $angka ? '<b class="angka-menu">' . $angka . '</b>' : '' ?></span><span class="lbl"><?= $t ?></span></a>
   <?php endif; ?>
-  <?php endforeach; ?>
+  <?php $n++; endforeach; ?>
 </nav>
 <div class="tirai-buat tak-cetak" id="lembar-buat" hidden role="dialog" aria-label="Buat baru">
   <div class="lembar">
@@ -126,6 +132,7 @@ function kaki(bool $polos = false): void
     ?>
 </main>
 <?php if (!$polos): ?><footer class="bawah tak-cetak">SiGuru v<?= VERSI ?> · <?= h((string)k('sekolah', '')) ?></footer><?php endif; ?>
+<script src="aset/gerak.js?v=<?= VERSI ?>"></script>
 <script src="aset/guru.js?v=<?= VERSI ?>"></script>
 <?= notif_sisip_apk() ?>
 <?php foreach ((array)($GLOBALS['skrip_tambahan'] ?? []) as $sk): ?><script src="<?= h($sk) ?>?v=<?= VERSI ?>"></script>

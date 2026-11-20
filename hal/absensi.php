@@ -119,7 +119,7 @@ judul_baris('Absensi siswa', '<a class="tombol" href="?p=absensi_rekap&amp;kelas
   <p class="kecil redup kal-ket"><span class="kal-d isi contoh">✓</span> sudah diisi, semua hadir · <b class="tdk">2 tdk</b> = 2 siswa S/I/A<?php if ($hari_jadwal): ?> · <span class="kal-d jadwal contoh"></span> hari jadwalmu di kelas ini<?php endif; ?> · tekan tanggal untuk membuka</p>
 </details>
 
-<form method="post" id="form-absen">
+<form method="post" id="form-absen" data-antre>
   <?= input_token() ?>
   <input type="hidden" name="kelas" value="<?= h($kelas) ?>"><input type="hidden" name="tanggal" value="<?= h($tanggal) ?>"><input type="hidden" name="mapel" value="<?= h($mapel) ?>">
   <div class="kartu lengket ringkas-absen">

@@ -204,11 +204,7 @@ kbd{background:#eef1f8;border:1px solid var(--garis);border-bottom-width:2px;bor
 a.bookmarklet{display:inline-block;cursor:grab;padding:.7rem 1.1rem;background:var(--emas);color:var(--navy2);border-color:var(--emas);text-decoration:none}
 #manual{margin-top:.6rem}
 
-/* Garis tipis di atas layar saat halaman sedang dimuat */
-.garis-muat{position:fixed;top:0;left:0;height:3px;width:0;z-index:1000;pointer-events:none;opacity:0;
-  background:linear-gradient(90deg,var(--emas),var(--hijau-logo));box-shadow:0 0 6px rgba(242,194,48,.7)}
-.garis-muat.jalan{opacity:1;width:85%;transition:width 8s cubic-bezier(.08,.8,.2,1),opacity .2s}
-@media print{.garis-muat{display:none}}
+/* Garis muat: lihat bagian "v1.68 animasi" di guru.css */
 /* v1.66 status kirim tugas siswa: belum (oranye) · kirim (biru) · ok (hijau) */
 .status-besar{display:flex;gap:.8rem;align-items:center;border-radius:16px;padding:.9rem 1rem;margin:0 0 1rem;border:2px solid}
 .status-besar .st-ikon{flex:none;width:3rem;height:3rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;color:#fff}

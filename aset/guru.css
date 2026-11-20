@@ -903,3 +903,170 @@ html.sg-dialog-buka,html.sg-dialog-buka body{overflow:hidden}
 .rincian-ai .r-kosong{background:#EEF0F5;color:#5B6382}
 .pesan-ai{margin-top:.4rem}
 .pesan-ai textarea{width:100%;margin-top:.3rem}
+
+/* ================= v1.68 animasi & mode tanpa sinyal (aset/gerak.js) ================= */
+/* Garis khas sekolah (emas 70% · hijau 30%) hidup saat halaman dimuat */
+.atas::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:4px;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.95) 45%,rgba(255,255,255,.95) 55%,rgba(255,255,255,0));
+  background-size:35% 100%;background-repeat:no-repeat;background-position:-60% 0}
+html.sg-memuat .atas{border-image:linear-gradient(90deg,rgba(242,194,48,.45) 0 70%,rgba(46,158,72,.45) 70% 100%) 1}
+html.sg-memuat .atas::after{opacity:1;animation:sg-sapu 1.1s cubic-bezier(.65,0,.35,1) infinite}
+html.sg-memuat body.polos::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;z-index:1000;pointer-events:none;
+  background:linear-gradient(90deg,rgba(242,194,48,.5) 0 70%,rgba(46,158,72,.5) 70% 100%)}
+html.sg-memuat body.polos::after{content:'';position:fixed;top:0;left:0;right:0;height:4px;z-index:1001;pointer-events:none;
+  background:linear-gradient(90deg,rgba(255,255,255,0),#fff 45%,#fff 55%,rgba(255,255,255,0));background-size:35% 100%;background-repeat:no-repeat;
+  animation:sg-sapu 1.1s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes sg-sapu{0%{background-position:-60% 0}100%{background-position:160% 0}}
+
+/* Lingkaran kecil + ikon Riau (muncul bila memuat > 0,3 detik) */
+.sg-muat{position:fixed;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;background:rgba(246,248,252,.94);
+  opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+body.polos .sg-muat{z-index:30}
+.sg-muat.tampil{opacity:1;visibility:visible}
+.sg-muat-isi{display:flex;flex-direction:column;align-items:center;gap:14px;transform:scale(.92);transition:transform .45s cubic-bezier(.65,0,.35,1)}
+.sg-muat.tampil .sg-muat-isi{transform:none}
+.sg-muat-teks{display:flex;align-items:center;gap:4px;color:var(--navy2);font-weight:700;font-size:.9rem}
+.sg-muat-teks span{margin-right:3px}
+.sg-muat-teks i,.sg-pindah-akhir small i{width:5px;height:5px;border-radius:50%;background:var(--emas);animation:sg-titik 1.2s infinite}
+.sg-muat-teks i:nth-of-type(2),.sg-pindah-akhir small i:nth-of-type(2){animation-delay:.2s}
+.sg-muat-teks i:nth-of-type(3),.sg-pindah-akhir small i:nth-of-type(3){animation-delay:.4s}
+.sg-muat:not(.tampil) *{animation-play-state:paused!important}
+.sg-lingkar{position:relative;width:96px;height:96px}
+.sg-cincin{position:absolute;inset:0;width:100%;height:100%;animation:sg-putar 1.6s linear infinite}
+.sg-cincin circle{fill:none;stroke-width:3.2}
+.sg-cincin .jalur{stroke:#E3ECF8}
+.sg-cincin .ekor{stroke:var(--emas);stroke-linecap:round;stroke-dasharray:.2 1;animation:sg-ekor 1.6s cubic-bezier(.65,0,.35,1) infinite}
+.sg-riau{position:absolute;left:22%;top:22%;width:56%;height:56%}
+.sg-riau path,.sg-pindah svg.asal path,.sg-pindah svg.tuju path{fill:none;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 2;stroke-dashoffset:1.01}
+.sg-riau .n,.sg-pindah .n{stroke:var(--navy)}
+.sg-riau .e,.sg-pindah .e{stroke:var(--emas)}
+.sg-riau g path{animation:sg-lukis 6s cubic-bezier(.65,0,.35,1) infinite;animation-delay:var(--d)}
+@keyframes sg-lukis{0%{stroke-dashoffset:1.01}10%{stroke-dashoffset:0}15%{stroke-dashoffset:0}19%{stroke-dashoffset:-1.01}100%{stroke-dashoffset:-1.01}}
+@keyframes sg-putar{to{transform:rotate(360deg)}}
+@keyframes sg-ekor{0%,100%{stroke-dasharray:.06 1}50%{stroke-dasharray:.42 1}}
+@keyframes sg-titik{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@keyframes sg-muncul{from{opacity:0}to{opacity:1}}
+
+/* Status Online / Offline di kepala */
+.atas-kanan{display:flex;align-items:center;gap:.5rem;flex:none}
+.status-jaringan{display:inline-flex;align-items:center;gap:.4rem;font-size:.7rem;font-weight:700;color:#fff;background:rgba(255,255,255,.12);
+  padding:.28rem .6rem;border-radius:99px;white-space:nowrap;transition:background .3s}
+.status-jaringan i{width:8px;height:8px;border-radius:50%;background:#4ADE80;position:relative;flex:none;transition:background .3s}
+.status-jaringan i::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #4ADE80;opacity:0;animation:sg-nadi 2.4s ease-out infinite}
+.status-jaringan.off{background:rgba(245,158,11,.28)}
+.status-jaringan.off i{background:#C9CEDD}
+.status-jaringan.off i::after{animation:none}
+@keyframes sg-nadi{0%{transform:scale(.5);opacity:.8}100%{transform:scale(1.6);opacity:0}}
+@media (max-width:350px){.status-jaringan b{display:none}.status-jaringan{padding:.4rem}}
+.sg-pita{display:flex;gap:.55rem;align-items:center;background:#FFF4DB;color:#7A4E00;font-size:.82rem;line-height:1.4;padding:0 .9rem;
+  max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.65,0,.35,1),padding .35s}
+.sg-pita.tampil{max-height:140px;padding:.55rem .9rem}
+.sg-pita svg{width:18px;height:18px;flex:none;fill:none;stroke:#B7791F;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sg-pita span{flex:1}
+.sg-pita button{min-height:32px;padding:.2rem .7rem;font-size:.8rem;flex:none}
+.sg-toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translate(-50%,16px);opacity:0;z-index:60;
+  background:#E8F6EC;color:#1E6B33;border:1px solid #A8DDB5;border-radius:12px;padding:.6rem .9rem;font-size:.86rem;font-weight:700;
+  display:flex;gap:.5rem;align-items:center;width:max-content;max-width:calc(100% - 2rem);box-shadow:0 4px 14px rgba(27,29,94,.12);
+  transition:transform .35s cubic-bezier(.65,0,.35,1),opacity .35s;pointer-events:none}
+body.polos .sg-toast{bottom:calc(96px + env(safe-area-inset-bottom))}
+.sg-toast.tampil{transform:translate(-50%,0);opacity:1}
+.sg-toast svg{width:18px;height:18px;flex:none;fill:none;stroke:#2E9E48;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 2;stroke-dashoffset:1.01}
+.sg-toast.tampil svg{animation:sg-gambar .45s .15s cubic-bezier(.65,0,.35,1) forwards}
+@keyframes sg-gambar{to{stroke-dashoffset:0}}
+.absen li.antre .absen-nama::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:#F59E0B;margin-right:.4rem;vertical-align:middle}
+.sg-info-antre{background:#FFF4DB;color:#7A4E00;border-radius:10px;padding:.5rem .7rem;margin:0 0 .6rem}
+
+/* Menu bawah: bola emas berpindah ke tab aktif, menu melekuk di bawahnya */
+@property --bx{syntax:'<percentage>';inherits:true;initial-value:50%}
+.menu{background:transparent;border-top:0;transition:--bx .5s cubic-bezier(.65,0,.35,1)}
+.menu::before{content:'';position:absolute;inset:0;z-index:-1;background:var(--putih)}
+.menu::after{content:'';position:absolute;left:0;right:0;top:0;height:1px;z-index:-1;background:var(--garis)}
+.menu.ada-bola::before,.menu.ada-bola::after{-webkit-mask:radial-gradient(circle 29px at var(--bx) 4px,transparent 28px,#000 29px);
+  mask:radial-gradient(circle 29px at var(--bx) 4px,transparent 28px,#000 29px)}
+.menu .bola{position:absolute;top:-19px;left:var(--bx);width:46px;height:46px;margin-left:-23px;border-radius:50%;background:var(--emas);
+  box-shadow:0 3px 10px rgba(27,29,94,.22);opacity:0;transform:scale(.5);pointer-events:none;
+  transition:left .5s cubic-bezier(.65,0,.35,1),opacity .3s,transform .35s cubic-bezier(.65,0,.35,1)}
+.menu.ada-bola .bola{opacity:1;transform:none}
+.menu.tanpa-gerak,.menu.tanpa-gerak .bola,.menu.tanpa-gerak .ik{transition:none!important}
+.menu a{z-index:1}
+.menu a .ik{transition:transform .45s cubic-bezier(.65,0,.35,1),color .3s}
+.menu a.aktif .ik{transform:translateY(-17px);color:var(--navy2)}
+.menu a.aktif .lbl{color:var(--navy)}
+.menu .menu-buat .ik{background:var(--navy);color:var(--emas)}
+/* anak-anak <main> digeser 12px saja (masih di dalam jarak tepi main) agar layar tidak melebar ke samping */
+main.sg-dari-kanan,main.sg-dari-kiri{overflow-x:clip}
+main.sg-dari-kanan>*{animation:sg-masuk-kanan-k .42s cubic-bezier(.2,0,0,1)}
+main.sg-dari-kiri>*{animation:sg-masuk-kiri-k .42s cubic-bezier(.2,0,0,1)}
+@keyframes sg-masuk-kanan-k{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+@keyframes sg-masuk-kiri-k{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+@keyframes sg-masuk-kanan{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes sg-masuk-kiri{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+
+/* Pindah aplikasi: ikon SiGuru → ikon tujuan → layar navy */
+.sg-pindah{position:fixed;inset:0;z-index:200;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;overflow:hidden;animation:sg-muncul .2s ease-out}
+.sg-pindah-lingkar{position:relative;width:150px;height:150px}
+.sg-pindah .sg-cincin{animation:sg-putar-cepat 1.8s cubic-bezier(.65,0,.35,1) forwards}
+@keyframes sg-putar-cepat{0%{transform:rotate(0)}30%{transform:rotate(200deg)}55%{transform:rotate(720deg)}100%{transform:rotate(900deg)}}
+.sg-pindah svg.asal,.sg-pindah svg.tuju{position:absolute;left:25%;top:25%;width:50%;height:50%}
+.sg-pindah svg.asal path{animation:sg-asal 1.8s cubic-bezier(.65,0,.35,1) forwards}
+.sg-pindah svg.tuju path{animation:sg-tuju 1.8s cubic-bezier(.65,0,.35,1) forwards}
+@keyframes sg-asal{0%{stroke-dashoffset:1.01}25%,38%{stroke-dashoffset:0}52%,100%{stroke-dashoffset:-1.01}}
+@keyframes sg-tuju{0%,52%{stroke-dashoffset:1.01}78%,100%{stroke-dashoffset:0}}
+.sg-pindah-nama{position:relative;height:1.4rem;width:100%;text-align:center;color:var(--navy2);font-weight:700}
+.sg-pindah-nama span{position:absolute;left:0;right:0;opacity:0}
+.sg-pindah-nama .a{animation:sg-nama-a 1.8s cubic-bezier(.65,0,.35,1) forwards}
+.sg-pindah-nama .b{animation:sg-nama-b 1.8s cubic-bezier(.65,0,.35,1) forwards}
+@keyframes sg-nama-a{0%{opacity:0;letter-spacing:6px}18%,38%{opacity:1;letter-spacing:.5px}48%,100%{opacity:0}}
+@keyframes sg-nama-b{0%,50%{opacity:0;letter-spacing:6px}68%,100%{opacity:1;letter-spacing:.5px}}
+.sg-pindah-tirai{position:absolute;left:50%;top:50%;width:300vmax;height:300vmax;margin:-150vmax 0 0 -150vmax;border-radius:50%;background:var(--navy);
+  transform:scale(0);animation:sg-tirai .7s cubic-bezier(.65,0,.35,1) 1.5s forwards}
+@keyframes sg-tirai{to{transform:scale(1)}}
+.sg-pindah-akhir{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;color:#fff;opacity:0;animation:sg-muncul .35s 2s forwards}
+.sg-pindah-akhir b{font-size:1.5rem;letter-spacing:.02em}
+.sg-pindah-akhir small{display:flex;align-items:center;gap:4px;color:var(--sky);font-size:.85rem}
+.sg-pindah-akhir small i{margin-left:1px}
+
+@media (prefers-reduced-motion:reduce){
+  .sg-riau g path,.sg-cincin,.sg-cincin .ekor,.atas::after,html.sg-memuat body.polos::after,main.sg-dari-kanan>*,main.sg-dari-kiri>*{animation:none!important}
+  .sg-riau g:first-child path{stroke-dashoffset:0}
+  .menu,.menu .bola,.menu a .ik{transition:none!important}
+}
+@media print{.sg-muat,.sg-pita,.sg-toast,.sg-pindah,.status-jaringan{display:none!important}}
+
+/* v1.68 Ujian siswa · gaya ujian profesional */
+.ujian-nomor{display:grid;grid-template-columns:repeat(auto-fill,minmax(2.3rem,1fr));gap:.35rem;overflow:visible;padding:.45rem .9rem .7rem}
+.ujian-nomor button{width:auto;height:2.3rem;min-height:0;padding:0;border-radius:9px;font-size:.85rem;transition:background .35s,border-color .35s,color .35s,box-shadow .2s}
+.ujian-nomor button.dijawab{background:var(--hijau-logo);border-color:var(--hijau-logo);color:#fff}
+.ujian-nomor button.tunda{background:#F59E0B;border-color:#F59E0B;color:#fff}
+.ujian-nomor button.ragu{background:var(--emas);border-color:var(--emas);color:var(--navy2)}
+.ujian-nomor button.kini{outline:0;box-shadow:0 0 0 2px #fff,0 0 0 4px var(--navy)}
+.ujian-status{display:flex;align-items:center;gap:.4rem;font-size:.8rem;padding:.3rem .9rem;min-height:1.6rem;transition:background .3s,color .3s}
+.ujian-status svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.ujian-status.proses{color:var(--redup)}
+.ujian-status.proses .putar{stroke-dasharray:11 33;transform-origin:10px 10px;animation:sg-putar .8s linear infinite}
+.ujian-status.ok{color:#1d6b33}
+.ujian-status.ok path{stroke-dasharray:1 2;stroke-dashoffset:1.01;animation:sg-gambar .4s cubic-bezier(.65,0,.35,1) forwards}
+.ujian-status.tunda{color:#7A4E00;background:#FFF4DB;font-weight:700}
+.ujian-status.tunda svg{stroke:#B7791F;stroke-width:2}
+.ujian-soal.geser-kanan{animation:sg-masuk-kanan .4s cubic-bezier(.2,0,0,1)}
+.ujian-soal.geser-kiri{animation:sg-masuk-kiri .4s cubic-bezier(.2,0,0,1)}
+.ujian-wadah{overflow-x:clip}
+.ujian-opsi button{transition:border-color .25s,background .25s}
+.ujian-opsi .huruf{position:relative;overflow:hidden;transition:color .25s}
+.ujian-opsi .huruf::before{content:'';position:absolute;inset:0;border-radius:50%;background:var(--navy);transform:scale(0);transition:transform .3s cubic-bezier(.2,0,0,1);z-index:-1}
+.ujian-opsi button.pilih .huruf{background:transparent}
+.ujian-opsi button.pilih .huruf::before{transform:none}
+.ujian-opsi button.pilih.baru .huruf::before{animation:sg-isi-huruf .35s cubic-bezier(.2,0,0,1)}
+.ujian-opsi .huruf{isolation:isolate}
+@keyframes sg-isi-huruf{from{transform:scale(0)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.ujian-soal.geser-kanan,.ujian-soal.geser-kiri,.ujian-opsi button.pilih.baru .huruf::before{animation:none}}
+
+/* v1.68 Kirim tugas: cincin emas kemajuan unggah + centang hijau */
+.status-besar.kirim .st-ikon{position:relative;background:#5B5FD6;animation:none}
+.st-cincin{position:absolute;inset:-5px;width:calc(100% + 10px);height:calc(100% + 10px);transform:rotate(-90deg)}
+.st-cincin circle{fill:none;stroke-width:4}
+.st-cincin .jl{stroke:#D8DAF3}
+.st-cincin .isi{stroke:var(--emas);stroke-linecap:round;stroke-dasharray:1 2;transition:stroke-dashoffset .35s cubic-bezier(.65,0,.35,1)}
+.status-besar.kirim .st-ikon span{animation:st-naik 1s ease-in-out infinite alternate}
+.st-centang{width:100%;height:100%}
+.st-centang path{fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 2;stroke-dashoffset:1.01;animation:sg-gambar .45s .1s cubic-bezier(.65,0,.35,1) forwards}
