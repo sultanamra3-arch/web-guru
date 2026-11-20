@@ -1,11 +1,11 @@
 /* SiGuru: simpan berkas tampilan di HP; halaman diambil dari server (data terbaru).
    v1.68: halaman guru yang pernah dibuka disimpan di HP → tetap bisa dilihat tanpa sinyal;
           layar pembuka (logo → ikon Riau) saat aplikasi baru dibuka. */
-const CACHE = 'siguru-v1.74';
+const CACHE = 'siguru-v1.75';
 const HALAMAN = 'siguru-halaman';
 const V = CACHE.replace('siguru-v', '');
 const ASET = [
-  'aset/gaya.css?v=' + V, 'aset/guru.css?v=' + V, 'aset/guru.js?v=' + V, 'aset/gerak.js?v=' + V, 'aset/dialog.js?v=' + V,
+  'aset/gaya.css?v=' + V, 'aset/guru.css?v=' + V, 'aset/guru.js?v=' + V, 'aset/gerak.js?v=' + V, 'aset/tuah.js?v=' + V, 'aset/dialog.js?v=' + V,
   'aset/huruf/quicksand-500.woff2', 'aset/huruf/quicksand-600.woff2', 'aset/huruf/quicksand-700.woff2',
   'aset/logo.png', 'aset/favicon.png?v=3', 'offline.html'
 ];
@@ -14,6 +14,10 @@ const HAL_SISWA = ['u', 'u_kerja', 'gambar', 't', 'tugas_foto', 'k', 'resi'];
 // halaman yang tidak disimpan di HP
 const JANGAN_SIMPAN = /^(api_|keluar$|masuk$|beralih$|apk$|ke_pustaka$|ke_slims$|sso$|gambar$|tugas_foto$|presentasi$|.*_cetak$)/;
 const MAKS_HALAMAN = 80;
+// v1.75: gambar TUAH (maskot) untuk layar pembuka & layar tanpa sinyal
+try { importScripts('aset/tuah.js?v=' + V); } catch (x) { /* tanpa TUAH */ }
+const TUAH = n => (self.sgTuah ? self.sgTuah(n) : '');
+if (self.sgTuahBerkas) ASET.push(...self.sgTuahBerkas); // gambar TUAH ikut disimpan untuk luring
 
 self.addEventListener('install', e => {
   // v1.71: satu berkas gagal diambil (mis. diblokir hosting) tidak boleh menggagalkan seluruh pemasangan
@@ -72,11 +76,11 @@ async function halamanOffline() {
   const ada = await caches.match('offline.html').catch(() => null);
   if (ada) return ada;
   return new Response('<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
-    '<title>SiGuru · Tanpa sinyal</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F6F8FC;' +
+    '<title>SiGuru · Tanpa sinyal</title><link rel="stylesheet" href="aset/guru.css?v=' + V + '"><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F6F8FC;' +
     'font-family:Quicksand,system-ui,sans-serif;color:#1A1A2E;overscroll-behavior:none}.k{background:#fff;border:1px solid #E3E8F2;border-radius:16px;' +
-    'padding:24px 20px;margin:16px;max-width:360px;text-align:center}h1{color:#2A2C84;font-size:1.3rem}p{color:#5B6382;line-height:1.5}' +
+    'padding:24px 20px;margin:16px;max-width:360px;text-align:center}h1{color:#2A2C84;font-size:1.3rem}.tuah{width:150px;margin:0 auto}p{color:#5B6382;line-height:1.5}' +
     'button{font:inherit;font-weight:700;background:#2A2C84;color:#fff;border:0;border-radius:12px;padding:12px 24px;margin:4px}' +
-    'button.b{background:#fff;color:#2A2C84;border:1px solid #E3E8F2}</style></head><body><div class="k"><h1>Tanpa sinyal</h1>' +
+    'button.b{background:#fff;color:#2A2C84;border:1px solid #E3E8F2}</style></head><body><div class="k"><div class="tuah">' + TUAH('payung') + '</div><h1>Sinyal sedang hujan</h1>' +
     '<p>Halaman ini belum tersimpan di HP. Halaman yang pernah dibuka saat ada sinyal tetap bisa dilihat.</p>' +
     '<button onclick="location.reload()">Coba lagi</button><button class="b" onclick="history.back()">‹ Kembali</button></div>' +
     '<script>addEventListener("online",function(){location.reload()})</script></body></html>',
@@ -157,6 +161,7 @@ const PEMBUKA = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
   '#sg-pembuka{position:fixed;inset:0;z-index:2147483000;background:#2A2C84;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;' +
   'font-family:Quicksand,system-ui,sans-serif;transition:opacity .45s,visibility .45s;overscroll-behavior:none}' +
   '#sg-pembuka.hilang{opacity:0;visibility:hidden}' +
+  '#sg-pembuka{padding-bottom:min(140px,22vh);box-sizing:border-box}' +
   '#sg-pembuka .lk{position:relative;width:150px;height:150px}' +
   '#sg-pembuka .lk>*{position:absolute}' +
   '#sg-pembuka .cc{inset:0;width:100%;height:100%;animation:sgp-putar 2.4s linear infinite}' +
@@ -172,6 +177,9 @@ const PEMBUKA = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
   '#sg-pembuka .nm span{position:absolute;left:0;right:0;opacity:0;animation:sgp-nama 7.2s cubic-bezier(.65,0,.35,1) infinite}' +
   '#sg-pembuka .mrk{position:absolute;bottom:calc(36px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;color:#fff;font-size:21px;font-weight:700;letter-spacing:1px}' +
   '#sg-pembuka .mrk i{display:flex;width:70px;height:3px;margin:8px auto 0;background:linear-gradient(90deg,#F2C230 0 70%,#2E9E48 70%);transform-origin:left;animation:sgp-garis 1.2s cubic-bezier(.65,0,.35,1)}' +
+  '#sg-pembuka .tuah-pembuka{position:absolute;bottom:calc(92px + env(safe-area-inset-bottom));left:50%;width:min(150px,30vh);transform:translateX(-50%);opacity:0;animation:sgp-muncul .6s 1.1s forwards}' +
+  '#sg-pembuka .tuah-pembuka span,#sg-pembuka .tuah-pembuka img{display:block;width:100%;height:auto}' +
+  '@keyframes sgp-muncul{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translateX(-50%)}}' +
   '@keyframes sgp-putar{to{transform:rotate(360deg)}}' +
   '@keyframes sgp-ekor{0%,100%{stroke-dasharray:.05 1}50%{stroke-dasharray:.45 1}}' +
   '@keyframes sgp-lukis{0%{stroke-dashoffset:1.01}8%{stroke-dashoffset:0}13.5%{stroke-dashoffset:0}16.6%{stroke-dashoffset:-1.01}100%{stroke-dashoffset:-1.01}}' +
@@ -185,7 +193,7 @@ const PEMBUKA = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
   RIAU.map((x, i) => '<svg class="ik" viewBox="0 0 100 100" aria-hidden="true" style="animation-delay:' + ((i + 1) * 1.2) + 's">' + x[1] + '</svg>').join('') +
   '</div><div class="nm"><span>SMPN 6 Keritang</span>' +
   RIAU.map((x, i) => '<span style="animation-delay:' + ((i + 1) * 1.2) + 's">' + x[0] + '</span>').join('') +
-  '</div><div class="mrk">SiGuru<i></i></div></div>' +
+  '</div><div class="tuah-pembuka">' + TUAH('pembuka') + '</div><div class="mrk">SiGuru<i></i></div></div>' +
   // tutup pembuka setelah halaman siap (paling cepat 2,4 detik: logo lalu ikon Riau pertama sempat terlihat)
   '<script>(function(){var p=document.getElementById("sg-pembuka"),t0=Date.now();function tutup(){setTimeout(function(){p.classList.add("hilang");' +
   'setTimeout(function(){p.remove()},500)},Math.max(0,2400-(Date.now()-t0)))}' +

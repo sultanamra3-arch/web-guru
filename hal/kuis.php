@@ -32,7 +32,7 @@ judul_baris('Kuis cepat');
 ?>
 <p class="redup" style="margin-top:-.4rem">Soal tampil di proyektor/layar, siswa menjawab dari HP. Makin cepat dan benar, makin besar poinnya — lalu muncul peringkat. Cocok untuk pemanasan atau penutup pelajaran.</p>
 <?php if (!$paket): ?>
-  <div class="pesan">Belum ada paket soal. Buat soal lalu jadikan paket di <a href="?p=soal">Bank soal</a>.</div>
+  <?= tuah_kosong('Belum ada paket soal', 'Kuis cepat memakai paket soal. Buat soal dulu, lalu jadikan paket di Bank soal.', ['?p=soal', 'Buka Bank soal']) ?>
 <?php else: ?>
 <form method="post" class="kartu formulir">
   <?= input_token() ?>

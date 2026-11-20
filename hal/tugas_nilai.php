@@ -104,9 +104,11 @@ judul_baris(h(tugas_nama_kirim($kode)), '<a class="tombol" href="?p=tugas_lihat&
   b.onclick = function () {
     var ulang = !!isi.textContent;
     b.disabled = true; st.textContent = '⏳ AI sedang membaca tugas (±20–40 detik)…';
+    var ai = window.sgAI && sgAI.mulai({ gaya: 'nilai', judul: 'TUAH sedang menilai tugas', langkah: ['Membaca tulisan siswa', 'Mencocokkan dengan soal', 'Menyusun nilai & komentar'], detik: 30 });
+    var akhir = window.sgAI ? sgAI.akhiri(ai) : function (r) { return r; };
     var fd = new FormData(); fd.append('_t', document.querySelector('input[name=_t]').value); fd.append('aksi', 'saran'); fd.append('id', k.dataset.id); fd.append('kode', k.dataset.kode);
     if (pesan && pesan.value.trim()) fd.append('pesan', pesan.value.trim());
-    fetch('?p=api_tugas', { method: 'POST', body: fd, credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (r) {
+    fetch('?p=api_tugas', { method: 'POST', body: fd, credentials: 'same-origin' }).then(function (r) { return r.json(); }).catch(function () { return { ok: false, galat: 'Gagal tersambung' }; }).then(akhir).then(function (r) {
       b.disabled = false;
       if (!r.ok) { st.textContent = '⚠ ' + (r.galat || 'gagal'); return; }
       st.textContent = ulang ? '✓ Sudah dinilai ulang — nilai & komentar di bawah diganti dengan saran baru.' : '';

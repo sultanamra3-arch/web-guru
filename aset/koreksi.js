@@ -72,7 +72,8 @@
     var teks = dua ? '⏳ Dua AI sedang membaca lembar jawaban…' : '⏳ AI sedang membaca lembar jawaban…';
     st.textContent = teks;
     var jam = setInterval(function () { st.textContent = teks + ' (' + Math.round((Date.now() - mulai) / 1000) + ' detik)'; }, 1000);
-    kirim({ aksi: 'koreksi', id: pid, member_id: pilihSiswa.value, dua_kali: dua ? '1' : '0', foto: foto }).then(function (r) {
+    var ai = window.sgAI && sgAI.mulai({ gaya: 'nilai', judul: dua ? 'TUAH & temannya membaca lembar jawaban' : 'TUAH sedang membaca lembar jawaban', langkah: ['Membaca foto lembar jawaban', 'Mencocokkan dengan kunci', 'Menghitung skor'], detik: dua ? 60 : 40 });
+    kirim({ aksi: 'koreksi', id: pid, member_id: pilihSiswa.value, dua_kali: dua ? '1' : '0', foto: foto }).then(window.sgAI ? sgAI.akhiri(ai) : function (r) { return r; }).then(function (r) {
       clearInterval(jam); tombol.disabled = false;
       if (!r.ok) { galat(r); return; }
       st.textContent = '';

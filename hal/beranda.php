@@ -65,7 +65,12 @@ $sapa = (int)date('G') < 11 ? 'pagi' : ((int)date('G') < 15 ? 'siang' : ((int)da
 
 kepala('Beranda', 'beranda');
 ?>
-<div class="sapa"><small><?= HARI[(int)date('N')] ?? 'Minggu' ?>, <?= tgl_panjang(hari_ini()) ?></small><h1>Selamat <?= $sapa ?>, <?= h(preg_replace('/,.*$/', '', pengguna()['nama'])) ?></h1></div>
+<div class="sapa"><small><?= HARI[(int)date('N')] ?? 'Minggu' ?>, <?= tgl_panjang(hari_ini()) ?></small><h1 class="sapa-biasa">Selamat <?= $sapa ?>, <?= h(preg_replace('/,.*$/', '', pengguna()['nama'])) ?></h1></div>
+<?php // v1.75: TUAH melambai menyapa — sekali sehari (diatur aset/tuah.js lewat data-sekali)
+$nama_depan = h(preg_replace('/\s.*$/u', '', trim(preg_replace('/,.*$/', '', (string)pengguna()['nama']))));
+echo str_replace('class="tuah-balon tuah-sapa"', 'class="tuah-balon tuah-sapa" data-sekali="sapa" hidden', tuah_balon('sapa',
+    'Selamat ' . h($sapa) . ', <b>' . $nama_depan . '</b>! ' . (count($tindak) ? 'Ada <b>' . count($tindak) . ' hal</b> yang perlu ditindaklanjuti hari ini.' : 'Semua beres hari ini. Semangat mengajar!')
+    . '<button type="button" class="tutup-sapa" aria-label="Tutup sapaan">×</button>', 'tuah-sapa')); ?>
 
 <form class="cari-besar" method="get" role="search"><input type="hidden" name="p" value="cari">
   <?= ikon('cari') ?><input type="search" name="q" placeholder="Cari siswa, soal, ujian, tugas…" aria-label="Cari"></form>

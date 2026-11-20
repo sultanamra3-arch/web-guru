@@ -163,7 +163,7 @@ if ($h):
 /* ---------- 0. Formulir tempel ---------- */
     $lama = $_SESSION['tempel_isian'] ?? [];
 ?>
-<form method="post" enctype="multipart/form-data" class="kartu formulir" id="form-baca">
+<form method="post" enctype="multipart/form-data" class="kartu formulir" id="form-baca" data-ai="tulis" data-ai-judul="TUAH sedang menyalin soal" data-ai-langkah="Membaca soal tempelanmu|Menyalin soal apa adanya|Melengkapi kunci yang kosong" data-ai-detik="60">
   <?= input_token() ?><input type="hidden" name="aksi" value="baca">
   <p style="margin-top:0">Salin soal dari Word, PDF, atau WA lalu tempel di bawah, <b>atau</b> pilih file Word. Boleh sekaligus dengan <b>kunci jawaban, pedoman esai, rubrik, dan aturan skor</b> — urutan bebas. Yang tidak tertulis akan <b>disarankan AI</b> dan ditandai kuning untuk diperiksa.</p>
   <div class="baris2">

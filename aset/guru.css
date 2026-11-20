@@ -1073,3 +1073,80 @@ main.sg-dari-kiri>*{animation:sg-masuk-kiri-k .42s cubic-bezier(.2,0,0,1)}
 .status-besar.kirim .st-ikon span{animation:st-naik 1s ease-in-out infinite alternate}
 .st-centang{width:100%;height:100%}
 .st-centang path{fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 2;stroke-dashoffset:1.01;animation:sg-gambar .45s .1s cubic-bezier(.65,0,.35,1) forwards}
+
+/* ================= v1.75 TUAH, maskot SiGuru (aset/tuah.js) ================= */
+/* gambar berlapis: dasar + bagian yang bergerak (tangan, bintang) */
+.tuah-gb{position:relative;display:block;width:100%;transform-origin:50% 100%;animation:tg-napas 3s ease-in-out infinite}
+.tuah-gb img{display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.tuah-gb .tg-dasar{width:100%;height:auto}
+.tuah-gb .tg-p{position:absolute;height:auto}
+.tg-sapa .tg-lengan{animation:tg-lambai 1s ease-in-out infinite alternate}
+.tg-kosong .tg-lengan{animation:tg-tunjuk 1.4s ease-in-out infinite}
+.tg-jempol .tg-lengan{animation:tg-jempol 1.8s ease-in-out infinite}
+.tuah-gb [class*="tg-b"]{animation:tg-kelip 1.6s ease-in-out infinite}
+.tuah-gb .tg-b2{animation-delay:.4s}.tuah-gb .tg-b3{animation-delay:.8s}.tuah-gb .tg-b4{animation-delay:1.2s}
+.tg-jempol .tg-b1{animation:tg-semburat 1.8s ease-out infinite}
+.tg-selesai{animation:tg-angguk 2.6s ease-in-out infinite}
+.tg-payung{animation:tg-goyang 3.2s ease-in-out infinite}
+.tg-pembuka{animation:tg-napas 2.4s ease-in-out infinite}
+/* AI bekerja: sinar memindai daftar periksa */
+.tg-pindai{position:absolute;left:66%;width:28%;top:20%;height:5%;border-radius:4px;background:linear-gradient(90deg,transparent,rgba(46,158,72,.35),transparent);animation:tg-pindai 2.2s ease-in-out infinite}
+/* hujan */
+.tg-hujan{position:absolute;inset:0 0 10% 0;overflow:hidden;pointer-events:none}
+.tg-hujan b{position:absolute;top:-10%;width:2px;height:9%;border-radius:2px;background:linear-gradient(#A0C4E8,rgba(160,196,232,0));animation:tg-hujan 1.1s linear infinite}
+.tg-hujan b:nth-child(1){left:6%;animation-delay:.1s}.tg-hujan b:nth-child(2){left:18%;animation-delay:.6s}.tg-hujan b:nth-child(3){left:70%;animation-delay:.3s}
+.tg-hujan b:nth-child(4){left:80%;animation-delay:.8s}.tg-hujan b:nth-child(5){left:90%;animation-delay:.45s}.tg-hujan b:nth-child(6){left:86%;animation-delay:1s}.tg-hujan b:nth-child(7){left:12%;animation-delay:.95s}
+/* istirahat (batas AI habis) */
+.tg-tidur{animation:tg-angguk 3.4s ease-in-out infinite;filter:saturate(.85)}
+.tg-tidur .tg-p{animation-play-state:paused}
+.tg-zzz{position:absolute;right:4%;top:6%;font:700 1.1rem/1 system-ui,sans-serif;font-style:normal;color:#2A2C84;animation:tg-z 2.6s ease-out infinite}
+.tg-zzz b{font-size:.8em;margin-left:2px}
+@keyframes tg-napas{0%,100%{transform:scale(1)}50%{transform:scale(1.012,.988)}}
+@keyframes tg-lambai{from{transform:rotate(12deg)}to{transform:rotate(-10deg)}}
+@keyframes tg-tunjuk{0%,100%{transform:rotate(0)}40%{transform:rotate(-6deg) translateX(3%)}60%{transform:rotate(-4deg) translateX(2%)}}
+@keyframes tg-jempol{0%,55%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-10deg) scale(1.06)}}
+@keyframes tg-kelip{0%,100%{transform:scale(.55) rotate(0);opacity:.35}50%{transform:scale(1.15) rotate(25deg);opacity:1}}
+@keyframes tg-semburat{0%,10%{opacity:0;transform:scale(.6)}30%{opacity:1;transform:scale(1.05)}70%,100%{opacity:0;transform:scale(1.15)}}
+@keyframes tg-angguk{0%,60%,100%{transform:rotate(0)}75%{transform:rotate(2.5deg) translateY(1%)}}
+@keyframes tg-goyang{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+@keyframes tg-pindai{0%{top:18%;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:50%;opacity:0}}
+@keyframes tg-hujan{to{transform:translateY(1100%)}}
+@keyframes tg-z{0%{opacity:0;transform:translate(0,6px) scale(.7)}25%{opacity:1}100%{opacity:0;transform:translate(10px,-18px) scale(1.15)}}
+/* Kartu "TUAH sedang bekerja" (proses AI) */
+.sg-ai-latar{position:fixed;inset:0;z-index:150;background:rgba(27,29,94,.38);display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;transition:opacity .25s}
+.sg-ai-latar.tampil{opacity:1}
+.sg-ai-kartu{width:100%;max-width:340px;background:#EEF3FC;border:1px solid #C9D6F2;border-radius:20px;padding:1rem 1.1rem 1.1rem;text-align:center;
+  box-shadow:0 12px 40px rgba(27,29,94,.25);transform:translateY(14px) scale(.97);transition:transform .35s cubic-bezier(.2,0,0,1)}
+.sg-ai-latar.tampil .sg-ai-kartu{transform:none}
+.sg-ai-tuah{width:150px;margin:0 auto .2rem}
+.sg-ai-judul{display:block;color:var(--navy);font-size:1.05rem;margin:.2rem 0 .5rem}
+.sg-ai-langkah{list-style:none;margin:0 auto .6rem;padding:0;text-align:left;max-width:260px}
+.sg-ai-langkah li{display:flex;align-items:center;gap:.5rem;font-size:.88rem;color:var(--redup);margin:.35rem 0;transition:color .3s}
+.sg-ai-langkah li svg{width:18px;height:18px;flex:none}
+.sg-ai-langkah li.jalan{color:var(--navy2);font-weight:700}
+.sg-ai-langkah li.ok{color:#1E6B33}
+.sg-ai-putar{transform-origin:9px 9px;animation:sg-putar .8s linear infinite}
+.sg-ai-ok{stroke-dasharray:1 2;stroke-dashoffset:1.01;animation:sg-gambar .4s forwards}
+.sg-ai-bar{height:7px;border-radius:4px;background:#D8E1F3;overflow:hidden}
+.sg-ai-bar i{display:block;height:100%;width:0;background:var(--navy);border-radius:4px;transition:width .6s ease}
+.sg-ai-sisa{display:block;color:var(--redup);margin-top:.35rem;min-height:1.1em}
+.sg-ai-pesan{margin:.3rem 0 .6rem;color:var(--navy2);font-size:.9rem;line-height:1.45}
+.sg-ai-tutup{min-width:9rem}
+
+/* TUAH di halaman */
+.kosong-tuah{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.4rem;padding:1rem .6rem 1.2rem;list-style:none}
+.kosong-tuah .tuah{width:120px}
+.kosong-tuah b{color:var(--navy2);font-size:1.02rem}
+.kosong-tuah p{margin:.2rem 0 .6rem;color:var(--redup)}
+.tuah-balon{display:flex;align-items:flex-end;gap:.5rem;margin:.2rem 0 .8rem}
+.tuah-balon .tuah{width:84px;flex:none}
+.tuah-balon .balon{position:relative;background:#fff;border:1px solid #C9D6F2;border-radius:14px;padding:.6rem .8rem;color:var(--navy2);line-height:1.45;margin-bottom:1.1rem;flex:1}
+.tuah-balon .balon::before{content:'';position:absolute;left:-7px;bottom:16px;width:12px;height:12px;background:#fff;border-left:1px solid #C9D6F2;border-bottom:1px solid #C9D6F2;transform:rotate(45deg)}
+.tuah-balon .balon .tutup-sapa{position:absolute;top:.15rem;right:.3rem;border:0;background:none;min-height:0;padding:.2rem .4rem;color:var(--redup);font-size:1rem;line-height:1}
+.selesai-ujian .tuah{width:120px;margin:0 auto -.3rem}
+.sg-muat .tuah-dayung{width:96px;margin:0 auto}
+@media (prefers-reduced-motion:reduce){.tuah-gb,.tuah-gb *{animation:none!important}.tg-hujan,.tg-pindai,.tg-zzz{display:none}}
+@media print{.tuah,.tuah-balon,.kosong-tuah .tuah,.sg-ai-latar{display:none!important}}
+.gelembung.ada-tuah{display:flex;align-items:center;gap:.5rem}
+.tuah-chat{width:46px;flex:none}
+.tuah-balon[hidden],.kosong-tuah[hidden]{display:none}

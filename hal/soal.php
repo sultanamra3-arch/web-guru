@@ -69,7 +69,7 @@ tab_perangkat('soal');
   <?= input_token() ?>
   <div class="pilih-semua-baris"><label class="centang"><input type="checkbox" id="pilih-semua-soal"> Pilih semua yang tampil</label><small class="redup"><?= count($daftar) ?> dari <?= $total ?> soal</small></div>
   <ul class="daftar kartu bank-soal ringkas">
-  <?php if (!$daftar): ?><li class="redup"><?= $dipaket ? 'Semua soalmu sudah masuk paket. Buat soal baru dengan' : 'Belum ada soal. Mulai dengan' ?> <a href="?p=soal_ai">Soal AI</a> atau <a href="?p=soal_manual">＋ Manual</a>.</li><?php endif; ?>
+  <?php if (!$daftar): ?><?= tuah_kosong($dipaket ? 'Semua soal sudah masuk paket' : 'Belum ada soal', 'Biar TUAH bantu menyusun soal dengan AI, atau tulis sendiri lewat <a href="?p=soal_manual">＋ Manual</a>.', ['?p=soal_ai', '✨ Buat soal dengan AI'], 'li') ?><?php endif; ?>
   <?php foreach ($daftar as $i => $s): $opsi = json_decode((string)$s['opsi'], true) ?: []; $go = gambar_opsi($s['gambar_opsi'] ?? null);
       $kunci = strtoupper(trim((string)$s['kunci'])); ?>
     <li>

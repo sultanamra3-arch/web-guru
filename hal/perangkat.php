@@ -18,7 +18,7 @@ tab_perangkat(isset(JENIS_DOKUMEN[$jenis]) ? $jenis : '');
   <a class="tombol kecil utama" href="?p=soal_ai"><?= ikon('ai') ?> Soal AI</a>
 </div>
 <ul class="daftar kartu">
-  <?php if (!$daftar): ?><li class="redup">Belum ada. Tekan salah satu tombol ＋ di atas.</li><?php endif; ?>
+  <?php if (!$daftar): ?><?= tuah_kosong('Belum ada perangkat ajar', 'Tekan salah satu tombol ＋ di atas: modul ajar, LKPD, presentasi, atau kisi-kisi.', null, 'li') ?><?php endif; ?>
   <?php foreach ($daftar as $d): $hal = ['presentasi' => 'presentasi', 'paket' => 'paket_cetak', 'kisi' => 'kisi'][$d['jenis']] ?? 'dokumen_lihat'; ?>
     <li><a href="?p=<?= $hal ?>&amp;id=<?= (int)$d['id'] ?>"><b><?= h($d['judul']) ?></b>
       <small><?= h(JENIS_DOKUMEN[$d['jenis']] ?? $d['jenis']) ?><?= $d['mapel'] ? ' · ' . h($d['mapel']) : '' ?><?= $d['kelas'] ? ' · Kelas ' . h($d['kelas']) : '' ?> · <?= tgl($d['diubah']) ?></small></a></li>

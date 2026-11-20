@@ -101,7 +101,9 @@
     var jam = setInterval(function () { st.textContent = '⏳ AI sedang membaca jadwal… (' + Math.round((Date.now() - mulai) / 1000) + ' detik)'; }, 1000);
     var fd = new FormData(); fd.append('_t', form.dataset.token); fd.append('aksi', 'baca_jadwal'); fd.append('guru', document.getElementById('kode-guru').value);
     foto.forEach(function (f) { fd.append('foto[]', f); });
+    var ai = window.sgAI && sgAI.mulai({ gaya: 'baca', judul: 'TUAH sedang membaca jadwal', langkah: ['Membaca foto jadwal', 'Mencari kode guru', 'Mengisi tabel jadwal'], detik: 35 });
     fetch('?p=api_ai', { method: 'POST', body: fd, credentials: 'same-origin' }).then(function (r) { return r.json(); }).catch(function () { return { ok: false, galat: 'Tidak tersambung ke server.' }; })
+      .then(window.sgAI ? sgAI.akhiri(ai) : function (r) { return r; })
       .then(function (r) {
         clearInterval(jam); btn.disabled = false;
         if (!r.ok) { st.textContent = '⚠ ' + (r.galat || 'Gagal membaca.'); return; }

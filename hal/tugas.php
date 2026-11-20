@@ -22,7 +22,7 @@ judul_baris('Tugas online', '<a class="tombol utama" href="?p=tugas_form">＋ Tu
   <?php foreach (['buka' => 'Berjalan', 'tutup' => 'Selesai'] as $k => $n): ?><a href="?p=tugas&amp;st=<?= $k ?>" class="<?= $st === $k ? 'aktif' : '' ?>"><?= $n ?> (<?= $hitung[$k] ?>)</a><?php endforeach; ?>
 </nav>
 <ul class="daftar kartu">
-  <?php if (!$daftar): ?><li class="redup"><?= $daftar_semua ? 'Tidak ada tugas di bagian ini.' : 'Belum ada tugas. Tekan <b>＋ Tugas baru</b>.' ?></li><?php endif; ?>
+  <?php if (!$daftar): ?><?= $daftar_semua ? '<li class="redup">Tidak ada tugas di bagian ini.</li>' : tuah_kosong('Belum ada tugas', 'Ayo buat tugas pertama untuk kelasmu!', ['?p=tugas_form', '＋ Buat tugas'], 'li') ?><?php endif; ?>
   <?php foreach ($daftar as $t): $n = tugas_kelompok($t) ? count(tugas_daftar_kelompok($t)) : ($jumlah[$t['kelas']] ?? 0); ?>
   <li><a href="?p=tugas_lihat&amp;id=<?= (int)$t['id'] ?>"><b><?= h($t['judul']) ?></b>
     <small><?= tugas_kelompok($t) ? '<span class="lencana">kelompok</span> ' : '' ?>Kelas <?= h($t['kelas']) ?><?= $t['mapel'] ? ' · ' . h($t['mapel']) : '' ?> · <?= $t['batas'] ? 'batas ' . h(tgl(substr($t['batas'], 0, 10)) . ' ' . substr($t['batas'], 11, 5)) : 'tanpa batas' ?>

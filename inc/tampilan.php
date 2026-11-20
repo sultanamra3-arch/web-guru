@@ -69,6 +69,7 @@ function kepala(string $judul, string $aktif = '', bool $polos = false): void
 <link rel="stylesheet" href="aset/gaya.css?v=<?= VERSI ?>">
 <link rel="stylesheet" href="aset/guru.css?v=<?= VERSI ?>">
 <script src="aset/dialog.js?v=<?= VERSI ?>"></script>
+<script src="aset/tuah.js?v=<?= VERSI ?>"></script>
 <?php if ($u && !$polos): ?>
 <script type="speculationrules">
 <?= json_encode(siap_cepat_aturan(), JSON_UNESCAPED_SLASHES) ?>
@@ -308,4 +309,21 @@ function tombol_tutorial(string $jenis): string
     $teks = VIDEO_TUTORIAL[$jenis][1];
     return '<a class="tombol-tutorial" href="' . h($url) . '" target="_blank" rel="noopener" data-tanpa-siap>'
         . ikon('video') . '<span><b>' . h($teks) . '</b><small>Tonton video tutorial (±2 menit)</small></span></a>';
+}
+
+/**
+ * v1.75: TUAH (maskot) menunjuk di halaman kosong.
+ * $ket boleh berisi HTML (teks dari kode sendiri, bukan dari pengguna). $tombol = [href, teks] atau null.
+ */
+function tuah_kosong(string $judul, string $ket = '', ?array $tombol = null, string $tag = 'div'): string
+{
+    $b = $tombol ? '<a class="tombol utama" href="' . h($tombol[0]) . '">' . $tombol[1] . '</a>' : '';
+    return '<' . $tag . ' class="kosong-tuah"><div class="tuah" data-tuah="tunjuk" aria-hidden="true"></div><b>' . h($judul) . '</b>'
+        . ($ket !== '' ? '<p>' . $ket . '</p>' : '') . $b . '</' . $tag . '>';
+}
+
+/** v1.75: TUAH + balon kata. $isi berisi HTML yang sudah aman. */
+function tuah_balon(string $pose, string $isi, string $kelas = ''): string
+{
+    return '<div class="tuah-balon' . ($kelas !== '' ? ' ' . $kelas : '') . '"><div class="tuah" data-tuah="' . h($pose) . '" aria-hidden="true"></div><div class="balon">' . $isi . '</div></div>';
 }

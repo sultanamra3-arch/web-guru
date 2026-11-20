@@ -117,7 +117,8 @@
     if (!foto.length) { galat(st, { galat: 'Ambil foto daftar siswa dulu.' }); return; }
     var btn = this, mulai = Date.now(); btn.disabled = true;
     var jam = setInterval(function () { st.textContent = '⏳ AI sedang membaca daftar nama… (' + Math.round((Date.now() - mulai) / 1000) + ' detik)'; }, 1000);
-    kirim({ aksi: 'baca_daftar', foto: foto }).then(function (r) {
+    var ai = window.sgAI && sgAI.mulai({ gaya: 'baca', judul: 'TUAH sedang membaca daftar nama', langkah: ['Membaca foto daftar hadir', 'Mengenali nama & L/P', 'Merapikan daftar'], detik: 30 });
+    kirim({ aksi: 'baca_daftar', foto: foto }).then(window.sgAI ? sgAI.akhiri(ai) : function (r) { return r; }).then(function (r) {
       clearInterval(jam); btn.disabled = false;
       if (!r.ok) { galat(st, r); return; }
       if (r.kelas && pilih.value === '__baru' && !kelasBaru.value) kelasBaru.value = r.kelas;

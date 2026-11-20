@@ -32,7 +32,7 @@ judul_baris('Ujian online');
   <?php foreach (['buka' => 'Berjalan', 'draf' => 'Draf', 'tutup' => 'Selesai'] as $k => $n): ?><a href="?p=ujian&amp;st=<?= $k ?>" class="<?= $st === $k ? 'aktif' : '' ?>"><?= $n ?> (<?= $hitung[$k] ?>)</a><?php endforeach; ?>
 </nav>
 <ul class="daftar kartu">
-  <?php if (!$tampil): ?><li class="redup"><?= $daftar ? 'Tidak ada ujian di bagian ini.' : 'Belum ada ujian online.' ?></li><?php endif; ?>
+  <?php if (!$tampil): ?><?= $daftar ? '<li class="redup">Tidak ada ujian di bagian ini.</li>' : tuah_kosong('Belum ada ujian online', 'Buat ujian dari paket soal, lalu bagikan kodenya ke siswa.', ['?p=ujian_form', '＋ Buat ujian'], 'li') ?><?php endif; ?>
   <?php foreach ($tampil as $u): ?>
   <li><a href="?p=ujian_lihat&amp;id=<?= (int)$u['id'] ?>"><b><?= h($u['judul']) ?></b>
     <small>Kelas <?= h($u['kelas']) ?> · <?= (int)$u['durasi'] ?> menit · kode <b><?= h($u['kode']) ?></b></small>

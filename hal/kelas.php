@@ -30,7 +30,7 @@ judul_baris('Kelas & siswa', '<a class="tombol" href="?p=siswa_tambah">＋ Siswa
 
 <?php if (!$kelas): ?>
 <div class="kartu">
-  <h3 style="margin-top:0">Belum ada data siswa</h3>
+  <?= tuah_kosong('Belum ada data siswa') ?>
   <p>Isi daftar siswa per kelas dengan salah satu cara: <b>foto daftar hadir</b> (dibaca AI), <b>tempel daftar nama</b>, atau <b>impor Excel</b>.</p>
   <a class="tombol utama lebar" href="?p=siswa_tambah">＋ Tambah siswa</a>
 </div>

@@ -79,7 +79,8 @@
       kotak = D.createElement('div');
       kotak.className = 'sg-muat tak-cetak';
       kotak.setAttribute('role', 'status');
-      kotak.innerHTML = '<div class="sg-muat-isi"><div class="sg-lingkar">' + cincin('sg-cincin') + ikonRiau() + '</div>' +
+      // v1.75: TUAH melambai (cadangan: lingkaran ikon Riau bila tuah.js belum termuat)
+      kotak.innerHTML = '<div class="sg-muat-isi">' + (window.sgTuahDayung ? window.sgTuahDayung() : '<div class="sg-lingkar">' + cincin('sg-cincin') + ikonRiau() + '</div>') +
         '<div class="sg-muat-teks"><span></span><i></i><i></i><i></i></div></div>';
       D.body.appendChild(kotak);
     }
@@ -90,7 +91,9 @@
       clearTimeout(tunda); clearTimeout(batas);
       tunda = setTimeout(function () {
         if (!kotak) buat();
-        kotak.querySelector('.sg-muat-teks span').textContent = teks || 'Memuat';
+        var t = teks || 'Memuat';
+        if (window.sgTuahDayung) t = /^Memuat /.test(t) ? 'TUAH membuka ' + t.slice(7) : t === 'Menyimpan' ? 'TUAH sedang menyimpan' : t === 'Membuka' ? 'TUAH sedang membuka' : t;
+        kotak.querySelector('.sg-muat-teks span').textContent = t;
         kotak.classList.add('tampil');
       }, 300);
       batas = setTimeout(henti, 20000);

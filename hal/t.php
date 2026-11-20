@@ -101,6 +101,7 @@ kepala($t ? $t['judul'] : 'Tugas online', '', true);
       <div class="status-besar ok" id="status-besar"><div class="st-ikon">✓</div><div class="st-isi"><b>Tugas sudah terkirim</b>
         <span>Diterima guru · <?= h(ujian_waktu_teks($k['dikirim'])) ?><?= $k['telat'] ? ' · <b>terlambat</b>' : '' ?></span>
         <span><?= count($foto_lama) ?> foto · <?= tugas_dari_guru($k) ? 'diunggah oleh guru · atas nama <b>' . h($atas) . '</b>' : ($pengirim ? 'dikirim oleh <b>' . h($pengirim) . '</b>' : 'atas nama <b>' . h($atas) . '</b>') ?></span></div></div>
+      <?= tuah_balon('jempol', 'Mantap! Tugas' . ($kel_n ? ' kelompokmu' : 'mu') . ' sudah <b>masuk</b>. Simpan resinya, ya.') ?>
     <?php endif; ?>
     <?php if ($kel_n && trim((string)$k['teks']) !== ''): ?><div class="kartu kecil" style="white-space:pre-line"><span class="redup">Catatan kelompok:</span> <?= h($k['teks']) ?></div><?php endif; ?>
     <?php $resi = resi_tugas($tid, (string)$k['kode']);

@@ -51,7 +51,7 @@ judul_baris('Penilaian', '<a class="tombol" href="?p=nilai_rekap' . ($f ? '&amp;
 <form class="cari" method="get"><input type="hidden" name="p" value="penilaian">
   <select name="kelas" onchange="this.form.submit()"><option value="">Semua kelas</option><?= pilihan(array_combine($kelas_list, $kelas_list) ?: [], $f) ?></select></form>
 <ul class="daftar kartu">
-  <?php if (!$daftar): ?><li class="redup">Belum ada penilaian.</li><?php endif; ?>
+  <?php if (!$daftar): ?><?= tuah_kosong('Belum ada penilaian', 'Buat penilaian pertama di formulir atas, lalu isi nilainya per siswa.', null, 'li') ?><?php endif; ?>
   <?php foreach ($daftar as $d): ?>
     <li><a href="?p=nilai&amp;id=<?= (int)$d['id'] ?>"><b><?= h($d['judul']) ?></b>
       <small><?= h($d['jenis']) ?> · Kelas <?= h($d['kelas']) ?> · <?= h($d['mapel']) ?> · <?= tgl($d['tanggal']) ?></small>

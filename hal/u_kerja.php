@@ -38,9 +38,10 @@ if ($p['selesai']):
 <div class="siswa-wadah">
   <header class="siswa-kop tak-cetak"><img src="aset/logo.png" alt=""><div><small><?= h((string)k('sekolah', '')) ?></small><b><?= ujian_latihan($u) ? 'Latihan Soal' : 'Ujian Online' ?></b></div></header>
   <div class="kartu selesai-ujian tak-cetak">
-    <div class="ikon-selesai"><?= $p['alasan'] === 'pengaman' ? '🔒' : '✅' ?></div>
+    <?php if ($p['alasan'] === 'pengaman'): ?><div class="ikon-selesai">🔒</div><?php else: ?><div class="tuah" data-tuah="selesai" aria-hidden="true"></div><?php endif; ?>
     <h2><?= $p['alasan'] === 'pengaman' ? 'Jawaban dikumpulkan otomatis' : 'Jawaban terkumpul' ?></h2>
     <p><b><?= h($nama) ?></b><br><?= h($u['judul']) ?></p>
+    <?php if ($p['alasan'] !== 'pengaman'): ?><p class="terima-kasih">Terima kasih sudah mengerjakan dengan <b>jujur</b>!</p><?php endif; ?>
     <?php if ($p['alasan'] === 'pengaman'): ?><div class="pesan galat" style="text-align:left">Kamu keluar dari halaman ujian <?= (int)$p['keluar'] ?> kali, jadi jawabanmu dikumpulkan otomatis. Kalau ini tidak sengaja (HP mati, telepon masuk), minta guru menekan <b>Buka ulang</b>.</div><?php endif; ?>
     <p class="redup"><?= $n_jawab ?> dari <?= count($soal_semua) ?> soal dijawab · dikumpulkan pukul <?= h(substr((string)$p['selesai'], 11, 5)) ?><?= ujian_latihan($u) && (int)$p['percobaan'] > 1 ? ' · percobaan ke-' . (int)$p['percobaan'] : '' ?></p>
     <?php if ($lihat_nilai): ?>

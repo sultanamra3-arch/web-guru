@@ -183,7 +183,7 @@ if (!$d) {
     ?>
     <div class="kartu">
       <p style="margin-top:0">Paket: <b><?= h($paket['judul']) ?></b> · <?= count($soal) ?> soal</p>
-      <form method="post" class="formulir" onsubmit="var b=this.querySelector('button.utama');b.disabled=true;b.textContent='⏳ AI sedang menyusun kisi-kisi (±30 detik)…';">
+      <form method="post" class="formulir" data-ai="tulis" data-ai-judul="TUAH sedang menyusun kisi-kisi" data-ai-langkah="Membaca soal-soal|Menentukan indikator & level|Menyusun kisi-kisi" data-ai-detik="35" onsubmit="var b=this.querySelector('button.utama');b.disabled=true;b.textContent='⏳ AI sedang menyusun kisi-kisi (±30 detik)…';">
         <?= input_token() ?><input type="hidden" name="aksi" value="buat">
         <label class="centang"><input type="checkbox" name="pakai_ai" value="1" <?= ai_siap() ? 'checked' : 'disabled' ?>> Isi materi, indikator, dan level dengan AI<?= ai_siap() ? '' : ' (AI belum aktif)' ?></label>
         <button class="utama lebar"><?= ikon('kisi') ?> Buat kisi-kisi</button>
@@ -242,7 +242,7 @@ kepala($d['judul'], 'perangkat');
 
 <div class="kartu tak-cetak aksi-kisi">
   <?php if ($paket): ?>
-  <form method="post" onsubmit="var b=this.querySelector('button');b.disabled=true;b.textContent='⏳ AI sedang menyusun…';"><?= input_token() ?><input type="hidden" name="aksi" value="ai"><button class="kecil" <?= ai_siap() ? '' : 'disabled' ?>>✨ Isi ulang dengan AI</button></form>
+  <form method="post" data-ai="tulis" data-ai-judul="TUAH sedang menyusun kisi-kisi" data-ai-langkah="Membaca soal-soal|Menentukan indikator & level|Menyusun kisi-kisi" data-ai-detik="35" onsubmit="var b=this.querySelector('button');b.disabled=true;b.textContent='⏳ AI sedang menyusun…';"><?= input_token() ?><input type="hidden" name="aksi" value="ai"><button class="kecil" <?= ai_siap() ? '' : 'disabled' ?>>✨ Isi ulang dengan AI</button></form>
   <form method="post"><?= input_token() ?><input type="hidden" name="aksi" value="segarkan"><button class="kecil" title="Bila soal di paket diubah/ditambah">↻ Sesuaikan dengan paket</button></form>
   <?php endif; ?>
   <form method="post" onsubmit="return confirm('Hapus kisi-kisi ini?\nBisa dikembalikan dari Sampah (Lainnya → Sampah) selama 30 hari.')"><?= input_token() ?><input type="hidden" name="aksi" value="hapus"><button class="kecil bahaya">Hapus</button></form>

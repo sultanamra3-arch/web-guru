@@ -90,13 +90,20 @@
   var t = document.querySelector('input[name=_t]').value;
   btn.addEventListener('click', function () {
     btn.disabled = true;
-    var i = 0, gagal = 0;
+    var i = 0, gagal = 0, pesanGagal = '';
+    var ai = window.sgAI && sgAI.mulai({ gaya: 'nilai', judul: 'TUAH sedang menilai uraian', langkah: ['Membaca jawaban siswa', 'Mencocokkan dengan rubrik', 'Menyusun skor'], detik: 20 * kode.length });
     (function lanjut() {
-      if (i >= kode.length) { st.textContent = '✅ Selesai' + (gagal ? ' (' + gagal + ' gagal, coba lagi nanti)' : '') + '. Memuat ulang…'; setTimeout(function () { location.reload(); }, 1200); return; }
+      if (i >= kode.length) {
+        st.textContent = '✅ Selesai' + (gagal ? ' (' + gagal + ' gagal, coba lagi nanti)' : '') + '. Memuat ulang…';
+        var akhir = !ai ? Promise.resolve() : (gagal && gagal === kode.length ? ai.gagal(pesanGagal) : ai.selesai(gagal ? 'Selesai, ' + gagal + ' belum berhasil' : 'Selesai!'));
+        akhir.then(function () { setTimeout(function () { location.reload(); }, 300); });
+        return;
+      }
       st.textContent = '⏳ Menilai ' + (i + 1) + ' dari ' + kode.length + '…';
+      if (ai) ai.teks('Menilai siswa ' + (i + 1) + ' dari ' + kode.length).kemajuan(i / kode.length);
       var fd = new FormData(); fd.append('_t', t); fd.append('aksi', 'nilai_ai'); fd.append('id', id); fd.append('kode', kode[i]);
       fetch('?p=api_ujian', { method: 'POST', body: fd, credentials: 'same-origin' }).then(function (r) { return r.json(); })
-        .then(function (r) { if (!r.ok) gagal++; }).catch(function () { gagal++; })
+        .then(function (r) { if (!r.ok) { gagal++; pesanGagal = r.galat || pesanGagal; } }).catch(function () { gagal++; })
         .then(function () { i++; lanjut(); });
     })();
   });

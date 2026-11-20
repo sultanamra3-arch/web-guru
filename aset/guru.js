@@ -121,7 +121,8 @@
       var d = dataForm(fs); d.aksi = 'buat_soal'; d.foto = ambilFotoSoal();
       btn.disabled = true;
       var t = jamTunggu(st, '⏳ AI sedang menyusun soal…');
-      kirimAI(fs.dataset.token, d).then(function (r) {
+      var ai = window.sgAI && sgAI.mulai({ gaya: 'tulis', judul: 'TUAH sedang menyusun soal', langkah: ['Memahami topik & kelas', 'Menyusun soal dan pilihan', 'Memeriksa kunci jawaban'], detik: Math.min(120, 15 + 3 * (hitungTotal ? hitungTotal() : 10)) });
+      kirimAI(fs.dataset.token, d).then(window.sgAI ? sgAI.akhiri(ai) : function (r) { return r; }).then(function (r) {
         clearInterval(t); btn.disabled = false;
         if (!r.ok) { tampilGalat(st, r); return; }
         var hit = {}; r.soal.forEach(function (s) { hit[s.tipe] = (hit[s.tipe] || 0) + 1; });
@@ -160,7 +161,9 @@
       var d = dataForm(fd); d.aksi = 'buat_dokumen'; d.jenis = fd.dataset.jenis; d.foto = ambilFotoDok();
       bd.disabled = true;
       var t = jamTunggu(std, '⏳ AI sedang menyusun (biasanya 20–90 detik, jangan tutup halaman)…');
-      kirimAI(fd.dataset.token, d).then(function (r) {
+      var NAMA = { modul: 'modul ajar', lkpd: 'LKPD', presentasi: 'presentasi', paket: 'paket soal', kisi: 'kisi-kisi' };
+      var ai = window.sgAI && sgAI.mulai({ gaya: 'tulis', judul: 'TUAH sedang menyusun ' + (NAMA[d.jenis] || 'dokumen'), langkah: ['Memahami topik & kelas', 'Menyusun tujuan & kegiatan', 'Merapikan isi'], detik: 60 });
+      kirimAI(fd.dataset.token, d).then(window.sgAI ? sgAI.akhiri(ai) : function (r) { return r; }).then(function (r) {
         clearInterval(t);
         if (!r.ok) { bd.disabled = false; tampilGalat(std, r); return; }
         std.textContent = '✅ Selesai (' + r.oleh + '). Membuka…';
@@ -176,7 +179,8 @@
       if (!fr.elements.perintah.value.trim()) return;
       b.disabled = true;
       var t = jamTunggu(st2, '⏳ Merevisi…');
-      kirimAI(fr.dataset.token, { aksi: 'revisi', id: fr.dataset.id, perintah: fr.elements.perintah.value }).then(function (r) {
+      var ai = window.sgAI && sgAI.mulai({ gaya: 'tulis', judul: 'TUAH sedang merevisi', langkah: ['Membaca perintahmu', 'Mengubah isi', 'Merapikan kembali'], detik: 40 });
+      kirimAI(fr.dataset.token, { aksi: 'revisi', id: fr.dataset.id, perintah: fr.elements.perintah.value }).then(window.sgAI ? sgAI.akhiri(ai) : function (r) { return r; }).then(function (r) {
         clearInterval(t); b.disabled = false;
         if (!r.ok) { tampilGalat(st2, r); return; }
         location.reload();

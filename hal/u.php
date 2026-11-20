@@ -126,6 +126,7 @@ kepala($u ? $u['judul'] : 'Masuk ujian', '', true);
   <form method="post" class="kartu tata-tertib">
     <?= input_token() ?><input type="hidden" name="k" value="<?= h($u['kode']) ?>"><input type="hidden" name="aksi" value="mulai">
     <p style="margin:0 0 .4rem">Halo, <b><?= h(nama_siswa((string)$siap['kode'])) ?></b> 👋</p>
+    <?= tuah_balon('tertib', 'Baca <b>tata tertib</b> di bawah dulu, ya. Kerjakan dengan jujur!') ?>
     <h3 style="margin:0 0 .2rem">📋 Tata tertib <?= ujian_latihan($u) ? 'latihan' : 'ujian' ?></h3>
     <p class="kecil redup" style="margin:0 0 .3rem">Baca dulu sampai selesai ya.</p>
     <ol class="poin-tertib"><?php foreach (ujian_tata_tertib($u) as $t): ?><li><?= $t ?></li><?php endforeach; ?></ol>

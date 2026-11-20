@@ -165,7 +165,7 @@ if ($tindak):
   </details>
   <?php endif; ?>
   <?php if (!$selesai): ?><p class="redup kecil">Muncul setelah ada siswa yang selesai.</p><?php else: ?>
-  <form method="post" class="tindak-blok">
+  <form method="post" class="tindak-blok" data-ai="tulis" data-ai-judul="TUAH sedang menyiapkan latihan remedial" data-ai-langkah="Melihat soal yang banyak salah|Menyusun soal latihan|Membuka latihan untuk siswa" data-ai-detik="45">
     <?= input_token() ?><input type="hidden" name="aksi" value="remedial">
     <b>🔁 Remedial: <?= count($rem) ?> siswa di bawah <?= $kktp + 0 ?></b>
     <?php if ($rem): ?>
@@ -180,7 +180,7 @@ if ($tindak):
     <p class="kecil redup">Isi: soal yang paling banyak dijawab salah oleh siswa remedial. Hanya siswa di atas yang bisa masuk; tanpa token, boleh diulang, dipakai nilai terbaik.</p>
     <?php else: ?><p class="kecil redup">Semua siswa yang selesai sudah tuntas. 🎉</p><?php endif; ?>
   </form>
-  <form method="post" class="tindak-blok">
+  <form method="post" class="tindak-blok" data-ai="tulis" data-ai-judul="TUAH sedang menyiapkan soal pengayaan" data-ai-langkah="Melihat kemampuan siswa|Menyusun soal HOTS|Membuka latihan untuk siswa" data-ai-detik="45">
     <?= input_token() ?><input type="hidden" name="aksi" value="pengayaan"><input type="hidden" name="kktp" value="<?= $kktp + 0 ?>">
     <b>⭐ Pengayaan: <?= count($kaya) ?> siswa dengan nilai ≥ <?= $batas_kaya + 0 ?></b>
     <span class="kecil"><a href="?p=ujian_hasil&amp;id=<?= $id ?>&amp;kaya=<?= $batas_kaya >= 90 ? 85 : 90 ?>">ubah batas ke <?= $batas_kaya >= 90 ? 85 : 90 ?></a></span>
