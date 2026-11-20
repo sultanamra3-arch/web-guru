@@ -13,6 +13,7 @@ Ciri:
 - Notifikasi (APK 1.5): `Periksa.java` (JobScheduler tiap ±15 menit) → `?p=api_notif`; kunci diterima lewat `SiGuruApp.notif(kunci, dasar)` dari kaki halaman SiGuru. Ketuk notifikasi → membuka alamatnya (extra `buka`).
 - `window.print()` diarahkan ke layanan cetak Android (bisa "Simpan sebagai PDF").
 - Unggah foto/berkas (kamera & galeri), kamera untuk pemindai (getUserMedia), unduhan lewat DownloadManager.
+- Tanpa internet (APK 1.6): layar "Sinyal sedang hujan" dengan TUAH berpayung (`assets/tuah-payung.webp`), buka ulang otomatis saat internet kembali (`ConnectivityManager` callback), sebab galat ditulis kecil.
 - Bila aplikasi sempat tertutup sendiri, pesan galatnya tampil saat dibuka lagi (untuk dikirim ke Claude).
 - Paket `id.my.otomasismpn6keritang.siguruadmin`, nama aktivitas tetap `LauncherActivity` agar ikon lama tetap jalan.
 

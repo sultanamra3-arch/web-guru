@@ -1,7 +1,7 @@
 /* SiGuru: simpan berkas tampilan di HP; halaman diambil dari server (data terbaru).
    v1.68: halaman guru yang pernah dibuka disimpan di HP → tetap bisa dilihat tanpa sinyal;
           layar pembuka (logo → ikon Riau) saat aplikasi baru dibuka. */
-const CACHE = 'siguru-v1.75';
+const CACHE = 'siguru-v1.76';
 const HALAMAN = 'siguru-halaman';
 const V = CACHE.replace('siguru-v', '');
 const ASET = [
