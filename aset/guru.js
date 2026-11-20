@@ -1,6 +1,11 @@
 (function () {
   'use strict';
-  if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  // v1.70: catat galat pemasangan penyimpanan offline (ditampilkan di kaki halaman, lihat gerak.js)
+  if ('serviceWorker' in navigator) window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js')
+      .then(function () { try { localStorage.removeItem('sg-sw-galat'); } catch (x) { /* abaikan */ } })
+      .catch(function (e) { try { localStorage.setItem('sg-sw-galat', String((e && e.message) || e).slice(0, 120)); } catch (x) { /* abaikan */ } });
+  });
 
   /* Garis muat & animasi loading: lihat aset/gerak.js (v1.68) */
 

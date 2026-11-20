@@ -381,6 +381,27 @@
     });
   }
 
+  /* ---------- 6. Keterangan penyimpanan offline di kaki halaman (v1.70, untuk memeriksa di HP) ---------- */
+  (function () {
+    var f = $('footer.bawah');
+    if (!f) return;
+    var s = D.createElement('span');
+    s.className = 'sg-diag';
+    f.appendChild(s);
+    function tulis(t) { s.textContent = ' · offline: ' + t; }
+    var galat = '';
+    try { galat = localStorage.getItem('sg-sw-galat') || ''; } catch (e) { /* abaikan */ }
+    if (!('serviceWorker' in navigator)) { tulis('tidak didukung HP ini'); return; }
+    navigator.serviceWorker.getRegistration().then(function (r) {
+      if (!r) { tulis('belum terpasang' + (galat ? ' (' + galat + ')' : '')); return; }
+      var aktif = navigator.serviceWorker.controller ? 'aktif' : (r.active ? 'terpasang, buka ulang aplikasi' : 'sedang dipasang');
+      if (!window.caches) { tulis(aktif + ' · tanpa simpanan'); return; }
+      caches.open('siguru-halaman').then(function (c) { return c.keys(); })
+        .then(function (k) { tulis(aktif + ' · ' + k.length + ' halaman tersimpan'); })
+        .catch(function (e) { tulis(aktif + ' · simpanan galat: ' + ((e && e.message) || e)); });
+    }).catch(function (e) { tulis('galat: ' + ((e && e.message) || e)); });
+  })();
+
   /* ---------- mulai ---------- */
   aturStatus();
   var tt = sesiAmbil('sg-toast');
