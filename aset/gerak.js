@@ -394,7 +394,7 @@
     if (!('serviceWorker' in navigator)) { tulis('tidak didukung HP ini'); return; }
     navigator.serviceWorker.getRegistration().then(function (r) {
       if (!r) { tulis('belum terpasang' + (galat ? ' (' + galat + ')' : '')); return; }
-      var aktif = navigator.serviceWorker.controller ? 'aktif' : (r.active ? 'terpasang, buka ulang aplikasi' : 'sedang dipasang');
+      var aktif = navigator.serviceWorker.controller ? 'aktif' : (r.active ? 'terpasang, buka ulang aplikasi' : r.installing ? 'sedang dipasang' : r.waiting ? 'menunggu' : 'gagal dipasang');
       if (!window.caches) { tulis(aktif + ' · tanpa simpanan'); return; }
       caches.open('siguru-halaman').then(function (c) { return c.keys(); })
         .then(function (k) { tulis(aktif + ' · ' + k.length + ' halaman tersimpan'); })

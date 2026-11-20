@@ -1,7 +1,7 @@
 /* SiGuru: simpan berkas tampilan di HP; halaman diambil dari server (data terbaru).
    v1.68: halaman guru yang pernah dibuka disimpan di HP → tetap bisa dilihat tanpa sinyal;
           layar pembuka (logo → ikon Riau) saat aplikasi baru dibuka. */
-const CACHE = 'siguru-v1.70';
+const CACHE = 'siguru-v1.71';
 const HALAMAN = 'siguru-halaman';
 const V = CACHE.replace('siguru-v', '');
 const ASET = [
@@ -16,7 +16,10 @@ const JANGAN_SIMPAN = /^(api_|keluar$|masuk$|beralih$|apk$|ke_pustaka$|sso$|gamb
 const MAKS_HALAMAN = 80;
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASET)).then(() => self.skipWaiting()));
+  // v1.71: satu berkas gagal diambil (mis. diblokir hosting) tidak boleh menggagalkan seluruh pemasangan
+  e.waitUntil(caches.open(CACHE)
+    .then(c => Promise.all(ASET.map(u => c.add(new Request(u, { cache: 'reload' })).catch(() => null))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
