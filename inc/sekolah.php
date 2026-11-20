@@ -78,3 +78,21 @@ function sso_alamat_sipustaka(): string
     $isi['s'] = hash_hmac('sha256', $isi['u'] . '|' . $isi['t'] . '|' . $isi['n'], $kunci);
     return $dasar . '?p=sso&' . http_build_query($isi);
 }
+
+/**
+ * v1.74: Alamat SLiMS yang langsung masuk (berlaku 60 detik, sekali pakai), memakai kunci bersama yang sama.
+ * Butuh berkas `siguru-masuk.php` di folder SLiMS (dari repo: pasang/slims/). Belum terpasang → alamat SLiMS biasa.
+ */
+function sso_alamat_slims(): string
+{
+    $biasa = sekolah_url('url_slims', APLIKASI_SEKOLAH[1][4]);
+    $folder = rtrim((string)k('slims_folder', '/home/bzydmpxm/public_html'), '/');
+    $kunci = sso_kunci();
+    $akun = sso_akun_slims();
+    if (!adalah_admin() || !$kunci || $akun === '' || !is_file($folder . '/siguru-masuk.php')) return $biasa;
+    $p = parse_url((string)k('url_slims', APLIKASI_SEKOLAH[1][4]));
+    $dasar = (string)k('url_slims_masuk', ($p['scheme'] ?? 'https') . '://' . ($p['host'] ?? 'otomasismpn6keritang.my.id') . (isset($p['port']) ? ':' . $p['port'] : '') . '/siguru-masuk.php');
+    $isi = ['u' => $akun, 't' => (string)time(), 'n' => bin2hex(random_bytes(8))];
+    $isi['s'] = hash_hmac('sha256', 'slims|' . $isi['u'] . '|' . $isi['t'] . '|' . $isi['n'], $kunci);
+    return $dasar . '?' . http_build_query($isi);
+}

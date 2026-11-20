@@ -1,7 +1,7 @@
 /* SiGuru: simpan berkas tampilan di HP; halaman diambil dari server (data terbaru).
    v1.68: halaman guru yang pernah dibuka disimpan di HP → tetap bisa dilihat tanpa sinyal;
           layar pembuka (logo → ikon Riau) saat aplikasi baru dibuka. */
-const CACHE = 'siguru-v1.73';
+const CACHE = 'siguru-v1.74';
 const HALAMAN = 'siguru-halaman';
 const V = CACHE.replace('siguru-v', '');
 const ASET = [
@@ -12,7 +12,7 @@ const ASET = [
 // halaman siswa & tamu: tidak disimpan, tanpa layar pembuka
 const HAL_SISWA = ['u', 'u_kerja', 'gambar', 't', 'tugas_foto', 'k', 'resi'];
 // halaman yang tidak disimpan di HP
-const JANGAN_SIMPAN = /^(api_|keluar$|masuk$|beralih$|apk$|ke_pustaka$|sso$|gambar$|tugas_foto$|presentasi$|.*_cetak$)/;
+const JANGAN_SIMPAN = /^(api_|keluar$|masuk$|beralih$|apk$|ke_pustaka$|ke_slims$|sso$|gambar$|tugas_foto$|presentasi$|.*_cetak$)/;
 const MAKS_HALAMAN = 80;
 
 self.addEventListener('install', e => {
