@@ -96,7 +96,7 @@
   });
   window.addEventListener('pageshow', function (e) {
     Muat.henti();
-    if (e.persisted) $$('.sg-pindah').forEach(function (x) { x.remove(); });
+    if (e.persisted) { $$('.sg-pindah').forEach(function (x) { x.remove(); }); sedangPindah = false; }
   });
   window.addEventListener('pagehide', function () { setTimeout(Muat.henti, 0); });
 
@@ -139,13 +139,21 @@
     });
   })();
 
-  /* ---------- 3. Pindah aplikasi (SiPustaka, SLiMS, Kartu, Buku tamu, Katalog) ---------- */
+  /* ---------- 3. Pindah aplikasi (SiPustaka, SLiMS, Kartu, Buku tamu, Katalog) ----------
+     v1.69: aplikasi tujuan baru dibuka saat layar navy mulai menutup (2,2 detik),
+     agar animasi tidak terpotong / terasa terburu-buru. */
+  var sedangPindah = false;
   D.addEventListener('click', function (e) {
     if (!tombolBiasa(e)) return;
     var a = e.target.closest && e.target.closest('a[data-ke-aplikasi]');
     if (!a || REDUKSI) return;
+    e.preventDefault();
+    if (sedangPindah) return;
+    sedangPindah = true;
+    var tujuan = a.href;
+    setTimeout(function () { location.href = tujuan; }, 2200);
+    setTimeout(function () { sedangPindah = false; }, 5000);
     setTimeout(function () {
-      if (e.defaultPrevented) return;
       var tuju = APLIKASI[a.getAttribute('data-ke-aplikasi')] || APLIKASI.sipustaka, nama = a.getAttribute('data-nama') || 'aplikasi';
       var o = D.createElement('div');
       o.className = 'sg-pindah tak-cetak';

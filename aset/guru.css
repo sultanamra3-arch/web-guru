@@ -1005,23 +1005,24 @@ main.sg-dari-kiri>*{animation:sg-masuk-kiri-k .42s cubic-bezier(.2,0,0,1)}
 /* Pindah aplikasi: ikon SiGuru → ikon tujuan → layar navy */
 .sg-pindah{position:fixed;inset:0;z-index:200;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;overflow:hidden;animation:sg-muncul .2s ease-out}
 .sg-pindah-lingkar{position:relative;width:150px;height:150px}
-.sg-pindah .sg-cincin{animation:sg-putar-cepat 1.8s cubic-bezier(.65,0,.35,1) forwards}
-@keyframes sg-putar-cepat{0%{transform:rotate(0)}30%{transform:rotate(200deg)}55%{transform:rotate(720deg)}100%{transform:rotate(900deg)}}
+/* v1.69: lebih tenang — cincin berputar pelan & rata, urutan 2,4 detik */
+.sg-pindah .sg-cincin{animation:sg-putar 2.4s linear infinite}
+.sg-pindah .sg-cincin .ekor{animation-duration:2.4s}
 .sg-pindah svg.asal,.sg-pindah svg.tuju{position:absolute;left:25%;top:25%;width:50%;height:50%}
-.sg-pindah svg.asal path{animation:sg-asal 1.8s cubic-bezier(.65,0,.35,1) forwards}
-.sg-pindah svg.tuju path{animation:sg-tuju 1.8s cubic-bezier(.65,0,.35,1) forwards}
-@keyframes sg-asal{0%{stroke-dashoffset:1.01}25%,38%{stroke-dashoffset:0}52%,100%{stroke-dashoffset:-1.01}}
-@keyframes sg-tuju{0%,52%{stroke-dashoffset:1.01}78%,100%{stroke-dashoffset:0}}
+.sg-pindah svg.asal path{animation:sg-asal 2.4s cubic-bezier(.65,0,.35,1) forwards}
+.sg-pindah svg.tuju path{animation:sg-tuju 2.4s cubic-bezier(.65,0,.35,1) forwards}
+@keyframes sg-asal{0%{stroke-dashoffset:1.01}22%,34%{stroke-dashoffset:0}46%,100%{stroke-dashoffset:-1.01}}
+@keyframes sg-tuju{0%,48%{stroke-dashoffset:1.01}70%,100%{stroke-dashoffset:0}}
 .sg-pindah-nama{position:relative;height:1.4rem;width:100%;text-align:center;color:var(--navy2);font-weight:700}
 .sg-pindah-nama span{position:absolute;left:0;right:0;opacity:0}
-.sg-pindah-nama .a{animation:sg-nama-a 1.8s cubic-bezier(.65,0,.35,1) forwards}
-.sg-pindah-nama .b{animation:sg-nama-b 1.8s cubic-bezier(.65,0,.35,1) forwards}
-@keyframes sg-nama-a{0%{opacity:0;letter-spacing:6px}18%,38%{opacity:1;letter-spacing:.5px}48%,100%{opacity:0}}
-@keyframes sg-nama-b{0%,50%{opacity:0;letter-spacing:6px}68%,100%{opacity:1;letter-spacing:.5px}}
+.sg-pindah-nama .a{animation:sg-nama-a 2.4s cubic-bezier(.65,0,.35,1) forwards}
+.sg-pindah-nama .b{animation:sg-nama-b 2.4s cubic-bezier(.65,0,.35,1) forwards}
+@keyframes sg-nama-a{0%{opacity:0;letter-spacing:6px}16%,34%{opacity:1;letter-spacing:.5px}44%,100%{opacity:0}}
+@keyframes sg-nama-b{0%,48%{opacity:0;letter-spacing:6px}66%,100%{opacity:1;letter-spacing:.5px}}
 .sg-pindah-tirai{position:absolute;left:50%;top:50%;width:300vmax;height:300vmax;margin:-150vmax 0 0 -150vmax;border-radius:50%;background:var(--navy);
-  transform:scale(0);animation:sg-tirai .7s cubic-bezier(.65,0,.35,1) 1.5s forwards}
+  transform:scale(0);animation:sg-tirai .8s cubic-bezier(.65,0,.35,1) 2.3s forwards}
 @keyframes sg-tirai{to{transform:scale(1)}}
-.sg-pindah-akhir{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;color:#fff;opacity:0;animation:sg-muncul .35s 2s forwards}
+.sg-pindah-akhir{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;color:#fff;opacity:0;animation:sg-muncul .4s 2.85s forwards}
 .sg-pindah-akhir b{font-size:1.5rem;letter-spacing:.02em}
 .sg-pindah-akhir small{display:flex;align-items:center;gap:4px;color:var(--sky);font-size:.85rem}
 .sg-pindah-akhir small i{margin-left:1px}
