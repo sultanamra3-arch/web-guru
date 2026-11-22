@@ -1187,3 +1187,7 @@ main.sg-dari-kiri>*{animation:sg-masuk-kiri-k .42s cubic-bezier(.2,0,0,1)}
 .tombol-tuah:focus-visible{outline:3px solid #F2C230;outline-offset:2px}
 .tombol-tuah:disabled{background:#B7BCD3;box-shadow:none;cursor:not-allowed}.tombol-tuah:disabled img{filter:grayscale(1);opacity:.7}.tombol-tuah:disabled small,.tombol-tuah:disabled i{color:#EEF1F8}
 @media print{.tombol-tuah{display:none}}
+/* v1.78 · Jadwal mingguan: jam mulai–selesai */
+.tabel-minggu td.kol-jam{white-space:nowrap}
+.tabel-minggu td.kol-jam small{font-size:.68rem;font-weight:600;color:var(--redup);line-height:1.25;margin-top:.15rem}
+.tabel-minggu .wkt-beda{display:block;font-size:.62rem;font-weight:700;color:#B07D0F;white-space:nowrap;margin-bottom:.1rem}

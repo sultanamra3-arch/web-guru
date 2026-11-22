@@ -108,10 +108,16 @@ judul_baris('Jadwal pelajaran', '<button type="button" class="tombol" onclick="w
   <div class="geser-x"><table class="tabel tabel-minggu">
     <tr><th>Jam</th><?php foreach (HARI as $nm): ?><th><?= $nm ?></th><?php endforeach; ?></tr>
     <?php $maks = max(array_map(fn($h) => max(array_keys(jam_hari($h)) ?: [0]), array_keys(HARI)));
-    for ($ke = 1; $ke <= $maks; $ke++): ?>
-    <tr><td><b><?= $ke ?></b></td>
-      <?php foreach (HARI as $no => $_): $j = $ada[$no][$ke] ?? null; ?>
-      <td class="<?= $j ? 'isi' : '' ?>"><?= $j ? h($j['kelas']) . '<small>' . h($j['mapel']) . '</small>' : '' ?></td>
+    $jam_tiap = []; foreach (array_keys(HARI) as $no) $jam_tiap[$no] = jam_hari($no);
+    for ($ke = 1; $ke <= $maks; $ke++):
+      // v1.78: jam mulai–selesai. Kolom Jam = jam yang paling banyak dipakai; hari yang berbeda (mis. Jumat) ditulis di selnya.
+      $hit = [];
+      foreach ($jam_tiap as $jh) if (isset($jh[$ke]) && $jh[$ke][0]) { $w = $jh[$ke][0] . '–' . $jh[$ke][1]; $hit[$w] = ($hit[$w] ?? 0) + 1; }
+      arsort($hit); $umum = (string)(array_key_first($hit) ?? ''); ?>
+    <tr><td class="kol-jam"><b><?= $ke ?></b><?= $umum !== '' ? '<small>' . str_replace('–', '–<br>', h($umum)) . '</small>' : '' ?></td>
+      <?php foreach (HARI as $no => $_): $j = $ada[$no][$ke] ?? null;
+        $w = isset($jam_tiap[$no][$ke]) && $jam_tiap[$no][$ke][0] ? $jam_tiap[$no][$ke][0] . '–' . $jam_tiap[$no][$ke][1] : ''; ?>
+      <td class="<?= $j ? 'isi' : '' ?>"><?= $j ? ($w !== '' && $w !== $umum ? '<span class="wkt-beda">' . h($w) . '</span>' : '') . h($j['kelas']) . '<small>' . h($j['mapel']) . '</small>' : '' ?></td>
       <?php endforeach; ?></tr>
     <?php endfor; ?>
   </table></div>
