@@ -1176,3 +1176,14 @@ main.sg-dari-kiri>*{animation:sg-masuk-kiri-k .42s cubic-bezier(.2,0,0,1)}
 .gelembung.ada-tuah{display:flex;align-items:center;gap:.5rem}
 .tuah-chat{width:46px;flex:none}
 .tuah-balon[hidden],.kosong-tuah[hidden]{display:none}
+/* v1.78 · Tombol AI bergaya kartu TUAH (Nilai ulang dengan AI) */
+.tombol-tuah{display:flex;align-items:center;gap:.7rem;width:100%;max-width:420px;border:0;border-radius:16px;padding:.45rem .9rem .45rem .45rem;background:linear-gradient(120deg,#2A2C84,#3A3FB0);color:#fff;font:inherit;text-align:left;cursor:pointer;box-shadow:0 4px 12px rgba(42,44,132,.25);transition:transform .15s ease,box-shadow .15s ease}
+.tombol-tuah img{width:52px;height:52px;flex:none;border-radius:12px;background:#F2C230;object-fit:cover}
+.tombol-tuah span{flex:1;min-width:0}
+.tombol-tuah b{display:block;font-size:1rem;line-height:1.25}
+.tombol-tuah small{display:block;color:#F2C230;font-size:.8rem;font-weight:600;margin-top:.1rem}
+.tombol-tuah i{font-style:normal;font-size:1.5rem;color:#F2C230;line-height:1}
+.tombol-tuah:active{transform:scale(.98);box-shadow:0 2px 6px rgba(42,44,132,.25)}
+.tombol-tuah:focus-visible{outline:3px solid #F2C230;outline-offset:2px}
+.tombol-tuah:disabled{background:#B7BCD3;box-shadow:none;cursor:not-allowed}.tombol-tuah:disabled img{filter:grayscale(1);opacity:.7}.tombol-tuah:disabled small,.tombol-tuah:disabled i{color:#EEF1F8}
+@media print{.tombol-tuah{display:none}}

@@ -57,7 +57,7 @@ judul_baris(h(tugas_nama_kirim($kode)), '<a class="tombol" href="?p=tugas_lihat&
 <div class="kartu saran-ai" id="kotak-saran" data-id="<?= $id ?>" data-kode="<?= h($kode) ?>" data-saran="<?= h(json_encode($saran ?: null, JSON_UNESCAPED_UNICODE)) ?>">
   <div id="isi-saran"></div>
   <div class="saran-tombol">
-    <button type="button" class="kecil" id="minta-saran" <?= ai_siap() ? '' : 'disabled' ?>><?= $saran ? '↻ Nilai ulang dengan AI' : '✨ Minta saran nilai dari AI' ?></button>
+    <button type="button" class="tombol-tuah" id="minta-saran" <?= ai_siap() ? '' : 'disabled' ?>><img src="aset/tuah/wajah-nilai.webp?v=<?= VERSI ?>" alt="" width="52" height="52"><span><b><?= $saran ? 'Nilai ulang dengan AI' : 'Minta saran nilai dari AI' ?></b><small><?= $saran ? 'TUAH periksa lagi jawabannya' : 'TUAH bantu menilai jawaban' ?></small></span><i aria-hidden="true">›</i></button>
     <small class="redup"><?= ai_siap() ? (trim((string)$t['kunci']) !== '' ? 'memakai kunci/rubrik tugas' : 'tanpa kunci: dinilai dari kelengkapan & ketepatan') : 'AI belum aktif' ?></small>
   </div>
   <details class="pesan-ai"<?= $saran ? '' : ' hidden' ?>><summary class="kecil">Beri pesan ke AI sebelum menilai ulang (opsional)</summary>
@@ -113,7 +113,7 @@ judul_baris(h(tugas_nama_kirim($kode)), '<a class="tombol" href="?p=tugas_lihat&
       if (!r.ok) { st.textContent = '⚠ ' + (r.galat || 'gagal'); return; }
       st.textContent = ulang ? '✓ Sudah dinilai ulang — nilai & komentar di bawah diganti dengan saran baru.' : '';
       tampil(r);
-      b.textContent = '↻ Nilai ulang dengan AI';
+      b.querySelector('b').textContent = 'Nilai ulang dengan AI'; b.querySelector('small').textContent = 'TUAH periksa lagi jawabannya';
       var d = k.querySelector('.pesan-ai'); if (d) d.hidden = false;
       var n = document.getElementById('isi-nilai'), c = document.getElementById('isi-komentar');
       if (ulang || !n.value) n.value = r.nilai;
